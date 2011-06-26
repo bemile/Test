@@ -30,8 +30,26 @@ int StatusMonitor::ConnectServer() {
 	}
 	else {
 		isConnected = true;
+		SendNodeName();
 		return 1;
 	}
+}
+
+
+int StatusMonitor::SendNodeName() {
+	struct utsname host_name;
+	uname(&host_name);
+	SendMessage(NODE_NAME, host_name.nodename);
+
+}
+
+int StatusMonitor::StartClients() {
+	if (!isConnected)
+		return -1;
+
+	CommandExecClient comm_exec_client(sockfd);
+	comm_exec_client.Start();
+
 }
 
 
@@ -58,4 +76,3 @@ int StatusMonitor::SendMessage(int msg_type, string msg) {
 	else
 		return 1;
 }
-

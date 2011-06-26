@@ -34,14 +34,7 @@ int main(int argc, char** argv) {
 	if (serv_addr.length() > 0) {
 		StatusMonitor monitor(serv_addr, atoi(port.c_str()));
 		monitor.ConnectServer();
-
-		// Send node name
-		struct utsname host_name;
-		uname(&host_name);
-		monitor.SendMessage(NODE_NAME, host_name.nodename);
-
-		// Send normal message
-		monitor.SendMessage(INFORMATIONAL, "Hello server.");
+		monitor.StartClients();
 	}
 
 	return 0;
