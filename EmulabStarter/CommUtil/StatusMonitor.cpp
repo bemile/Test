@@ -35,18 +35,17 @@ int StatusMonitor::ConnectServer() {
 }
 
 
-int StatusMonitor::SendMessage(string msg) {
+int StatusMonitor::SendMessage(int msg_type, string msg) {
 	if (!isConnected)
 		return -1;
 
-	int type = 1;
-	int length = msg.length();
 	int res;
-	if ( (res = write(sockfd, &type, sizeof(type))) < 0) {
+	if ( (res = write(sockfd, &msg_type, sizeof(msg_type))) < 0) {
 		cout << "Error sending message. " << endl;
 		return -1;
 	}
 
+	int length = msg.length();
 	if ( (res = write(sockfd, &length, sizeof(length))) < 0) {
 		cout << "Error sending message. " << endl;
 		return -1;

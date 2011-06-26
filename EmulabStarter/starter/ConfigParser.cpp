@@ -57,7 +57,7 @@ map<string, string> ConfigParser::GetParamSet() {
 	return param_set;
 }
 
-string ConfigParser::GetValue(char* param) {
+string ConfigParser::GetValue(string param) {
 	return param_set[param];
 }
 

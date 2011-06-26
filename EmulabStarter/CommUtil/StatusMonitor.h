@@ -22,13 +22,22 @@
 #include <unistd.h>
 
 using namespace std;
+
 typedef struct sockaddr SA;
+
+enum MsgType {
+	NODE_NAME = 1,
+    IP_ADDRESS = 2,
+    INFORMATIONAL = 3,
+    WARNING = 4
+};
+
 
 class StatusMonitor {
 public:
 	StatusMonitor(string addr, int port);
 	int ConnectServer();
-	int SendMessage(string msg);
+	int SendMessage(int msg_type, string msg);
 
 private:
 	int sockfd;

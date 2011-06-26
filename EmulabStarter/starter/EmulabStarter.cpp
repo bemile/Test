@@ -8,44 +8,41 @@
 
 #include <iostream>
 #include <cstdio>
+#include <cstdlib>
 #include "../CommUtil/StatusMonitor.h"
 #include "ConfigParser.h"
 
 using namespace std;
 
-int main() {
-	/*ConfigParser parser("config");
-	map<string, string> params = parser.GetParamSet();
+int main(int argc, char** argv) {
+
+	if (argc != 2) {
+		cout << "usage: a.out config_file_name" << endl;
+		return -1;
+	}
+
+	ConfigParser parser(argv[1]);
+	/*map<string, string> params = parser.GetParamSet();
 	map<string, string>::iterator iter;
 	int size = params.size();
 	for (iter = params.begin(); iter != params.end(); iter++) {
 		cout << (*iter).first << "\t\t" << (*iter).second << endl;
 	}*/
 
-	StatusMonitor monitor("192.168.1.101", 10000);
-	monitor.ConnectServer();
+	string serv_addr = parser.GetValue("Monitor Server");
+	string port = parser.GetValue("Monitor Server Port");
+	if (serv_addr.length() > 0) {
+		StatusMonitor monitor(serv_addr, atoi(port.c_str()));
+		monitor.ConnectServer();
 
-	struct utsname host_name;
-	uname(&host_name);
-	char buf[100];
+		// Send node name
+		struct utsname host_name;
+		uname(&host_name);
+		monitor.SendMessage(NODE_NAME, host_name.nodename);
 
-	sprintf(buf, "Domain Name: %s", host_name.domainname);
-	monitor.SendMessage(buf);
-
-	sprintf(buf, "Machine Name: %s", host_name.machine);
-	monitor.SendMessage(buf);
-
-	sprintf(buf, "Node Name: %s", host_name.nodename);
-	monitor.SendMessage(buf);
-
-	sprintf(buf, "System Name: %s", host_name.sysname);
-	monitor.SendMessage(buf);
-
-	sprintf(buf, "Release: %s", host_name.release);
-	monitor.SendMessage(buf);
-
-	sprintf(buf, "Version: %s", host_name.version);
-	monitor.SendMessage(buf);
+		// Send normal message
+		monitor.SendMessage(INFORMATIONAL, "Hello server.");
+	}
 
 	return 0;
 }

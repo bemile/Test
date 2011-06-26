@@ -14,7 +14,7 @@ class ConfigParser {
 public:
 	ConfigParser(char* file_name);
 	map<string, string> GetParamSet();
-	string GetValue(char* param);
+	string GetValue(string param);
 
 
 private:
