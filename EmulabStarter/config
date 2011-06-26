@@ -1,0 +1,5 @@
+# This is a comment
+Monitor Server=128.143.12.23
+Monitor Server Port=11003
+Debug=false
+
