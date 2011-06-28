@@ -21,6 +21,8 @@ typedef struct sockaddr SA;
 class StatusMonitor {
 public:
 	StatusMonitor(string addr, int port);
+	~StatusMonitor();
+
 	int ConnectServer();
 	int StartClients();
 	int ReportStatus(int msg_type, string msg);
@@ -30,7 +32,8 @@ private:
 	int sockfd;
 	struct sockaddr_in servaddr;
 	bool isConnected;
-
+	CommandExecClient comm_exec_client;
+	StatusReportClient stat_rep_client;
 	int SendNodeName();
 
 };

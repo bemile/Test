@@ -16,6 +16,10 @@ StatusMonitor::StatusMonitor(string addr, int port) {
 	isConnected = false;
 }
 
+StatusMonitor::~StatusMonitor() {
+
+}
+
 
 int StatusMonitor::ConnectServer() {
 	if ((sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
@@ -26,7 +30,7 @@ int StatusMonitor::ConnectServer() {
 	int res;
 	while ((res = connect(sockfd, (SA *) &servaddr, sizeof(servaddr))) < 0) {
 		cout << "connect() error" << endl;
-		sleep(60);
+		sleep(30);
 		//return -1;
 	}
 
@@ -48,17 +52,24 @@ int StatusMonitor::StartClients() {
 	if (!isConnected)
 		return -1;
 
-	CommandExecClient comm_exec_client(sockfd);
+	comm_exec_client.SetSocket(sockfd);
 	comm_exec_client.SendMessage(INFORMATIONAL, "Command execution client started.");
-
-	StatusReportClient stat_rep_client(sockfd);
-	stat_rep_client.SendMessage(INFORMATIONAL, "Status report client started.");
-
 	comm_exec_client.Start();
 
-	while (true) {
+	stat_rep_client.SetSocket(sockfd);
+	stat_rep_client.SendMessage(INFORMATIONAL, "Status report client started.");
+
+
+	while (comm_exec_client.IsConnected()) {
 		sleep(1);
 	}
+
+	close(sockfd);
+	comm_exec_client.Stop();
+
+	ConnectServer();
+	StartClients();
+
 	return 1;
 }
 

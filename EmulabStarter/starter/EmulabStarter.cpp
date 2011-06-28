@@ -9,16 +9,23 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "../CommUtil/StatusMonitor.h"
 #include "ConfigParser.h"
 
 using namespace std;
+
+int InitDaemon();
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
 		cout << "usage: a.out config_file_name" << endl;
 		return -1;
 	}
+
+	InitDaemon();
 
 	ConfigParser parser(argv[1]);
 //	map<string, string> params = parser.GetParamSet();
@@ -37,4 +44,21 @@ int main(int argc, char** argv) {
 	}
 
 	return 0;
+}
+
+
+int InitDaemon() {
+	pid_t pid;
+	if ( (pid = fork()) < 0)
+		return -1;
+	else if (pid != 0)
+		exit(0);
+
+	// Child process
+	setsid();
+	chdir("/");
+	umask(0);
+
+	return 0;
+
 }

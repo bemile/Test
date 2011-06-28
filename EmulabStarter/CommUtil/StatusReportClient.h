@@ -15,7 +15,9 @@ using namespace std;
 
 class StatusReportClient {
 public:
+	StatusReportClient()	{sockfd = -1;}
 	StatusReportClient(int sock);
+	void SetSocket(int sock);
 	int SendMessage(int msg_type, string msg);
 
 private:

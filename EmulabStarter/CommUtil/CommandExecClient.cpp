@@ -19,12 +19,22 @@ CommandExecClient::~CommandExecClient() {
 
 void CommandExecClient::Start() {
 	pthread_mutex_init(&mutex, 0);
-	keepAlive = true;
+	keep_alive = true;
+	is_connected = true;
 	int val = pthread_create(&thread, NULL, &CommandExecClient::StartThread, this);
 }
 
 void CommandExecClient::Stop() {
-	keepAlive = false;
+	keep_alive = false;
+	is_connected = false;
+}
+
+bool CommandExecClient::IsConnected() {
+	return is_connected;
+}
+
+void CommandExecClient::SetSocket(int sock) {
+	sockfd = sock;
 }
 
 
@@ -35,13 +45,16 @@ void* CommandExecClient::StartThread(void* ptr) {
 
 
 void CommandExecClient::Run() {
-	while (keepAlive) {
+	while (keep_alive) {
 		int res;
 		int msg_type;
 
 		pthread_mutex_lock(&mutex);
 		if ((res = read(sockfd, &msg_type, sizeof(msg_type))) < 0) {
-			cout << "Error sending message. " << endl;
+			cout << "Error reading message. " << endl;
+			is_connected = false;
+			return;
+			//exit(0);
 		}
 
 		switch (msg_type) {

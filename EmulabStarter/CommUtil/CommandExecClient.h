@@ -16,18 +16,22 @@ using namespace std;
 
 class CommandExecClient {
 public:
+	CommandExecClient() {sockfd = -1;}
 	CommandExecClient(int sock);
 	~CommandExecClient();
 	void Start();
 	void Run();
 	void Stop();
+	bool IsConnected();
+	void SetSocket(int sock);
 	int SendMessage(int msg_type, string msg);
 
 private:
 	int sockfd;
 	pthread_t thread;
 	pthread_mutex_t mutex;
-	bool keepAlive;
+	bool keep_alive;
+	bool is_connected;
 
 	static void* StartThread(void* ptr);
 	int HandleCommand();

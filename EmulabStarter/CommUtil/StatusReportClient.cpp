@@ -11,6 +11,9 @@ StatusReportClient::StatusReportClient(int sock) {
 	sockfd = sock;
 }
 
+void StatusReportClient::SetSocket(int sock) {
+	sockfd = sock;
+}
 
 int StatusReportClient::SendMessage(int msg_type, string msg) {
 	int res;
