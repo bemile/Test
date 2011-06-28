@@ -24,15 +24,15 @@ int StatusMonitor::ConnectServer() {
 	}
 
 	int res;
-	if ((res = connect(sockfd, (SA *) &servaddr, sizeof(servaddr))) < 0) {
+	while ((res = connect(sockfd, (SA *) &servaddr, sizeof(servaddr))) < 0) {
 		cout << "connect() error" << endl;
-		return -1;
+		sleep(60);
+		//return -1;
 	}
-	else {
-		isConnected = true;
-		SendNodeName();
-		return 1;
-	}
+
+	isConnected = true;
+	SendNodeName();
+	return 1;
 }
 
 
@@ -40,6 +40,7 @@ int StatusMonitor::SendNodeName() {
 	struct utsname host_name;
 	uname(&host_name);
 	SendMessage(NODE_NAME, host_name.nodename);
+	return 1;
 
 }
 
@@ -48,10 +49,23 @@ int StatusMonitor::StartClients() {
 		return -1;
 
 	CommandExecClient comm_exec_client(sockfd);
+	comm_exec_client.SendMessage(INFORMATIONAL, "Command execution client started.");
+
+	StatusReportClient stat_rep_client(sockfd);
+	stat_rep_client.SendMessage(INFORMATIONAL, "Status report client started.");
+
 	comm_exec_client.Start();
 
+	while (true) {
+		sleep(1);
+	}
+	return 1;
 }
 
+
+int StatusMonitor::ReportStatus(int msg_type, string msg) {
+	SendMessage(msg_type, msg);
+}
 
 int StatusMonitor::SendMessage(int msg_type, string msg) {
 	if (!isConnected)

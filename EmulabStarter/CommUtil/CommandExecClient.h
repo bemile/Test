@@ -8,35 +8,29 @@
 #ifndef COMMANDEXECCLIENT_H_
 #define COMMANDEXECCLIENT_H_
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/utsname.h>
-#include <time.h>
-#include <iostream>
-#include <string>
-#include <stdio.h>
-#include <string.h>
-#include <sys/errno.h>
-#include <unistd.h>
+#include <pthread.h>
 #include "CommUtil.h"
+
 
 using namespace std;
 
 class CommandExecClient {
 public:
 	CommandExecClient(int sock);
+	~CommandExecClient();
 	void Start();
+	void Run();
+	void Stop();
 	int SendMessage(int msg_type, string msg);
 
 private:
-	//StatusMonitor* pmonitor;
 	int sockfd;
+	pthread_t thread;
+	pthread_mutex_t mutex;
+	bool keepAlive;
 
+	static void* StartThread(void* ptr);
 	int HandleCommand();
-
 };
 
 #endif /* COMMANDEXECCLIENT_H_ */

@@ -15,19 +15,18 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-
 	if (argc != 2) {
 		cout << "usage: a.out config_file_name" << endl;
 		return -1;
 	}
 
 	ConfigParser parser(argv[1]);
-	/*map<string, string> params = parser.GetParamSet();
-	map<string, string>::iterator iter;
-	int size = params.size();
-	for (iter = params.begin(); iter != params.end(); iter++) {
-		cout << (*iter).first << "\t\t" << (*iter).second << endl;
-	}*/
+//	map<string, string> params = parser.GetParamSet();
+//	map<string, string>::iterator iter;
+//	int size = params.size();
+//	for (iter = params.begin(); iter != params.end(); iter++) {
+//		cout << (*iter).first << "\t\t" << (*iter).second << endl;
+//	}
 
 	string serv_addr = parser.GetValue("Monitor Server");
 	string port = parser.GetValue("Monitor Server Port");

@@ -8,20 +8,9 @@
 #ifndef STATUSMONITOR_H_
 #define STATUSMONITOR_H_
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/utsname.h>
-#include <time.h>
-#include <iostream>
-#include <string>
-#include <string.h>
-#include <sys/errno.h>
-#include <unistd.h>
 #include "CommUtil.h"
 #include "CommandExecClient.h"
+#include "StatusReportClient.h"
 
 using namespace std;
 
@@ -34,6 +23,7 @@ public:
 	StatusMonitor(string addr, int port);
 	int ConnectServer();
 	int StartClients();
+	int ReportStatus(int msg_type, string msg);
 	int SendMessage(int msg_type, string msg);
 
 private:

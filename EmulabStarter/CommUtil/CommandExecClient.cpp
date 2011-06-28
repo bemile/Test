@@ -7,28 +7,54 @@
 
 #include "CommandExecClient.h"
 
+
 CommandExecClient::CommandExecClient(int sock) {
 	sockfd = sock;
 }
 
+CommandExecClient::~CommandExecClient() {
+	pthread_mutex_destroy(&mutex);
+}
+
 
 void CommandExecClient::Start() {
-	while (true) {
+	pthread_mutex_init(&mutex, 0);
+	keepAlive = true;
+	int val = pthread_create(&thread, NULL, &CommandExecClient::StartThread, this);
+}
+
+void CommandExecClient::Stop() {
+	keepAlive = false;
+}
+
+
+void* CommandExecClient::StartThread(void* ptr) {
+	((CommandExecClient*)ptr)->Run();
+	return NULL;
+}
+
+
+void CommandExecClient::Run() {
+	while (keepAlive) {
 		int res;
 		int msg_type;
+
+		pthread_mutex_lock(&mutex);
 		if ((res = read(sockfd, &msg_type, sizeof(msg_type))) < 0) {
 			cout << "Error sending message. " << endl;
 		}
 
 		switch (msg_type) {
-			case COMMAND:
-				HandleCommand();
-				break;
-			default:
-				break;
+		case COMMAND:
+			HandleCommand();
+			break;
+		default:
+			break;
 		}
+		pthread_mutex_unlock(&mutex);
 	}
 }
+
 
 int CommandExecClient::HandleCommand() {
 	int res;
