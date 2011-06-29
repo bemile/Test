@@ -15,6 +15,20 @@ void StatusReportClient::SetSocket(int sock) {
 	sockfd = sock;
 }
 
+
+int StatusReportClient::SendNodeInfo() {
+	SendNodeName();
+}
+
+int StatusReportClient::SendNodeName() {
+	struct utsname host_name;
+	uname(&host_name);
+	SendMessage(NODE_NAME, host_name.nodename);
+	return 1;
+
+}
+
+
 int StatusReportClient::SendMessage(int msg_type, string msg) {
 	int res;
 	if ( (res = write(sockfd, &msg_type, sizeof(msg_type))) < 0) {

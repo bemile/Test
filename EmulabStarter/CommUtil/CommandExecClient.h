@@ -26,7 +26,7 @@ public:
 	void SetSocket(int sock);
 	int SendMessage(int msg_type, string msg);
 
-private:
+protected:
 	int sockfd;
 	pthread_t thread;
 	pthread_mutex_t mutex;
@@ -34,7 +34,11 @@ private:
 	bool is_connected;
 
 	static void* StartThread(void* ptr);
-	int HandleCommand();
+	virtual int HandleCommand(char* command);
+	int ExecSysCommand(char* command);
+
+private:
+
 };
 
 #endif /* COMMANDEXECCLIENT_H_ */

@@ -7,21 +7,23 @@
 
 #include "ConfigParser.h"
 
-ConfigParser::ConfigParser(char* file_name) {
+ConfigParser::ConfigParser() {
+
+}
+
+void ConfigParser::Parse(string file_name) {
 	string line;
-	ifstream fs(file_name);
+	ifstream fs(file_name.c_str());
 	if (fs.is_open()) {
+		param_set.clear();
 		while (fs.good()) {
 			getline(fs, line);
 			ParseLine(line, '=');
-			cout << line << endl;
 		}
 		fs.close();
-	}
-	else {
+	} else {
 		cout << "Cannot open config file to read." << endl;
 	}
-
 }
 
 

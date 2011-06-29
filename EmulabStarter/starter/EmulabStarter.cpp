@@ -14,10 +14,17 @@
 #include <fcntl.h>
 #include "../CommUtil/StatusMonitor.h"
 #include "ConfigParser.h"
+#include "Logger.h"
+#include "../MVCTP/Tester.h"
 
 using namespace std;
 
-int InitDaemon();
+ConfigParser* ptr_parser;
+StatusMonitor* ptr_monitor;
+
+void StartStatusMonitor();
+void Clean();
+
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
@@ -25,40 +32,48 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	InitDaemon();
+	// Parse configuration file
+	ptr_parser = new ConfigParser();
+	ptr_parser->Parse(argv[1]);
 
-	ConfigParser parser(argv[1]);
-//	map<string, string> params = parser.GetParamSet();
-//	map<string, string>::iterator iter;
-//	int size = params.size();
-//	for (iter = params.begin(); iter != params.end(); iter++) {
-//		cout << (*iter).first << "\t\t" << (*iter).second << endl;
-//	}
+	// Start status monitor
+	//StartStatusMonitor();
 
-	string serv_addr = parser.GetValue("Monitor Server");
-	string port = parser.GetValue("Monitor Server Port");
-	if (serv_addr.length() > 0) {
-		StatusMonitor monitor(serv_addr, atoi(port.c_str()));
-		monitor.ConnectServer();
-		monitor.StartClients();
-	}
+	// Configure logger
+	//Logger::AddRemoteClient(ptr_monitor->GetStatusReportClient());
 
+
+	Tester tester;
+	tester.StartTest();
+
+	Clean();
 	return 0;
 }
 
 
-int InitDaemon() {
+// Start status monitor and connect to remote server (if configured)
+void StartStatusMonitor() {
 	pid_t pid;
-	if ( (pid = fork()) < 0)
-		return -1;
-	else if (pid != 0)
-		exit(0);
+	if ((pid = fork()) < 0)
+		return;
+	else if (pid == 0) {
+		// run status monitor as a daemon in the child process
+		setsid();
+		chdir("/");
+		umask(0);
 
-	// Child process
-	setsid();
-	chdir("/");
-	umask(0);
+		string serv_addr = ptr_parser->GetValue("Monitor Server");
+		string port = ptr_parser->GetValue("Monitor Server Port");
+		if (serv_addr.length() > 0) {
+			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
+			ptr_monitor->ConnectServer();
+			ptr_monitor->StartClients();
+		}
+	}
+}
 
-	return 0;
 
+void Clean() {
+	delete ptr_parser;
+	delete ptr_monitor;
 }

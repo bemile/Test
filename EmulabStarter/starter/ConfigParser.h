@@ -12,7 +12,8 @@ using namespace std;
 
 class ConfigParser {
 public:
-	ConfigParser(char* file_name);
+	ConfigParser();
+	void Parse(string file_name);
 	map<string, string> GetParamSet();
 	string GetValue(string param);
 

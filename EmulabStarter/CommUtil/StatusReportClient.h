@@ -18,10 +18,13 @@ public:
 	StatusReportClient()	{sockfd = -1;}
 	StatusReportClient(int sock);
 	void SetSocket(int sock);
+	int SendNodeInfo();
 	int SendMessage(int msg_type, string msg);
 
 private:
 	int sockfd;
+
+	int SendNodeName();
 };
 
 #endif /* STATUSREPORTCLIENT_H_ */

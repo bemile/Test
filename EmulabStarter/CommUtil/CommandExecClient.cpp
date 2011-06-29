@@ -57,9 +57,25 @@ void CommandExecClient::Run() {
 			//exit(0);
 		}
 
+		int msg_length;
+		if ((res = read(sockfd, &msg_length, sizeof(msg_length))) < 0) {
+			cout << "Error sending message. " << endl;
+			is_connected = false;
+			return;
+		}
+
+		char buffer[BUFFER_SIZE];
+		if ((res = read(sockfd, buffer, msg_length)) < 0) {
+			cout << "Error sending message. " << endl;
+			is_connected = false;
+			return;
+		} else {
+			buffer[res] = '\0';
+		}
+
 		switch (msg_type) {
 		case COMMAND:
-			HandleCommand();
+			HandleCommand(buffer);
 			break;
 		default:
 			break;
@@ -69,34 +85,24 @@ void CommandExecClient::Run() {
 }
 
 
-int CommandExecClient::HandleCommand() {
-	int res;
-	int msg_length;
-	if ((res = read(sockfd, &msg_length, sizeof(msg_length))) < 0) {
-		cout << "Error sending message. " << endl;
-		return -1;
-	}
+int CommandExecClient::HandleCommand(char* command) {
+	return ExecSysCommand(command);
+}
 
-	char buffer[BUFFER_SIZE];
-	if ((res = read(sockfd, buffer, msg_length)) < 0) {
-		cout << "Error sending message. " << endl;
-		return -1;
-	} else {
-		buffer[res] = '\0';
-		cout << "I received a command: " << buffer << endl;
-		FILE* pFile = popen(buffer, "r");
+
+int CommandExecClient::ExecSysCommand(char* command) {
+	cout << "I received a command: " << command << endl;
+		FILE* pFile = popen(command, "r");
 		if (pFile != NULL) {
 			char output[BUFFER_SIZE];
 			int bytes = fread(output, 1, BUFFER_SIZE, pFile);
 			output[bytes] = '\0';
 			pclose(pFile);
 			SendMessage(COMMAND_RESPONSE, output);
-		}
-		else {
+		} else {
 			cout << "Cannot get output from execution." << endl;
 		}
 		return 1;
-	}
 }
 
 

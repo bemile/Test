@@ -35,32 +35,24 @@ int StatusMonitor::ConnectServer() {
 	}
 
 	isConnected = true;
-	SendNodeName();
 	return 1;
 }
 
 
-int StatusMonitor::SendNodeName() {
-	struct utsname host_name;
-	uname(&host_name);
-	SendMessage(NODE_NAME, host_name.nodename);
-	return 1;
-
-}
 
 int StatusMonitor::StartClients() {
 	if (!isConnected)
 		return -1;
 
-	comm_exec_client.SetSocket(sockfd);
-	comm_exec_client.SendMessage(INFORMATIONAL, "Command execution client started.");
-	comm_exec_client.Start();
-
 	stat_rep_client.SetSocket(sockfd);
+	stat_rep_client.SendNodeInfo();
 	stat_rep_client.SendMessage(INFORMATIONAL, "Status report client started.");
 
+	ptr_comm_exec_client->SetSocket(sockfd);
+	ptr_comm_exec_client->SendMessage(INFORMATIONAL, "Command execution client started.");
+	ptr_comm_exec_client->Start();
 
-	while (comm_exec_client.IsConnected()) {
+	/*while (comm_exec_client.IsConnected()) {
 		sleep(1);
 	}
 
@@ -69,35 +61,19 @@ int StatusMonitor::StartClients() {
 
 	ConnectServer();
 	StartClients();
-
+	*/
 	return 1;
 }
 
 
-int StatusMonitor::ReportStatus(int msg_type, string msg) {
-	SendMessage(msg_type, msg);
+void StatusMonitor::SetCommandExecClient(CommandExecClient* ptr_client) {
+	ptr_comm_exec_client = ptr_client;
 }
 
-int StatusMonitor::SendMessage(int msg_type, string msg) {
-	if (!isConnected)
-		return -1;
+CommandExecClient* StatusMonitor::GetCommandExecClient() {
+	return ptr_comm_exec_client;
+}
 
-	int res;
-	if ( (res = write(sockfd, &msg_type, sizeof(msg_type))) < 0) {
-		cout << "Error sending message. " << endl;
-		return -1;
-	}
-
-	int length = msg.length();
-	if ( (res = write(sockfd, &length, sizeof(length))) < 0) {
-		cout << "Error sending message. " << endl;
-		return -1;
-	}
-
-	if ( (res = write(sockfd, msg.c_str(), length)) < 0) {
-		cout << "Error sending message. " << endl;
-		return -1;
-	}
-	else
-		return 1;
+StatusReportClient* StatusMonitor::GetStatusReportClient() {
+	return &stat_rep_client;
 }

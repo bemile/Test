@@ -25,17 +25,17 @@ public:
 
 	int ConnectServer();
 	int StartClients();
-	int ReportStatus(int msg_type, string msg);
-	int SendMessage(int msg_type, string msg);
+	void SetCommandExecClient(CommandExecClient* ptr_client);
+	CommandExecClient* GetCommandExecClient();
+	StatusReportClient* GetStatusReportClient();
+
 
 private:
 	int sockfd;
 	struct sockaddr_in servaddr;
 	bool isConnected;
-	CommandExecClient comm_exec_client;
 	StatusReportClient stat_rep_client;
-	int SendNodeName();
-
+	CommandExecClient* ptr_comm_exec_client;
 };
 
 
