@@ -55,8 +55,11 @@ void Tester::StartTest() {
 		char buff[BUFF_SIZE];
 		sockaddr_in from;
 		socklen_t socklen;
-		while (receiver.ReceiveData(buff, BUFF_SIZE, 0, (SA *)&from, &socklen) > 0) {
-
+		int bytes;
+		while ( (bytes = receiver.ReceiveData(buff, BUFF_SIZE, 0, (SA *)&from, &socklen)) > 0) {
+			string s = "I received a message: ";
+			s.append(buff);
+			this->Log(INFORMATIONAL, s);
 		}
 	}
 }
