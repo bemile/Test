@@ -18,4 +18,9 @@ int SenderCommandClient::HandleCommand(char* command) {
 		ptr_sender->Send(&command[index + 1], args.length());
 		SendMessage(COMMAND_RESPONSE, "Data sent.");
 	}
+	else {
+		ExecSysCommand(command);
+	}
+
+	return 1;
 }

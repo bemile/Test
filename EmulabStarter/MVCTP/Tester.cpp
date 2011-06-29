@@ -57,6 +57,7 @@ void Tester::StartTest() {
 		socklen_t socklen;
 		int bytes;
 		while ( (bytes = receiver.ReceiveData(buff, BUFF_SIZE, 0, (SA *)&from, &socklen)) > 0) {
+			buff[bytes] = '\0';
 			string s = "I received a message: ";
 			s.append(buff);
 			this->Log(INFORMATIONAL, s);
