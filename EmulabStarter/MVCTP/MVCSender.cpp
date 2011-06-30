@@ -24,6 +24,15 @@ int MVCSender::JoinGroup(string addr) {
 }
 
 
+int MVCSender::JoinGroup(const unsigned char* group_addr) {
+	return mvctp_manager.JoinGroup(group_addr);
+}
+
+
 int MVCSender::Send(char* data, size_t length) {
+	return mvctp_manager.Send(data, length);
+}
+
+int MVCSender::IPSend(char* data, size_t length) {
 	return comm.SendData(data, length, 0);
 }

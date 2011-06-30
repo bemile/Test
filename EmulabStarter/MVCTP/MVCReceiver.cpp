@@ -15,6 +15,15 @@ MVCReceiver::~MVCReceiver() {
 }
 
 
+int MVCReceiver::JoinGroup(const unsigned char* group_addr) {
+	return mvctp_manager.JoinGroup(group_addr);
+}
+
+ssize_t MVCReceiver::ReceiveData(void* buff, size_t len) {
+	return mvctp_manager.Receive(buff, len);
+}
+
+
 int MVCReceiver::JoinGroup(string addr) {
 	sockaddr_in sa;
 	sa.sin_family = AF_INET;
@@ -24,8 +33,7 @@ int MVCReceiver::JoinGroup(string addr) {
 	return comm.JoinGroup((SA *) &sa, sizeof(sa), (char*) NULL);
 }
 
-
-ssize_t MVCReceiver::ReceiveData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len) {
+ssize_t MVCReceiver::IPReceiveData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len) {
 	return comm.RecvData(buff, len, flags, from, from_len);
 }
 

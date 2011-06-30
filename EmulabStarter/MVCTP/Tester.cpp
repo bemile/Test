@@ -18,7 +18,7 @@ Tester::~Tester() {
 void Tester::StartTest() {
 	if (IsSender()) {
 		MVCSender sender;
-		sender.JoinGroup(multicast_addr);
+		sender.JoinGroup(group_mac_addr);
 
 		SenderCommandClient command_client(&sender);
 		string serv_addr = ptr_parser->GetValue("Monitor Server");
@@ -48,15 +48,15 @@ void Tester::StartTest() {
 		}
 
 		MVCReceiver receiver;
-		receiver.JoinGroup(multicast_addr);
+		receiver.JoinGroup(group_mac_addr);
 		this->Log(INFORMATIONAL, "Receiver joined group.");
 
 
 		char buff[BUFF_SIZE];
-		sockaddr_in from;
-		socklen_t socklen;
+		//sockaddr_in from;
+		//socklen_t socklen;
 		int bytes;
-		while ( (bytes = receiver.ReceiveData(buff, BUFF_SIZE, 0, (SA *)&from, &socklen)) > 0) {
+		while ( (bytes = receiver.ReceiveData(buff, BUFF_SIZE)) > 0) {
 			buff[bytes] = '\0';
 			string s = "I received a message: ";
 			s.append(buff);

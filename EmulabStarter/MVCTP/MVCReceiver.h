@@ -11,6 +11,7 @@
 #include "mvctp.h"
 #include "../starter/ConfigParser.h"
 #include "MulticastComm.h"
+#include "MVCTPManager.h"
 
 extern ConfigParser* ptr_parser;
 
@@ -19,10 +20,13 @@ public:
 	MVCReceiver();
 	~MVCReceiver();
 	int JoinGroup(string addr);
-	int ReceiveData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
+	int IPReceiveData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
+	int JoinGroup(const unsigned char* mac_addr);
+	int ReceiveData(void* buff, size_t len);
 
 private:
 	MulticastComm comm;
+	MVCTPManager mvctp_manager;
 };
 
 
