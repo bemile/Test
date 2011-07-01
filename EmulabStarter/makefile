@@ -1,9 +1,10 @@
 CC=g++
 CFLAGS=-lpthread
 VPATH=starter:CommUtil:MVCTP
-OBJ=EmulabStarter.o ConfigParser.o Logger.o Tester.o MulticastComm.o \
+OBJ=EmulabStarter.o ConfigParser.o Logger.o mvctp.o Tester.o MulticastComm.o \
 MVCReceiver.o MVCSender.o ReceiverCommExecClient.o SenderCommandClient.o \
-StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o 
+StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o  NetInterfaceManager.o
+
 
 all: emustarter
 
@@ -14,9 +15,9 @@ EmulabStarter.o: ConfigParser.o Logger.o Tester.o
 
 ConfigParser.o Logger.o: 
 
-Tester.o: MulticastComm.o MVCReceiver.o MVCSender.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o
+Tester.o: mvctp.o MulticastComm.o MVCReceiver.o MVCSender.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o NetInterfaceManager.o
 
-MulticastComm.o :
+mvctp.of MulticastComm.o :
 
 MVCSender.o: SenderCommandClient.o
 
@@ -28,9 +29,10 @@ StatusMonitor.o: CommandExecClient.o StatusReportClient.o
 
 CommandExecClient.o StatusReportClient.o:
 
-MVCTPManager.o: RawSocketComm.o
+MVCTPManager.o: NetInterfaceManager.o RawSocketComm.o
 
-RawSocketComm.o:
+NetInterfaceManager.o RawSocketComm.o:
+
 
 clean:
 	rm *.o
