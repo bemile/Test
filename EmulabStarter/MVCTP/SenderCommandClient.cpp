@@ -7,6 +7,16 @@
 
 #include "SenderCommandClient.h"
 
+SenderCommandClient::SenderCommandClient(MVCTPComm* psender) {
+	ptr_sender = psender;
+}
+
+
+SenderCommandClient::SenderCommandClient(int sock, MVCTPComm* psender) {
+	sockfd = sock;
+	ptr_sender = psender;
+}
+
 int SenderCommandClient::HandleCommand(char* command) {
 	string s = command;
 	int length = s.length();

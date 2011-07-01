@@ -14,7 +14,8 @@
 class RawSocketComm {
 public:
 	RawSocketComm(const char* if_name);
-	int SendData(const unsigned char* dest_addr, void* buffer, size_t length);
+	int SendData(const u_char* dest_addr, void* buffer, size_t length);
+	int SendFrame(const u_char* dest_addr, void* buffer, size_t length);
 	int ReceiveFrame(void* buffer);
 
 private:

@@ -36,13 +36,13 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 	dest_address.sll_pkttype = PACKET_OTHERHOST;
 	dest_address.sll_halen = ETH_ALEN;
 
-	etherhead = (unsigned char*)frame_buf;
-	data = (unsigned char*)frame_buf + ETH_HLEN;
+	etherhead = (u_char*)frame_buf;
+	data = (u_char*)frame_buf + ETH_HLEN;
 	eh = (struct ethhdr *)etherhead;
 }
 
 
-int RawSocketComm::SendData(const unsigned char* dest_addr, void* buffer, size_t length) {
+int RawSocketComm::SendData(const u_char* dest_addr, void* buffer, size_t length) {
 	memcpy(dest_address.sll_addr, dest_addr, ETH_ALEN);
 	dest_address.sll_addr[6] = 0x00;/*not used*/
 	dest_address.sll_addr[7] = 0x00;/*not used*/
@@ -74,6 +74,31 @@ int RawSocketComm::SendData(const unsigned char* dest_addr, void* buffer, size_t
 	}
 
 	return length;
+}
+
+
+int RawSocketComm::SendFrame(const u_char* dest_addr, void* buffer, size_t length) {
+	memcpy(dest_address.sll_addr, dest_addr, ETH_ALEN);
+	dest_address.sll_addr[6] = 0x00;/*not used*/
+	dest_address.sll_addr[7] = 0x00;/*not used*/
+
+	/*set the frame header*/
+	memcpy(frame_buf, dest_addr, ETH_ALEN);
+	memcpy(frame_buf + ETH_ALEN, mac_addr, ETH_ALEN);
+	eh->h_proto = htons(0x0000);
+
+	size_t actual_len = length;
+	if (length > ETH_DATA_LEN)
+		actual_len = ETH_DATA_LEN;
+
+	memcpy(data, buffer, actual_len);
+	int res;
+	if ((res = sendto(sockfd, frame_buf, ETH_HLEN + actual_len, 0,
+				(SA*) &dest_address, sizeof(dest_address))) < 0) {
+		SysError("sendto() error.");
+	}
+
+	return actual_len;
 }
 
 

@@ -17,10 +17,10 @@ Tester::~Tester() {
 
 void Tester::StartTest() {
 	if (IsSender()) {
-		MVCSender sender;
-		sender.JoinGroup(group_mac_addr);
+		MVCTPComm mvctp_sender;
+		mvctp_sender.JoinGroup(group_id);
 
-		SenderCommandClient command_client(&sender);
+		SenderCommandClient command_client(&mvctp_sender);
 		string serv_addr = ptr_parser->GetValue("Monitor Server");
 		string port = ptr_parser->GetValue("Monitor Server Port");
 		if (serv_addr.length() > 0) {
@@ -47,8 +47,8 @@ void Tester::StartTest() {
 			ptr_monitor->StartClients();
 		}
 
-		MVCReceiver receiver;
-		receiver.JoinGroup(group_mac_addr);
+		MVCTPComm mvctp_receiver;
+		mvctp_receiver.JoinGroup(group_id);
 		this->Log(INFORMATIONAL, "Receiver joined group.");
 
 
@@ -56,7 +56,7 @@ void Tester::StartTest() {
 		//sockaddr_in from;
 		//socklen_t socklen;
 		int bytes;
-		while ( (bytes = receiver.ReceiveData(buff, BUFF_SIZE)) > 0) {
+		while ( (bytes = mvctp_receiver.Receive(buff, BUFF_SIZE)) > 0) {
 			buff[bytes] = '\0';
 			string s = "I received a message: ";
 			s.append(buff);

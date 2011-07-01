@@ -26,7 +26,6 @@ int MulticastComm::JoinGroup(const SA* sa, int sa_len, const char *if_name) {
 			struct ifreq if_req;
 			dst_addr = *sa;
 			dst_addr_len = sa_len;
-			cout << "Joined group address: " << ((sockaddr_in*)&dst_addr)->sin_addr.s_addr << endl;
 
 			memcpy(&mreq.imr_multiaddr, &((struct sockaddr_in *) sa)->sin_addr,
 					sizeof(struct in_addr));

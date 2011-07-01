@@ -146,7 +146,7 @@ int NetInterfaceManager::GetIfreqLength(IFREQ* ifr) {
 	int len;
 
 #ifdef HAVE_SOCKADDR_SA_LEN
-		len = max(sizeof(struct sockaddr), ifr->ifr_addr.sa_len);
+		len = MAX(sizeof(struct sockaddr), ifr->ifr_addr.sa_len);
 #else
 		switch (ifr->ifr_addr.sa_family) {
 #ifdef	IPV6
