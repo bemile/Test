@@ -6,14 +6,14 @@
  */
 #include "RawSocketComm.h"
 
-RawSocketComm::RawSocketComm(string if_name) {
+RawSocketComm::RawSocketComm(const char* if_name) {
 	if ( (sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL))) < 0) {
 			SysError("Cannot create new socket.");
 	}
 
 	/*get the index of the network device*/
 	memset(&if_req, 0, sizeof(if_req));
-	strncpy(if_req.ifr_name, if_name.c_str(), sizeof(if_name.c_str()));
+	strncpy(if_req.ifr_name, if_name, sizeof(if_name));
 	if (ioctl(sockfd, SIOCGIFINDEX, &if_req)) {
 		SysError("unable to get index: ");
 	}

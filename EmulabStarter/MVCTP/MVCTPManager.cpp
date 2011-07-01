@@ -22,7 +22,7 @@ MVCTPManager::MVCTPManager() {
 		}
 	}
 	cout << "interface name: " << if_name << endl;
-	raw_sock_comm = new RawSocketComm(if_name);
+	raw_sock_comm = new RawSocketComm(if_name.c_str());
 }
 
 MVCTPManager::~MVCTPManager() {

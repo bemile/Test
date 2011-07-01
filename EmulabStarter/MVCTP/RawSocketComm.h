@@ -13,7 +13,7 @@
 
 class RawSocketComm {
 public:
-	RawSocketComm(string if_name);
+	RawSocketComm(const char* if_name);
 	int SendData(const unsigned char* dest_addr, void* buffer, size_t length);
 	int ReceiveFrame(void* buffer);
 
