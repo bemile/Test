@@ -74,10 +74,11 @@ bool Tester::IsSender() {
 	struct utsname host_name;
 	uname(&host_name);
 	string nodename = host_name.nodename;
-	if (nodename.find("node0") != string::npos) {
-		return false;
+	if (nodename.find("node0") != string::npos ||
+			nodename.find("ubuntu") != string::npos) {
+		return true;
 	}
 	else
-		return true;
+		return false;
 }
 
