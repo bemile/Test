@@ -116,8 +116,3 @@ ssize_t MulticastComm::RecvData(void* buff, size_t len, int flags, SA* from, soc
 	return recvfrom(sock_fd, buff, len, flags, from, from_len);
 }
 
-
-void MulticastComm::SysError(char* s) {
-	cout << s << endl;
-	exit(-1);
-}

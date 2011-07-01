@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <iostream>
+#include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <string.h>
@@ -31,10 +32,16 @@
 using namespace std;
 
 typedef struct sockaddr SA;
+typedef struct ifreq	IFREQ;
 
 const string multicast_addr = "224.1.2.3";
 const unsigned char group_mac_addr[6] = {0x01, 0x00, 0x5e, 0x01, 0x02, 0x03};
 const int PORT_NUM = 11001;
 const int BUFF_SIZE = 10000;
+
+#define max(a, b)  ((a) > (b) ? (a) : (b))
+
+void SysError(string s);
+
 
 #endif /* MVCTP_H_ */

@@ -9,24 +9,26 @@
 #define RAWSOCKETCOMM_H_
 
 #include "mvctp.h"
+#include <cstdio>
 
 class RawSocketComm {
 public:
-	RawSocketComm();
-	int SendData(unsigned char* dest_addr, void* buffer, size_t length);
+	RawSocketComm(string if_name);
+	int SendData(const unsigned char* dest_addr, void* buffer, size_t length);
 	int ReceiveFrame(void* buffer);
 
 private:
 	int sockfd;
+	int if_index;
 	struct ifreq if_req;
-	char mac_addr[6];
+	unsigned char mac_addr[6];
 	struct sockaddr_ll dest_address; 	// target address
-	unsigned char frame_buf[ETH_FRAME_LEN];
+	char frame_buf[ETH_FRAME_LEN];
 	unsigned char* etherhead;
 	unsigned char* data;
 	struct ethhdr* eh;
 
-	void SysError(string s);
+	string GetMacAddrString(const unsigned char* addr);
 };
 
 #endif /* RAWSOCKETCOMM_H_ */

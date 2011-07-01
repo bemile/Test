@@ -1,5 +1,6 @@
 # This is a comment
 Monitor Server=128.143.69.164
+# 192.168.1.101
 Monitor Server Port=11003
 Debug=false
 

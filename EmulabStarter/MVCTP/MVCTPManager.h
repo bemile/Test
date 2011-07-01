@@ -10,16 +10,19 @@
 
 #include "mvctp.h"
 #include "RawSocketComm.h"
+#include "NetInterfaceManager.h"
 
 class MVCTPManager {
 public:
 	MVCTPManager();
+	~MVCTPManager();
 	int JoinGroup(const unsigned char* mac_addr);
 	int Send(void* buffer, size_t length);
 	int Receive(void* buffer, size_t length);
 
 private:
-	RawSocketComm raw_sock_comm;
+	NetInterfaceManager* if_manager;
+	RawSocketComm* raw_sock_comm;
 	unsigned char group_addr[6];
 	char frame_buf[ETH_FRAME_LEN];
 	char* etherhead;

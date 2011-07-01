@@ -75,9 +75,9 @@ bool Tester::IsSender() {
 	uname(&host_name);
 	string nodename = host_name.nodename;
 	if (nodename.find("node0") != string::npos) {
-		return true;
+		return false;
 	}
 	else
-		return false;
+		return true;
 }
 

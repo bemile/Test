@@ -31,7 +31,6 @@ private:
 	SA dst_addr;
 	int dst_addr_len;
 	ip_mreq mreq;
-	void SysError(char* s);
 };
 
 #endif /* MULTICASTCOMM_H_ */
