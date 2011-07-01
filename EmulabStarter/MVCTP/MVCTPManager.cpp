@@ -38,7 +38,8 @@ MVCTPManager::~MVCTPManager() {
 
 
 int MVCTPManager::JoinGroup(u_int32_t group_id) {
-	SetMulticastMacAddress(group_addr, group_id);
+	mvctp_group_id = group_id;
+	SetMulticastMacAddress(mac_group_addr, group_id);
 	send_mvctp_header->group_id  = group_id;
 	send_mvctp_header->src_port = mvctp_port;
 	return 1;
@@ -49,14 +50,14 @@ int MVCTPManager::Send(void* buffer, size_t length) {
 	u_char* pos = (u_char*)buffer;
 	while (remained_len > MVCTP_DATA_LEN) {
 		memcpy(send_data, pos, MVCTP_DATA_LEN);
-		raw_sock_comm->SendFrame(group_addr, send_packet_buf, MVCTP_PACKET_LEN);
+		raw_sock_comm->SendFrame(mac_group_addr, send_packet_buf, MVCTP_PACKET_LEN);
 		pos += MVCTP_DATA_LEN;
 		remained_len -= MVCTP_DATA_LEN;
 	}
 
 	if (remained_len > 0) {
 		memcpy(send_data, pos, remained_len);
-		raw_sock_comm->SendFrame(group_addr, send_packet_buf, MVCTP_HLEN + remained_len);
+		raw_sock_comm->SendFrame(mac_group_addr, send_packet_buf, MVCTP_HLEN + remained_len);
 	}
 
 	return length;
@@ -89,8 +90,8 @@ int MVCTPManager::Receive(void* buffer, size_t length) {
 
 
 bool MVCTPManager::IsMyPacket() {
-	if (memcmp(eth_header->h_dest, group_addr, 6) == 0 &&
-			recv_mvctp_header->group_id == group_id)
+	if (memcmp(eth_header->h_dest, mac_group_addr, 6) == 0 &&
+			recv_mvctp_header->group_id == mvctp_group_id)
 		return true;
 	else
 		return false;

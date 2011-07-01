@@ -23,8 +23,8 @@ public:
 private:
 	NetInterfaceManager* if_manager;
 	RawSocketComm* raw_sock_comm;
-	u_int32_t group_id;
-	u_char group_addr[6];
+	u_int32_t mvctp_group_id;
+	u_char mac_group_addr[6];
 
 	// single MVCTP packet send buffer
 	char send_packet_buf[ETH_DATA_LEN];
