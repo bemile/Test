@@ -25,6 +25,7 @@ int MVCSender::JoinGroup(string addr) {
 
 
 int MVCSender::JoinGroup(const unsigned char* group_addr) {
+	JoinGroup(multicast_addr);
 	return mvctp_manager.JoinGroup(group_addr);
 }
 

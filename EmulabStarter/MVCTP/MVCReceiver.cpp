@@ -16,10 +16,12 @@ MVCReceiver::~MVCReceiver() {
 
 
 int MVCReceiver::JoinGroup(const unsigned char* group_addr) {
+
 	return mvctp_manager.JoinGroup(group_addr);
 }
 
 ssize_t MVCReceiver::ReceiveData(void* buff, size_t len) {
+	JoinGroup(multicast_addr);
 	return mvctp_manager.Receive(buff, len);
 }
 
