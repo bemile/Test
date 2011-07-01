@@ -13,9 +13,9 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 
 	/*get the index of the network device*/
 	memset(&if_req, 0, sizeof(if_req));
-	strncpy(if_req.ifr_name, if_name, sizeof(if_name));
+	strncpy(if_req.ifr_name, if_name, sizeof(if_req.ifr_name));
 	if (ioctl(sockfd, SIOCGIFINDEX, &if_req)) {
-		SysError("unable to get index: ");
+		SysError("unable to get index");
 	}
 	if_index = if_req.ifr_ifindex;
 
