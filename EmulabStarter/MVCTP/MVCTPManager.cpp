@@ -13,7 +13,7 @@ MVCTPManager::MVCTPManager() {
 
 	eth_header = (struct ethhdr *)recv_frame_buf;
 	recv_mvctp_header = (PTR_MVCTP_HEADER)(recv_frame_buf + ETH_HLEN);
-	recv_data = (u_char*)recv_frame_buf + ETH_HLEN;
+	recv_data = (u_char*)recv_frame_buf + ETH_HLEN + sizeof(MVCTP_HEADER);
 
 	if_manager = new NetInterfaceManager();
 	string if_name;
@@ -76,7 +76,7 @@ int MVCTPManager::Receive(void* buffer, size_t length) {
 		}
 
 		if (IsMyPacket()) {
-			int data_len = bytes - ETH_HLEN;
+			int data_len = bytes - ETH_HLEN - sizeof(MVCTP_HEADER);
 			memcpy(ptr, recv_data, data_len);
 			received_bytes += data_len;
 			ptr += data_len;
