@@ -10,8 +10,8 @@
 MVCTPComm::MVCTPComm(int send_buf_size, int recv_buf_size) {
 	comm = new MulticastComm();
 
-	send_buf = new MVCTPBuffer(send_buf_size, comm);
-	recv_buf = new MVCTPBuffer(recv_buf_size, comm);
+	send_buf = new SendBuffer(send_buf_size, comm);
+	recv_buf = new ReceiveBuffer(recv_buf_size, comm);
 }
 
 
@@ -51,7 +51,8 @@ ssize_t MVCTPComm::RawReceive(void* buff, size_t len) {
 
 
 int MVCTPComm::IPSend(char* data, size_t length) {
-	return comm->SendData(data, length, 0);
+	return send_buf->SendData(data, length);
+	//return comm->SendData(data, length, 0);
 }
 
 ssize_t MVCTPComm::IPReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len) {

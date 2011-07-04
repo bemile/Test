@@ -11,8 +11,8 @@
 #include "mvctp.h"
 #include "MulticastComm.h"
 #include "MVCTPManager.h"
-#include "MVCTPBuffer.h"
-
+#include "SendBuffer.h"
+#include "ReceiveBuffer.h"
 
 
 class MVCTPComm {
@@ -30,7 +30,8 @@ public:
 private:
 	MVCTPManager 	mvctp_manager;
 	MulticastComm* 	comm;
-	MVCTPBuffer		*send_buf, *recv_buf;
+	SendBuffer		*send_buf;
+	ReceiveBuffer 	*recv_buf;
 	u_int32_t 		group_id;
 };
 
