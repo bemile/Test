@@ -8,7 +8,6 @@
 #include "ReceiveBuffer.h"
 
 ReceiveBuffer::ReceiveBuffer(int size, MulticastComm* mcomm): MVCTPBuffer(size, mcomm) {
-	StartReceiveThread();
 }
 
 ReceiveBuffer::~ReceiveBuffer() {
@@ -93,7 +92,7 @@ void ReceiveBuffer::Run() {
 		if (comm->RecvData(data, header.data_len, 0, NULL, NULL) <= 0) {
 			SysError("MVCTPBuffer error on receiving data");
 		}
-		cout << "MVCTP packet data received." << endl;
+		cout << "MVCTP packet data received. Data length: " << header.data_len << endl;
 
 		pthread_mutex_lock(&buf_mutex);
 		AddData(&header, data);
