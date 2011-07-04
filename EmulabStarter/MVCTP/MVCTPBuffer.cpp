@@ -39,7 +39,7 @@ BufferEntry* MVCTPBuffer::Begin() {
 
 
 BufferEntry* MVCTPBuffer::End() {
-	return nil->prev;
+	return nil;
 }
 
 bool MVCTPBuffer::IsEmpty() {
