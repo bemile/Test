@@ -24,28 +24,29 @@ int SendBuffer::SendData(char* data, size_t length) {
 		else
 			len = bytes_left;
 
-		BufferEntry* entry = (BufferEntry*) malloc(sizeof(BufferEntry));
-		entry->packet_id = ++last_packet_id;
-		entry->data_len = len + MVCTP_HLEN;
-
 		char* ptr_data = (char*) malloc(len + MVCTP_HLEN);
 		MVCTP_HEADER* header = (MVCTP_HEADER*)ptr_data;
 		header->packet_id = entry->packet_id;
 		header->data_len = len;
 		memcpy(ptr_data + MVCTP_HLEN, pos, len);
+
+		BufferEntry* entry = (BufferEntry*) malloc(sizeof(BufferEntry));
+		entry->packet_id = ++last_packet_id;
+		entry->data_len = len + MVCTP_HLEN;
 		entry->data = ptr_data;
 
-		PushBack(entry);
-		actual_size += entry->data_len;
-		num_entry++;
+		if (SendPacket(entry) <= 0) {
+			SysError("SendBuffer error on sending packet");
+		}
+		cout << "Packet sent successfully." << endl;
 
 		pos += len;
 		bytes_left -= len;
 		bytes_sent += len;
 
-		if (SendPacket(entry) <= 0) {
-			SysError("SendBuffer error on sending packet");
-		}
+		PushBack(entry);
+		actual_size += entry->data_len;
+		num_entry++;
 	}
 
 	return bytes_sent;
