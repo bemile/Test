@@ -1,9 +1,9 @@
 CC=g++
 CFLAGS=-lpthread
 VPATH=starter:CommUtil:MVCTP
-OBJ=EmulabStarter.o ConfigParser.o Logger.o mvctp.o Tester.o MulticastComm.o \
-MVCTPComm.o ReceiverCommExecClient.o SenderCommandClient.o \
-StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o  NetInterfaceManager.o
+OBJ=EmulabStarter.o ConfigParser.o Logger.o mvctp.o Tester.o MVCTPComm.o MVCTPBuffer.o \
+MulticastComm.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o \
+CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o  NetInterfaceManager.o
 
 
 all: emustarter
@@ -19,7 +19,9 @@ Tester.o: mvctp.o MulticastComm.o MVCTPComm.o ReceiverCommExecClient.o SenderCom
 
 SenderCommandClient.o ReceiverCommExecClient.o : CommandExecClient.o MVCTPComm.o
 
-MVCTPComm.o: mvctp.o MulticastComm.o MVCTPManager.o
+MVCTPComm.o: mvctp.o MulticastComm.o MVCTPManager.o MVCTPBuffer.o
+
+MVCTPBuffer.o: mvctp.o MulticastComm.o
 
 MulticastComm.o: mvctp.o  
 
