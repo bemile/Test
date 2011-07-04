@@ -26,12 +26,12 @@ int SendBuffer::SendData(char* data, size_t length) {
 
 		char* ptr_data = (char*) malloc(len + MVCTP_HLEN);
 		MVCTP_HEADER* header = (MVCTP_HEADER*)ptr_data;
-		header->packet_id = entry->packet_id;
+		header->packet_id = ++last_packet_id;
 		header->data_len = len;
 		memcpy(ptr_data + MVCTP_HLEN, pos, len);
 
 		BufferEntry* entry = (BufferEntry*) malloc(sizeof(BufferEntry));
-		entry->packet_id = ++last_packet_id;
+		entry->packet_id = header->packet_id;
 		entry->data_len = len + MVCTP_HLEN;
 		entry->data = ptr_data;
 
