@@ -81,16 +81,19 @@ void* ReceiveBuffer::StartReceivingData(void* ptr) {
 
 
 void ReceiveBuffer::Run() {
+	cout << "Start receiving data from MulticastComm..." << endl;
 	MVCTP_HEADER header;
 	while (true) {
 		if (comm->RecvData(&header, sizeof(MVCTP_HEADER), 0, NULL, NULL) <= 0) {
 			SysError("MVCTPBuffer error on receiving data");
 		}
+		cout << "MVCTP packet header received." << endl;
 
 		char* data = (char*)malloc(header.data_len);
 		if (comm->RecvData(data, header.data_len, 0, NULL, NULL) <= 0) {
 			SysError("MVCTPBuffer error on receiving data");
 		}
+		cout << "MVCTP packet data received." << endl;
 
 		pthread_mutex_lock(&buf_mutex);
 		AddData(&header, data);
