@@ -25,7 +25,7 @@ int SenderCommandClient::HandleCommand(char* command) {
 	string args = s.substr(index + 1, length - index - 1);
 
 	if (comm_name.compare("send") == 0) {
-		ptr_sender->Send(&command[index + 1], args.length());
+		ptr_sender->IPSend(&command[index + 1], args.length());
 		SendMessage(COMMAND_RESPONSE, "Data sent.");
 	}
 	else {

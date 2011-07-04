@@ -1,6 +1,7 @@
 # This is a comment
-Monitor Server=128.143.69.164
-# 192.168.1.101
-Monitor Server Port=11003
+Monitor_Server=128.143.69.164
+Monitor_Server_Port=11003
+Send_Buffer_Size=65536
+Recv_Buffer_Size=65536
 Debug=false
 

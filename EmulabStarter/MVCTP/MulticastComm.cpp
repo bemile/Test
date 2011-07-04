@@ -11,7 +11,6 @@ MulticastComm::MulticastComm() {
 	if ( (sock_fd = socket(PF_INET, SOCK_DGRAM, 0)) < 0) {
 		SysError("Cannot create new socket.");
 	}
-
 }
 
 MulticastComm::~MulticastComm() {
@@ -114,4 +113,5 @@ ssize_t MulticastComm::SendData(const void* buff, size_t len, int flags) {
 ssize_t MulticastComm::RecvData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len) {
 	return recvfrom(sock_fd, buff, len, flags, from, from_len);
 }
+
 

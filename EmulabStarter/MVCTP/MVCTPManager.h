@@ -16,7 +16,7 @@ class MVCTPManager {
 public:
 	MVCTPManager();
 	~MVCTPManager();
-	int JoinGroup(u_int32_t group_id);
+	int JoinGroup(u_int32_t group_id, u_short port);
 	int Send(void* buffer, size_t length);
 	int Receive(void* buffer, size_t length);
 
@@ -36,8 +36,6 @@ private:
 	struct ethhdr* eth_header;
 	MVCTP_HEADER* recv_mvctp_header;
 	u_char* recv_data;
-
-
 
 
 	bool IsMyPacket();

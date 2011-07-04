@@ -37,11 +37,11 @@ MVCTPManager::~MVCTPManager() {
 
 
 
-int MVCTPManager::JoinGroup(u_int32_t group_id) {
+int MVCTPManager::JoinGroup(u_int32_t group_id, u_short port) {
 	mvctp_group_id = group_id;
 	SetMulticastMacAddress(mac_group_addr, group_id);
 	send_mvctp_header->group_id  = group_id;
-	send_mvctp_header->src_port = mvctp_port;
+	send_mvctp_header->src_port = port;
 	return 1;
 }
 

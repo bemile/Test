@@ -39,6 +39,8 @@ typedef struct MVCTPHeader {
 	u_int32_t		group_id;
 	u_int16_t		src_port;
 	u_int16_t		dest_port;
+	u_int32_t		packet_id;
+	u_int32_t		data_len;
 } MVCTP_HEADER, *PTR_MVCTP_HEADER;
 
 
@@ -68,6 +70,12 @@ const int BUFF_SIZE = 10000;
 const int MVCTP_PACKET_LEN = ETH_FRAME_LEN - ETH_HLEN;
 const int MVCTP_HLEN = sizeof(MVCTP_HEADER);
 const int MVCTP_DATA_LEN = ETH_FRAME_LEN - ETH_HLEN - sizeof(MVCTP_HEADER);
+
+// parameters for MVCTP over UDP
+const int UDP_MVCTP_PACKET_LEN = 1200;
+const int UDP_MVCTP_HLEN = sizeof(MVCTP_HEADER);
+const int UDP_MVCTP_DATA_LEN = 1200 - sizeof(MVCTP_HEADER);
+
 
 
 // Prototypes for global functions

@@ -11,7 +11,7 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 			SysError("Cannot create new socket.");
 	}
 
-	/*get the index of the network device*/
+	// get the index of the network device
 	memset(&if_req, 0, sizeof(if_req));
 	strncpy(if_req.ifr_name, if_name, sizeof(if_req.ifr_name));
 	if (ioctl(sockfd, SIOCGIFINDEX, &if_req)) {
@@ -19,8 +19,9 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 	}
 	if_index = if_req.ifr_ifindex;
 
+	// get the MAC address of the interface
 	if (ioctl(sockfd, SIOCGIFHWADDR, &if_req) < 0) {
-		SysError("Cannot get network interface info: ");
+		SysError("Cannot get network interface address: ");
 	}
 	memcpy(mac_addr, if_req.ifr_addr.sa_data, ETH_ALEN);
 

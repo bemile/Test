@@ -9,6 +9,7 @@
 #define MULTICASTCOMM_H_
 
 #include "mvctp.h"
+#include <pthread.h>
 
 using namespace std;
 

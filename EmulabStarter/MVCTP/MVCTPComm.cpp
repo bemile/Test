@@ -7,40 +7,55 @@
 
 #include "MVCTPComm.h"
 
-MVCTPComm::MVCTPComm() {
+MVCTPComm::MVCTPComm(int send_buf_size, int recv_buf_size) {
+	comm = new MulticastComm();
+
+	send_buf = new MVCTPBuffer(send_buf_size, comm);
+	recv_buf = new MVCTPBuffer(recv_buf_size, comm);
 }
+
 
 MVCTPComm::~MVCTPComm() {
+	delete send_buf;
+	send_buf = NULL;
+	delete recv_buf;
+	recv_buf = NULL;
+	delete comm;
+	comm = NULL;
 }
 
 
-int MVCTPComm::JoinGroup(string addr) {
+
+int MVCTPComm::JoinGroup(string addr, ushort port) {
 	sockaddr_in sa;
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(PORT_NUM);
 	inet_pton(AF_INET, addr.c_str(), &sa.sin_addr);
 
 	group_id = sa.sin_addr.s_addr;
-	mvctp_manager.JoinGroup(group_id);
+	mvctp_manager.JoinGroup(group_id, port);
 
-	return comm.JoinGroup((SA *)&sa, sizeof(sa), (char*)NULL);
+	comm->JoinGroup((SA *)&sa, sizeof(sa), (char*)NULL);
+	recv_buf->StartReceiveThread();
+	return 1;
 }
 
 
-int MVCTPComm::Send(char* data, size_t length) {
+int MVCTPComm::RawSend(char* data, size_t length) {
 	return mvctp_manager.Send(data, length);
 }
 
-ssize_t MVCTPComm::Receive(void* buff, size_t len) {
+ssize_t MVCTPComm::RawReceive(void* buff, size_t len) {
 	return mvctp_manager.Receive(buff, len);
 }
 
 
 int MVCTPComm::IPSend(char* data, size_t length) {
-	return comm.SendData(data, length, 0);
+	return comm->SendData(data, length, 0);
 }
 
 ssize_t MVCTPComm::IPReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len) {
-	return comm.RecvData(buff, len, flags, from, from_len);
+	size_t bytes = recv_buf->GetData(buff, len);
+	return bytes;
 }
 

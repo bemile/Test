@@ -16,13 +16,17 @@ Tester::~Tester() {
 }
 
 void Tester::StartTest() {
+	string serv_addr = ptr_parser->GetValue("Monitor_Server");
+	string port = ptr_parser->GetValue("Monitor_Server_Port");
+
+	int send_buf_size = atoi(ptr_parser->GetValue("Send_Buffer_Size").c_str());
+	int recv_buf_size = atoi(ptr_parser->GetValue("Recv_Buffer_Size").c_str());
+
 	if (IsSender()) {
-		MVCTPComm mvctp_sender;
-		mvctp_sender.JoinGroup(group_id);
+		MVCTPComm mvctp_sender(send_buf_size, recv_buf_size);
+		mvctp_sender.JoinGroup(group_id, mvctp_port);
 
 		SenderCommandClient command_client(&mvctp_sender);
-		string serv_addr = ptr_parser->GetValue("Monitor Server");
-		string port = ptr_parser->GetValue("Monitor Server Port");
 		if (serv_addr.length() > 0) {
 			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
 			ptr_monitor->SetCommandExecClient(&command_client);
@@ -38,8 +42,6 @@ void Tester::StartTest() {
 	}
 	else {  //Is receiver
 		CommandExecClient command_client;
-		string serv_addr = ptr_parser->GetValue("Monitor Server");
-		string port = ptr_parser->GetValue("Monitor Server Port");
 		if (serv_addr.length() > 0) {
 			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
 			ptr_monitor->SetCommandExecClient(&command_client);
@@ -47,16 +49,16 @@ void Tester::StartTest() {
 			ptr_monitor->StartClients();
 		}
 
-		MVCTPComm mvctp_receiver;
-		mvctp_receiver.JoinGroup(group_id);
+		MVCTPComm mvctp_receiver(send_buf_size, recv_buf_size);
+		mvctp_receiver.JoinGroup(group_id, mvctp_port);
 		this->Log(INFORMATIONAL, "Receiver joined group.");
 
 
 		char buff[BUFF_SIZE];
-		//sockaddr_in from;
-		//socklen_t socklen;
+		sockaddr_in from;
+		socklen_t socklen = sizeof(from);
 		int bytes;
-		while ( (bytes = mvctp_receiver.Receive(buff, BUFF_SIZE)) > 0) {
+		while ( (bytes = mvctp_receiver.IPReceive(buff, BUFF_SIZE, 0, (SA *)&from, &socklen)) > 0) {
 			buff[bytes] = '\0';
 			string s = "I received a message: ";
 			s.append(buff);
