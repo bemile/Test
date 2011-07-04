@@ -98,7 +98,7 @@ BufferEntry* MVCTPBuffer::Find(u_int32_t pid) {
 int MVCTPBuffer::ShrinkEntry(BufferEntry* entry, size_t new_size) {
 	char* new_data = (char*)malloc(new_size);
 	memcpy(new_data, entry->data + (entry->data_len - new_size), new_size);
-	delete entry->data;
+	free(entry->data);
 	entry->data = new_data;
 	entry->data_len = new_size;
 
@@ -106,8 +106,8 @@ int MVCTPBuffer::ShrinkEntry(BufferEntry* entry, size_t new_size) {
 }
 
 void MVCTPBuffer::DestroyEntry(BufferEntry* entry) {
-	delete entry->data;
-	delete entry;
+	free(entry->data);
+	free(entry);
 }
 
 
