@@ -38,7 +38,7 @@ int SendBuffer::SendData(char* data, size_t length) {
 		if (SendPacket(entry) <= 0) {
 			SysError("SendBuffer error on sending packet");
 		}
-		cout << "Packet sent successfully." << endl;
+		cout << "Packet sent successfully. Packet length:" << entry->data_len << endl;
 
 		pos += len;
 		bytes_left -= len;
