@@ -70,7 +70,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 			}
 
 			if (tmp != NULL) {
-				last_del_packet_id = tmp->packet_id - 1;
+				last_del_packet_id = tmp->prev->packet_id;
 				recv_buf->DeleteUntil(tmp);
 			}
 		}
