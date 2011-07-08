@@ -74,8 +74,8 @@ struct NackMsgInfo {
 const string group_id = "224.1.2.3";
 const unsigned char group_mac_addr[6] = {0x01, 0x00, 0x5e, 0x01, 0x02, 0x03};
 const ushort mvctp_port = 123;
-const ushort BUFFER_UDP_SEND_PORT = 11005;
-const ushort BUFFER_UDP_RECV_PORT = 11006;
+const ushort BUFFER_UDP_SEND_PORT = 12345;
+const ushort BUFFER_UDP_RECV_PORT = 12346;
 const int PORT_NUM = 11001;
 const int BUFF_SIZE = 10000;
 const int MVCTP_PACKET_LEN = ETH_FRAME_LEN - ETH_HLEN;
