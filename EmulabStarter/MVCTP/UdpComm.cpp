@@ -9,7 +9,7 @@
 
 UdpComm::UdpComm(ushort port) {
 	if ( (sock_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		SysError("socket() error");
+		SysError("UdpComm::socket() error");
 	}
 
 	bzero(&server_addr, sizeof(server_addr));
@@ -18,7 +18,7 @@ UdpComm::UdpComm(ushort port) {
 	server_addr.sin_port = htons(port);
 
 	if ( bind(sock_fd, (SA*)&server_addr, sizeof(server_addr)) < 0)
-		SysError("bind() error");
+		SysError("UdpComm::bind() error");
 
 }
 
