@@ -38,6 +38,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	while (recv_buf->IsEmpty()) {
 		usleep(10000);
 	}
+	cout << "New packets are ready." << endl;
 
 	int sleep_turns = 0;
 	int32_t last_pid = recv_buf->Front()->packet_id - 1;

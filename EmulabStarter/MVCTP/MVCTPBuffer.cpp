@@ -16,6 +16,7 @@ MVCTPBuffer::MVCTPBuffer(int size) {
 
 
 MVCTPBuffer::~MVCTPBuffer() {
+	DeleteUntil(End());
 }
 
 
