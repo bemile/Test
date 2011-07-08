@@ -16,7 +16,7 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, MulticastComm* mcomm) {
 
 	recv_buf = new MVCTPBuffer(size);
 	comm = mcomm;
-	udp_comm = new UdpComm(BUFFER_UDP_SEND_PORT);
+	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
 }
 
 
