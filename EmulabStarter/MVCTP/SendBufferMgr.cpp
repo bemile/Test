@@ -54,6 +54,7 @@ int SendBufferMgr::SendData(char* data, size_t length) {
 		if (SendPacket(entry) <= 0) {
 			SysError("SendBuffer error on sending packet");
 		}
+		cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
 
 		pos += len;
 		bytes_left -= len;
@@ -106,7 +107,7 @@ void SendBufferMgr::ReceiveNack() {
 }
 
 
-void SendBufferMgr::Retransmit(u_int32_t packet_id) {
+void SendBufferMgr::Retransmit(int32_t packet_id) {
 	pthread_mutex_lock(&buf_mutex);
 	for (BufferEntry* it = send_buf->End()->prev; it != send_buf->Begin()->prev; it = it->prev) {
 		if (it->packet_id == packet_id)

@@ -32,14 +32,14 @@ private:
 	int 	num_entry;		// number of buffer entries in the buffer
 	int 	max_size;		// Maximum data bytes for the buffer
 	int 	actual_size;	// actual assigned data bytes in the buffer
-	int		last_packet_id;	// ID number for the latest sent/received packet
+	int32_t		last_packet_id;	// ID number for the latest sent/received packet
 
 
 	pthread_t udp_thread;
 	pthread_mutex_t buf_mutex;
 	static void* StartUdpNackReceive(void* ptr);
 	void ReceiveNack();
-	void Retransmit(u_int32_t packet_id);
+	void Retransmit(int32_t packet_id);
 };
 
 #endif /* SENDBUFFERMGR_H_ */

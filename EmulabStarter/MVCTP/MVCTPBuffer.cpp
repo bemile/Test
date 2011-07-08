@@ -70,7 +70,7 @@ int MVCTPBuffer::DeleteUntil(BufferEntry* entry) {
 }
 
 
-BufferEntry* MVCTPBuffer::Find(u_int32_t pid) {
+BufferEntry* MVCTPBuffer::Find(int32_t pid) {
 	BufferEntry *tmp = NULL;
 	for (tmp = Begin(); tmp != End(); tmp = tmp->next) {
 		if (tmp->packet_id == pid) {

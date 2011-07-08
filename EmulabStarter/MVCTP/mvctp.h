@@ -40,7 +40,7 @@ typedef struct MVCTPHeader {
 	u_int32_t		group_id;
 	u_int16_t		src_port;
 	u_int16_t		dest_port;
-	u_int32_t		packet_id;
+	int32_t			packet_id;
 	u_int32_t		data_len;
 } MVCTP_HEADER, *PTR_MVCTP_HEADER;
 
@@ -57,11 +57,11 @@ typedef struct MVCTPHeader {
 */
 
 struct NackMsg {
-	u_int32_t packet_id;
+	int32_t packet_id;
 };
 
 struct NackMsgInfo {
-	u_int32_t	packet_id;
+	int32_t	packet_id;
 	clock_t		time_stamp;
 	short		num_retries;
 };

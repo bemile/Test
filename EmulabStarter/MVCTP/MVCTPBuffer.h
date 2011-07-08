@@ -14,7 +14,7 @@
 
 // buffer entry for a single packet
 typedef struct BufferEntry {
-	u_int32_t 	packet_id;
+	int32_t 	packet_id;
 	size_t		data_len;
 	char*		data;
 	BufferEntry	*prev, *next;
@@ -33,7 +33,7 @@ public:
 	int Insert(BufferEntry* pos, BufferEntry* entry);
 	int Delete(BufferEntry*	entry);
 	int DeleteUntil(BufferEntry* entry);
-	BufferEntry* Find(u_int32_t pid);
+	BufferEntry* Find(int32_t pid);
 	bool 	IsEmpty();
 	int ShrinkEntry(BufferEntry* entry, size_t new_size);
 	int		AddEntry(MVCTP_HEADER* header, char* data);

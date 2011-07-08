@@ -33,7 +33,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	char* pos = (char*)buff;
 	size_t bytes_copied = 0;
 	size_t bytes_remained = len;
-	u_int32_t last_pid = recv_buf->Begin()->packet_id;
+	int32_t last_pid = recv_buf->Begin()->packet_id;
 
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty()) {
@@ -124,13 +124,14 @@ void ReceiveBufferMgr::Run() {
 		if ( (bytes = comm->RecvData(buf, 1500, 0, (SA*)&sender_addr, &sender_socklen)) <= 0) {
 			SysError("MVCTPBuffer error on receiving data");
 		}
+		cout << "I received one packet. Packet length: " << bytes << endl;
 
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
 
 		// Initialize the packet id information on receiving the first packet
 		if (is_first_packet) {
-			last_recv_packet_id = header->packet_id;
+			last_recv_packet_id = header->packet_id - 1;
 			last_del_packet_id = header->packet_id - 1;
 			is_first_packet = false;
 		}
@@ -139,7 +140,7 @@ void ReceiveBufferMgr::Run() {
 		if (header->packet_id - last_recv_packet_id > 1) {
 			pthread_mutex_lock(&nack_list_mutex);
 			clock_t time = clock() - 0.1 * CLOCKS_PER_SEC;
-			for (u_int32_t i = last_recv_packet_id + 1; i != header->packet_id; i++) {
+			for (int32_t i = last_recv_packet_id + 1; i != header->packet_id; i++) {
 				NackMsgInfo info;
 				info.packet_id = i;
 				info.time_stamp = time;
@@ -213,7 +214,7 @@ void ReceiveBufferMgr::UdpReceive() {
 }
 
 // Send a retransmission request to the sender
-int ReceiveBufferMgr::SendNackMsg(u_int32_t packet_id) {
+int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
 	NackMsg msg;
 	msg.packet_id = packet_id;
 	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0, (SA*)&sender_addr, sender_socklen);

@@ -32,11 +32,11 @@ private:
 	int 	num_entry;		// number of buffer entries in the buffer
 	int 	max_size;		// Maximum data bytes for the buffer
 	int 	actual_size;	// actual assigned data bytes in the buffer
-	u_int32_t			last_recv_packet_id;	// ID number for the latest sent/received packet
-	u_int32_t			last_del_packet_id;
+	int32_t			last_recv_packet_id;	// ID number for the latest sent/received packet
+	int32_t			last_del_packet_id;
 	list<NackMsgInfo> 	missing_packet_list;
 
-	int SendNackMsg(u_int32_t packet_id);
+	int SendNackMsg(int32_t packet_id);
 
 	pthread_t recv_thread, nack_thread, udp_thread;
 	pthread_mutex_t buf_mutex, nack_list_mutex;
