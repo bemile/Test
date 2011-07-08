@@ -33,18 +33,18 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	char* pos = (char*)buff;
 	size_t bytes_copied = 0;
 	size_t bytes_remained = len;
-	int32_t last_pid = recv_buf->Begin()->packet_id;
 
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty()) {
 		usleep(10000);
 	}
 
-	BufferEntry *tmp = NULL;
 	int sleep_turns = 0;
+	int32_t last_pid = recv_buf->Front()->packet_id - 1;
+	BufferEntry *tmp = NULL;
 	while (true) {
 		pthread_mutex_lock(&buf_mutex);
-		if (recv_buf->Begin()->packet_id == last_del_packet_id  + 1) {
+		if (recv_buf->Front()->packet_id == last_del_packet_id  + 1) {
 			for (tmp = recv_buf->Begin(); tmp != recv_buf->End(); tmp = tmp->next) {
 				if (tmp->packet_id != (last_pid + 1) )
 					break;
@@ -157,6 +157,7 @@ void ReceiveBufferMgr::Run() {
 		last_recv_packet_id = header->packet_id;
 		num_entry++;
 		pthread_mutex_unlock(&buf_mutex);
+		cout << "Packet added to the buffer." << endl;
 	}
 }
 

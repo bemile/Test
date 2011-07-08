@@ -29,6 +29,8 @@ public:
 
 	BufferEntry* Begin();
 	BufferEntry* End();
+	BufferEntry* Front();
+	BufferEntry* Back();
 	int PushBack(BufferEntry* entry);
 	int Insert(BufferEntry* pos, BufferEntry* entry);
 	int Delete(BufferEntry*	entry);

@@ -28,20 +28,28 @@ BufferEntry* MVCTPBuffer::End() {
 	return nil;
 }
 
+BufferEntry* MVCTPBuffer::Front() {
+	return nil->next;
+}
+
+BufferEntry* MVCTPBuffer::Back() {
+	return nil->prev;
+}
+
 bool MVCTPBuffer::IsEmpty() {
-	return (Begin() == nil);
+	return (nil->next == nil);
 }
 
 
 int MVCTPBuffer::PushBack(BufferEntry* entry) {
-	return Insert(End(), entry);
+	return Insert(Back(), entry);
 }
 
 
 int MVCTPBuffer::Insert(BufferEntry* pos, BufferEntry* entry) {
-	entry->prev = pos->prev;
-	entry->next = pos;
-	pos->prev = pos->prev->next = entry;
+	entry->prev = pos;
+	entry->next = pos->next;
+	pos->next = pos->next->prev = entry;
 	return 1;
 }
 
@@ -104,8 +112,8 @@ int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
 	entry->data = data;
 
 	int32_t packet_id = header->packet_id;
-	BufferEntry* it = End()->prev;
-	for (; it != Begin()->prev; it = it->prev) {
+	BufferEntry* it = Back();
+	for (; it != Front()->prev; it = it->prev) {
 		if (it->packet_id == packet_id)
 			return 0;
 		else if (it->packet_id < packet_id) {
@@ -113,7 +121,7 @@ int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
 		}
 	}
 
-	Insert(it->next, entry);
+	Insert(it, entry);
 	//PushBack(entry);
 	return 1;
 }
