@@ -10,8 +10,8 @@
 MVCTPComm::MVCTPComm(int send_buf_size, int recv_buf_size) {
 	comm = new MulticastComm();
 
-	send_buf = new SendBuffer(send_buf_size, comm);
-	recv_buf = new ReceiveBuffer(recv_buf_size, comm);
+	send_buf = new SendBufferMgr(send_buf_size, comm);
+	recv_buf = new ReceiveBufferMgr(recv_buf_size, comm);
 }
 
 

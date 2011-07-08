@@ -21,12 +21,13 @@
 #include <net/if.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <time.h>
+#include <ctime>
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <string.h>
+#include <list>
 
 
 using namespace std;
@@ -55,7 +56,15 @@ typedef struct MVCTPHeader {
 #endif
 */
 
+struct NackMsg {
+	u_int32_t packet_id;
+};
 
+struct NackMsgInfo {
+	u_int32_t	packet_id;
+	clock_t		time_stamp;
+	short		num_retries;
+};
 
 // Macros
 #define MAX(a, b)  ((a) > (b) ? (a) : (b))
@@ -64,7 +73,8 @@ typedef struct MVCTPHeader {
 // Constant values
 const string group_id = "224.1.2.3";
 const unsigned char group_mac_addr[6] = {0x01, 0x00, 0x5e, 0x01, 0x02, 0x03};
-const u_short mvctp_port = 123;
+const ushort mvctp_port = 123;
+const ushort BUFFER_UDP_PORT = 11005;
 const int PORT_NUM = 11001;
 const int BUFF_SIZE = 10000;
 const int MVCTP_PACKET_LEN = ETH_FRAME_LEN - ETH_HLEN;
@@ -75,7 +85,9 @@ const int MVCTP_DATA_LEN = ETH_FRAME_LEN - ETH_HLEN - sizeof(MVCTP_HEADER);
 const int UDP_MVCTP_PACKET_LEN = 1200;
 const int UDP_MVCTP_HLEN = sizeof(MVCTP_HEADER);
 const int UDP_MVCTP_DATA_LEN = 1200 - sizeof(MVCTP_HEADER);
+const int UDP_PACKET_LEN = ETH_DATA_LEN;
 
+const int INIT_RTT	= 50;		// in milliseconds
 
 
 // Prototypes for global functions

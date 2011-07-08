@@ -7,30 +7,16 @@
 
 #include "MVCTPBuffer.h"
 
-MVCTPBuffer::MVCTPBuffer(int size, MulticastComm* mcomm) {
-	max_size = size;
-	num_entry = 0;
-	actual_size = 0;
-	last_packet_id = 0;
-
+MVCTPBuffer::MVCTPBuffer(int size) {
 	nil = (BufferEntry*) malloc(sizeof(BufferEntry));
 	memset(nil, 0, sizeof(BufferEntry));
 	nil->prev = nil;	// list tail
 	nil->next = nil;	// list head
-
-	comm = mcomm;
-
 }
 
 
 MVCTPBuffer::~MVCTPBuffer() {
 }
-
-size_t MVCTPBuffer::GetDataSize() {
-	return actual_size;
-}
-
-
 
 
 BufferEntry* MVCTPBuffer::Begin() {
@@ -111,18 +97,21 @@ void MVCTPBuffer::DestroyEntry(BufferEntry* entry) {
 }
 
 
-int MVCTPBuffer::AddData(MVCTP_HEADER* header, char* data) {
+int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
 	BufferEntry* entry = (BufferEntry*)malloc(sizeof(BufferEntry));
 	entry->packet_id = header->packet_id;
 	entry->data_len = header->data_len;
 	entry->data = data;
 
-	PushBack(entry);
-
-	actual_size += header->data_len;
-	last_packet_id = header->packet_id;
-	num_entry++;
-
+	u_int32_t packet_id = header->packet_id;
+	for (BufferEntry* it = End()->prev; it != Begin()->prev; it = it->prev) {
+		if (it->packet_id == packet_id)
+			return 0;
+		else if (it->packet_id < packet_id) {
+			Insert(it->next, entry);
+		}
+	}
+	//PushBack(entry);
 	return 1;
 }
 

@@ -24,10 +24,8 @@ typedef struct BufferEntry {
 //	information for an MVCTP send/receive buffer
 class MVCTPBuffer {
 public:
-	MVCTPBuffer(int size, MulticastComm* mcomm);
+	MVCTPBuffer(int size);
 	~MVCTPBuffer();
-
-	size_t 	GetDataSize();
 
 	BufferEntry* Begin();
 	BufferEntry* End();
@@ -37,21 +35,14 @@ public:
 	int DeleteUntil(BufferEntry* entry);
 	BufferEntry* Find(u_int32_t pid);
 	bool 	IsEmpty();
-
+	int ShrinkEntry(BufferEntry* entry, size_t new_size);
+	int		AddEntry(MVCTP_HEADER* header, char* data);
 
 
 protected:
-	int 	num_entry;		// number of buffer entries in the buffer
-	int 	max_size;		// Maximum data bytes for the buffer
-	int 	actual_size;	// actual assigned data bytes in the buffer
-	int		last_packet_id;	// ID number for the latest sent/received packet
 	PTR_BUFFER_ENTRY	nil;		// pointer to the first and last entry
 
-	MulticastComm* comm;
-
-	int		AddData(MVCTP_HEADER* header, char* data);
 	void DestroyEntry(BufferEntry* entry);
-	int ShrinkEntry(BufferEntry* entry, size_t new_size);
 };
 
 
