@@ -2,7 +2,8 @@ CC=g++
 CFLAGS=-lpthread
 VPATH=starter:CommUtil:MVCTP
 OBJ=EmulabStarter.o ConfigParser.o Logger.o mvctp.o Tester.o MVCTPComm.o \
-SendBuffer.o ReceiveBuffer.o MVCTPBuffer.o MulticastComm.o ReceiverCommExecClient.o \
+SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MulticastComm.o UdpComm.o \
+ReceiverCommExecClient.o \
 SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o \
 MVCTPManager.o RawSocketComm.o  NetInterfaceManager.o
 
@@ -16,17 +17,17 @@ EmulabStarter.o: ConfigParser.o Logger.o Tester.o
 
 ConfigParser.o Logger.o: 
 
-Tester.o: mvctp.o MulticastComm.o MVCTPComm.o SendBuffer.o ReceiveBuffer.o MVCTPBuffer.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o NetInterfaceManager.o
+Tester.o: mvctp.o MulticastComm.o MVCTPComm.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o UdpComm.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o NetInterfaceManager.o
 
 SenderCommandClient.o ReceiverCommExecClient.o : CommandExecClient.o MVCTPComm.o
 
-MVCTPComm.o: mvctp.o MulticastComm.o MVCTPManager.o SendBuffer.o ReceiveBuffer.o MVCTPBuffer.o
+MVCTPComm.o: mvctp.o MulticastComm.o MVCTPManager.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o
 
-SendBuffer.o ReceiveBuffer.o: mvctp.o MVCTPBuffer.o
+SendBufferMgr.o ReceiveBufferMgr.o: mvctp.o MVCTPBuffer.o UdpComm.o
 
 MVCTPBuffer.o: mvctp.o MulticastComm.o
 
-MulticastComm.o: mvctp.o  
+MulticastComm.o UdpComm.o: mvctp.o  
 
 MVCTPManager.o: mvctp.o RawSocketComm.o NetInterfaceManager.o 
 
