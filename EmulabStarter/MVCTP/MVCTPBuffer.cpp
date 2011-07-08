@@ -103,14 +103,17 @@ int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
 	entry->data_len = header->data_len;
 	entry->data = data;
 
-	u_int32_t packet_id = header->packet_id;
-	for (BufferEntry* it = End()->prev; it != Begin()->prev; it = it->prev) {
+	int32_t packet_id = header->packet_id;
+	BufferEntry* it = End()->prev;
+	for (; it != Begin()->prev; it = it->prev) {
 		if (it->packet_id == packet_id)
 			return 0;
 		else if (it->packet_id < packet_id) {
-			Insert(it->next, entry);
+			break; //Insert(it->next, entry);
 		}
 	}
+
+	Insert(it->next, entry);
 	//PushBack(entry);
 	return 1;
 }
