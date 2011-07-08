@@ -8,16 +8,15 @@
 #include "ReceiveBufferMgr.h"
 
 ReceiveBufferMgr::ReceiveBufferMgr(int size, MulticastComm* mcomm) {
-	recv_buf = new MVCTPBuffer(size);
-	comm = mcomm;
-	udp_comm = new UdpComm(BUFFER_UDP_PORT);
-
 	max_size = size;
 	num_entry = 0;
 	actual_size = 0;
 	last_recv_packet_id = 0;
 	last_del_packet_id = 0;
 
+	recv_buf = new MVCTPBuffer(size);
+	comm = mcomm;
+	udp_comm = new UdpComm(BUFFER_UDP_SEND_PORT);
 }
 
 
