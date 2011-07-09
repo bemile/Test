@@ -122,7 +122,7 @@ void ReceiveBufferMgr::Run() {
 	bool is_first_packet = true;
 
 	while (true) {
-		if ( (bytes = comm->RecvData(buf, 1500, 0, (SA*)&sender_addr, &sender_socklen)) <= 0) {
+		if ( (bytes = comm->RecvData(buf, 1500, 0, (SA*)&sender_multicast_addr, &sender_socklen)) <= 0) {
 			SysError("MVCTPBuffer error on receiving data");
 		}
 		cout << "I received one packet. Packet length: " << bytes << endl;
@@ -134,6 +134,8 @@ void ReceiveBufferMgr::Run() {
 		if (is_first_packet) {
 			last_recv_packet_id = header->packet_id - 1;
 			last_del_packet_id = header->packet_id - 1;
+			memcpy(&sender_udp_addr, &sender_multicast_addr, sizeof(sender_multicast_addr));
+			sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 			is_first_packet = false;
 		}
 
@@ -226,6 +228,7 @@ void ReceiveBufferMgr::UdpReceive() {
 int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
 	NackMsg msg;
 	msg.packet_id = packet_id;
-	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0, (SA*)&sender_addr, sender_socklen);
+	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
+			(SA*)&sender_udp_addr, sizeof(sender_udp_addr));
 }
 
