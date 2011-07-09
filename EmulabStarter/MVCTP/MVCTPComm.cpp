@@ -50,8 +50,8 @@ ssize_t MVCTPComm::RawReceive(void* buff, size_t len) {
 }
 
 
-int MVCTPComm::IPSend(char* data, size_t length) {
-	return send_buf->SendData(data, length);
+int MVCTPComm::IPSend(const char* data, size_t length, bool send_out) {
+	return send_buf->SendData(data, length, send_out);
 	//return comm->SendData(data, length, 0);
 }
 

@@ -27,10 +27,13 @@ SendBufferMgr::~SendBufferMgr() {
 }
 
 
-int SendBufferMgr::SendData(char* data, size_t length) {
+// Send out data through the multicast socket
+// send_out: whether or not actually send out the packet (for testing reliability)
+//              should be removed in real implementation
+int SendBufferMgr::SendData(const char* data, size_t length, bool send_out) {
 	int bytes_left = length;
 	int bytes_sent = 0;
-	char* pos = data;
+	const char* pos = data;
 
 	pthread_mutex_lock(&buf_mutex);
 	while (bytes_left > 0) {
@@ -51,10 +54,12 @@ int SendBufferMgr::SendData(char* data, size_t length) {
 		entry->data_len = len + MVCTP_HLEN;
 		entry->data = ptr_data;
 
-		if (SendPacket(entry) <= 0) {
-			SysError("SendBuffer error on sending packet");
+		if (send_out) {
+			if (SendPacket(entry) <= 0) {
+				SysError("SendBuffer error on sending packet");
+			}
+			cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
 		}
-		cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
 
 		pos += len;
 		bytes_left -= len;

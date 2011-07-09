@@ -23,7 +23,7 @@ public:
 	int JoinGroup(string addr, ushort port);
 	int RawSend(char* data, size_t length);
 	int RawReceive(void* buff, size_t len);
-	int IPSend(char* data, size_t length);
+	int IPSend(const char* data, size_t length, bool send_out);
 	int IPReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 
 

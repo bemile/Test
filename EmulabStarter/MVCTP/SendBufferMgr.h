@@ -18,7 +18,7 @@ public:
 	SendBufferMgr(int size, MulticastComm* mcomm);
 	~SendBufferMgr();
 
-	int SendData(char* data, size_t length);
+	int SendData(const char* data, size_t length, bool send_out);
 	int SendPacket(BufferEntry* entry);
 	void StartUdpThread();
 

@@ -30,7 +30,7 @@ private:
 	socklen_t 		sender_socklen;
 
 	int 	num_entry;		// number of buffer entries in the buffer
-	int 	max_size;		// Maximum data bytes for the buffer
+	int 	max_size;		// maximum data bytes for the buffer
 	int 	actual_size;	// actual assigned data bytes in the buffer
 	int32_t			last_recv_packet_id;	// ID number for the latest sent/received packet
 	int32_t			last_del_packet_id;
