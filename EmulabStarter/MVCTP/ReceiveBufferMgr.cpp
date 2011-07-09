@@ -137,7 +137,7 @@ void ReceiveBufferMgr::Run() {
 			memcpy(&sender_udp_addr, &sender_multicast_addr, sizeof(sender_multicast_addr));
 			sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 			char ip[20];
-			inet_ntop(AF_INET, (void*)&sender_multicast_addr.sin_addr.s_addr, ip, 20);
+			inet_ntop(AF_INET, (void*)&sender_multicast_addr.sin_addr, ip, 20);
 			ip[15] = 0;
 			cout << "Sender IP address: " << ip << endl;
 			cout << "Sender Port: " << sender_multicast_addr.sin_port << endl;

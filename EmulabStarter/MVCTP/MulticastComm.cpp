@@ -42,7 +42,7 @@ int MulticastComm::JoinGroup(const SA* sa, int sa_len, const char *if_name) {
 				mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 			}
 
-			//bind(sock_fd, &dst_addr, dst_addr_len);
+			bind(sock_fd, &dst_addr, dst_addr_len);
 			return (setsockopt(sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)));
 
 		default:
@@ -77,7 +77,7 @@ int MulticastComm::JoinGroup(const SA* sa, int sa_len, u_int if_index) {
 					mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 				}
 
-				//bind(sock_fd, &dst_addr, dst_addr_len);
+				bind(sock_fd, &dst_addr, dst_addr_len);
 
 				return (setsockopt(sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)));
 
