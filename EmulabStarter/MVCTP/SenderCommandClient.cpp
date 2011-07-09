@@ -19,10 +19,11 @@ SenderCommandClient::SenderCommandClient(int sock, MVCTPComm* psender) {
 
 int SenderCommandClient::HandleCommand(char* command) {
 	string s = command;
-	int length = s.length();
+	/*int length = s.length();
 	int index = s.find(' ');
 	string comm_name = s.substr(0, index);
 	string args = s.substr(index + 1, length - index - 1);
+	 */
 
 	list<string> parts;
 	Split(s, ' ', parts);
@@ -46,7 +47,7 @@ int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 	bool memory_transfer = false;
 	bool send_out_packets = true;
 
-	string arg;
+	string arg = "";
 	list<string>::iterator it;
 	for (it = slist.begin(); it != slist.end(); it++) {
 		if ((*it)[0] == '-') {
@@ -100,6 +101,11 @@ void SenderCommandClient::Split(string s, char c, list<string>& slist) {
 		}
 
 		cur_pos++;
+	}
+
+	if (cur_pos != start) {
+		string subs = s.substr(start, cur_pos - start);
+		slist.push_back(subs);
 	}
 }
 
