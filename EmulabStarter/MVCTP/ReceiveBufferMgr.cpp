@@ -136,6 +136,10 @@ void ReceiveBufferMgr::Run() {
 			last_del_packet_id = header->packet_id - 1;
 			memcpy(&sender_udp_addr, &sender_multicast_addr, sizeof(sender_multicast_addr));
 			sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
+			char ip[20];
+			inet_ntop(AF_INET, (void*)&sender_multicast_addr.sin_addr, ip, 20);
+			ip[15] = 0;
+			cout << "Sender IP address: " << ip << endl;
 			is_first_packet = false;
 		}
 
