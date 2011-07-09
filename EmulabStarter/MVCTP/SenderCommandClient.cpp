@@ -91,7 +91,7 @@ void SenderCommandClient::Split(string s, char c, list<string>& slist) {
 	const char* ptr = s.c_str();
 	int start = 0;
 	int cur_pos = 0;
-	for (; ptr != '\0'; ptr++) {
+	for (; *ptr != '\0'; ptr++) {
 		if (*ptr == c) {
 			if (cur_pos != start) {
 				string subs = s.substr(start, cur_pos - start);
