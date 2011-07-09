@@ -139,6 +139,9 @@ void ReceiveBufferMgr::Run() {
 
 		// Record missing packets if there is a gap in the packet_id
 		if (header->packet_id - last_recv_packet_id > 1) {
+			cout << "Packet loss detected. Received Packet ID: " << header->packet_id
+					<< "  Supposed ID:" << last_recv_packet_id + 1 << endl;
+
 			pthread_mutex_lock(&nack_list_mutex);
 			clock_t time = clock() - 0.1 * CLOCKS_PER_SEC;
 			for (int32_t i = last_recv_packet_id + 1; i != header->packet_id; i++) {
@@ -149,6 +152,7 @@ void ReceiveBufferMgr::Run() {
 				missing_packet_list.push_back(info);
 			}
 			pthread_mutex_unlock(&nack_list_mutex);
+			cout << "Missing packets added to the retransmit list." << endl;
 		}
 
 		// Add the received packet to the buffer
@@ -179,6 +183,7 @@ void ReceiveBufferMgr::NackRun() {
 				SendNackMsg(it->packet_id);
 				it->num_retries++;
 				it->time_stamp = cur_time;
+				cout << "One NACK message sent." << endl;
 			}
 		}
 		pthread_mutex_unlock(&nack_list_mutex);
@@ -204,6 +209,8 @@ void ReceiveBufferMgr::UdpReceive() {
 		if ( (bytes = udp_comm->RecvFrom(buf, UDP_PACKET_LEN, 0, NULL, NULL)) <= 0) {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
+
+		cout << "One retransmission packet received." << endl;
 
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);

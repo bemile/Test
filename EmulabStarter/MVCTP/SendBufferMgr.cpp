@@ -106,6 +106,7 @@ void SendBufferMgr::ReceiveNack() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
+		cout << "One retransmission request received." << endl;
 		nack_msg = (NackMsg*)buf;
 		Retransmit(nack_msg->packet_id);
 	}
@@ -114,7 +115,7 @@ void SendBufferMgr::ReceiveNack() {
 
 void SendBufferMgr::Retransmit(int32_t packet_id) {
 	pthread_mutex_lock(&buf_mutex);
-	for (BufferEntry* it = send_buf->End()->prev; it != send_buf->Begin()->prev; it = it->prev) {
+	for (BufferEntry* it = send_buf->Back(); it != send_buf->Begin()->prev; it = it->prev) {
 		if (it->packet_id == packet_id)
 			udp_comm->SendTo((void *)it->data, it->data_len, 0, (SA*)&sender_addr, sender_socklen);;
 	}
