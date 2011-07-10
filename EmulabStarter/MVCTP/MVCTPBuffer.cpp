@@ -10,8 +10,8 @@
 MVCTPBuffer::MVCTPBuffer(int size) {
 	nil = (BufferEntry*) malloc(sizeof(BufferEntry));
 	memset(nil, 0, sizeof(BufferEntry));
-	nil->prev = nil;	// list tail
-	nil->next = nil;	// list head
+	nil->prev = nil;	// list back
+	nil->next = nil;	// list front
 }
 
 
@@ -124,6 +124,7 @@ int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
 
 	Insert(it, entry);
 	//PushBack(entry);
+	cout << "Entry added. New front packet ID: " << Front()->packet_id << endl;
 	return 1;
 }
 
