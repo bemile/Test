@@ -143,7 +143,7 @@ void ReceiveBufferMgr::Run() {
 			//memcpy(&sender_udp_addr, &sender_multicast_addr, sizeof(sender_multicast_addr));
 			sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 			sender_udp_addr.sin_family = AF_INET;
-			inet_pton(AF_INET, "155.98.36.83", &sender_udp_addr.sin_addr);
+			inet_pton(AF_INET, "155.98.36.111", &sender_udp_addr.sin_addr);
 			is_first_packet = false;
 		}
 
@@ -189,7 +189,7 @@ void ReceiveBufferMgr::NackRun() {
 		clock_t cur_time = clock();
 		pthread_mutex_lock(&nack_list_mutex);
 		for (it = missing_packet_list.begin(); it != missing_packet_list.end(); it++) {
-			if ( (cur_time - it->time_stamp) > INIT_RTT * CLOCKS_PER_SEC / 1000) {
+			if ( (cur_time - it->time_stamp) > INIT_RTT / 1000 * CLOCKS_PER_SEC ) {
 				SendNackMsg(it->packet_id);
 				it->num_retries++;
 				it->time_stamp = cur_time;
@@ -201,6 +201,18 @@ void ReceiveBufferMgr::NackRun() {
 		usleep(10000);
 	}
 }
+
+
+// Send a retransmission request to the sender
+int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
+	NackMsg msg;
+	msg.packet_id = packet_id;
+	cout << "Sending NACK message to sender IP address: " << sender_udp_addr.sin_addr.s_addr << endl;
+	cout << "Sender Port #: " << sender_udp_addr.sin_port << endl;
+	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
+			(SA*)&sender_udp_addr, sizeof(sender_udp_addr));
+}
+
 
 // Helper function to start the unicast UDP thread
 void* ReceiveBufferMgr::StartUdpReceiveThread(void* ptr) {
@@ -232,11 +244,5 @@ void ReceiveBufferMgr::UdpReceive() {
 	}
 }
 
-// Send a retransmission request to the sender
-int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
-	NackMsg msg;
-	msg.packet_id = packet_id;
-	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
-			(SA*)&sender_udp_addr, sizeof(sender_udp_addr));
-}
+
 

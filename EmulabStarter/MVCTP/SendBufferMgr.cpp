@@ -17,7 +17,7 @@ SendBufferMgr::SendBufferMgr(int size, MulticastComm* mcomm) {
 	comm = mcomm;
 	udp_comm = new UdpComm(BUFFER_UDP_SEND_PORT);
 
-	void StartUdpThread();
+	StartUdpThread();
 }
 
 SendBufferMgr::~SendBufferMgr() {
