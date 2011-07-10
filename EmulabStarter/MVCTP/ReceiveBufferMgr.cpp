@@ -228,6 +228,9 @@ void ReceiveBufferMgr::UdpReceive() {
 		}
 
 		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
+		// Discard duplicated packet that has already been used and deleted from the buffer
+		if (header->packet_id <= last_del_packet_id)
+			continue;
 
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
@@ -237,8 +240,23 @@ void ReceiveBufferMgr::UdpReceive() {
 		num_entry++;
 		pthread_mutex_unlock(&buf_mutex);
 
+
+
 		cout << "Retransmission packet added to the buffer." << endl;
 	}
+}
+
+
+void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
+	pthread_mutex_lock(&nack_list_mutex);
+	list<NackMsgInfo>::iterator it;
+	for (it = missing_packet_list.begin(); it != missing_packet_list.end(); it++) {
+		if (it->packet_id == packet_id) {
+			missing_packet_list.remove(*it);
+			break;
+		}
+	}
+	pthread_mutex_unlock(&nack_list_mutex);
 }
 
 

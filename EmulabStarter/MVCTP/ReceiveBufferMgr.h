@@ -44,6 +44,7 @@ private:
 	void Run();
 	static void* StartNackThread(void* ptr);
 	void NackRun();
+	void DeleteNackFromList(int32_t packet_id);
 	static void* StartUdpReceiveThread(void* ptr);
 	void UdpReceive();
 };
