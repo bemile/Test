@@ -227,7 +227,7 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
-		cout << "One retransmission packet received." << endl;
+		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
 
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
