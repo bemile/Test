@@ -44,7 +44,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	while (true) {
 		pthread_mutex_lock(&buf_mutex);
 		int32_t last_pid = recv_buf->Front()->packet_id - 1;
-		BufferEntry *tmp = NULL;
+		BufferEntry *tmp;
 		for (tmp = recv_buf->Begin(); tmp != recv_buf->End(); tmp = tmp->next) {
 			if (tmp->packet_id != (last_pid + 1))
 				break;
@@ -67,7 +67,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 			}
 		}
 
-		if (tmp != NULL) {
+		if (tmp != recv_buf->Begin()) {
 			last_del_packet_id = tmp->prev->packet_id;
 			recv_buf->DeleteUntil(tmp);
 		}
