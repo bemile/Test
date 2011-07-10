@@ -252,7 +252,7 @@ void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
 	list<NackMsgInfo>::iterator it;
 	for (it = missing_packet_list.begin(); it != missing_packet_list.end(); it++) {
 		if (it->packet_id == packet_id) {
-			missing_packet_list.remove(*it);
+			missing_packet_list.erase(it);
 			break;
 		}
 	}
