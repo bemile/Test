@@ -65,11 +65,11 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 				bytes_copied += tmp->data_len;
 				bytes_remained -= tmp->data_len;
 			}
+		}
 
-			if (tmp != NULL) {
-				last_del_packet_id = tmp->prev->packet_id;
-				recv_buf->DeleteUntil(tmp);
-			}
+		if (tmp != NULL) {
+			last_del_packet_id = tmp->prev->packet_id;
+			recv_buf->DeleteUntil(tmp);
 		}
 		pthread_mutex_unlock(&buf_mutex);
 
