@@ -207,8 +207,6 @@ void ReceiveBufferMgr::NackRun() {
 int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
 	NackMsg msg;
 	msg.packet_id = packet_id;
-	cout << "Sending NACK message to sender IP address: " << sender_udp_addr.sin_addr.s_addr << endl;
-	cout << "Sender Port #: " << sender_udp_addr.sin_port << endl;
 	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
 			(SA*)&sender_udp_addr, sizeof(sender_udp_addr));
 }
@@ -241,6 +239,8 @@ void ReceiveBufferMgr::UdpReceive() {
 		actual_size += header->data_len;
 		num_entry++;
 		pthread_mutex_unlock(&buf_mutex);
+
+		cout << "Retransmission packet added to the buffer." << endl;
 	}
 }
 
