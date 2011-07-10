@@ -35,38 +35,35 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	size_t bytes_remained = len;
 
 	//wait until there are some data in the buffer
-	while (recv_buf->IsEmpty()) {
+	while (recv_buf->IsEmpty() || recv_buf->Front()->packet_id != last_del_packet_id  + 1) {
 		usleep(10000);
 	}
 	cout << "New packets are ready." << endl;
 
 	int sleep_turns = 0;
-	int32_t last_pid = recv_buf->Front()->packet_id - 1;
-	BufferEntry *tmp = NULL;
 	while (true) {
 		pthread_mutex_lock(&buf_mutex);
-		if (recv_buf->Front()->packet_id == last_del_packet_id  + 1) {
-			for (tmp = recv_buf->Begin(); tmp != recv_buf->End(); tmp = tmp->next) {
-				if (tmp->packet_id != (last_pid + 1) )
-					break;
+		int32_t last_pid = recv_buf->Front()->packet_id - 1;
+		BufferEntry *tmp = NULL;
+		for (tmp = recv_buf->Begin(); tmp != recv_buf->End(); tmp = tmp->next) {
+			if (tmp->packet_id != (last_pid + 1))
+				break;
 
-				last_pid = tmp->packet_id;
-				if (bytes_remained <= 0)
-					break;
-				else if (bytes_remained < tmp->data_len) {
-					memcpy(pos, tmp->data, bytes_remained);
-					pos += bytes_remained;
-					bytes_copied += bytes_remained;
-					bytes_remained = 0;
-					recv_buf->ShrinkEntry(tmp, tmp->data_len - bytes_remained);
-					break;
-				}
-				else {
-					memcpy(pos, tmp->data, tmp->data_len);
-					pos += tmp->data_len;
-					bytes_copied += tmp->data_len;
-					bytes_remained -= tmp->data_len;
-				}
+			last_pid = tmp->packet_id;
+			if (bytes_remained <= 0)
+				break;
+			else if (bytes_remained < tmp->data_len) {
+				memcpy(pos, tmp->data, bytes_remained);
+				pos += bytes_remained;
+				bytes_copied += bytes_remained;
+				bytes_remained = 0;
+				recv_buf->ShrinkEntry(tmp, tmp->data_len - bytes_remained);
+				break;
+			} else {
+				memcpy(pos, tmp->data, tmp->data_len);
+				pos += tmp->data_len;
+				bytes_copied += tmp->data_len;
+				bytes_remained -= tmp->data_len;
 			}
 
 			if (tmp != NULL) {
