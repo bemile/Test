@@ -9,6 +9,7 @@
 #define COMMANDEXECCLIENT_H_
 
 #include <pthread.h>
+#include <list>
 #include "CommUtil.h"
 
 
@@ -36,8 +37,10 @@ protected:
 	static void* StartThread(void* ptr);
 	virtual int HandleCommand(char* command);
 	int ExecSysCommand(char* command);
+	void Split(string s, char c, list<string>& slist);
 
 private:
+	void HandleRestartCommand();
 
 };
 

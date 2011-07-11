@@ -34,13 +34,17 @@ int SenderCommandClient::HandleCommand(char* command) {
 		HandleSendCommand(parts);
 	}
 	else {
-		ExecSysCommand(command);
+		CommandExecClient::HandleCommand(command);
+		//ExecSysCommand(command);
 	}
 
 	return 1;
 }
 
 
+
+
+//
 int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 	bool direct_transfer = true;
 	bool file_transfer = false;
@@ -65,8 +69,10 @@ int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 				break;
 			}
 		}
-		else
-			arg = *it;
+		else {
+			arg.append(*it);
+			arg.append(" ");
+		}
 	}
 
 	//ptr_sender->IPSend(&command[index + 1], args.length(), true);
@@ -83,30 +89,6 @@ int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 	}
 
 	return 1;
-}
-
-
-// Divide string s into sub strings separated by the character c
-void SenderCommandClient::Split(string s, char c, list<string>& slist) {
-	const char* ptr = s.c_str();
-	int start = 0;
-	int cur_pos = 0;
-	for (; *ptr != '\0'; ptr++) {
-		if (*ptr == c) {
-			if (cur_pos != start) {
-				string subs = s.substr(start, cur_pos - start);
-				slist.push_back(subs);
-			}
-			start = cur_pos + 1;
-		}
-
-		cur_pos++;
-	}
-
-	if (cur_pos != start) {
-		string subs = s.substr(start, cur_pos - start);
-		slist.push_back(subs);
-	}
 }
 
 

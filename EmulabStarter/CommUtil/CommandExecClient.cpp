@@ -86,23 +86,43 @@ void CommandExecClient::Run() {
 
 
 int CommandExecClient::HandleCommand(char* command) {
-	return ExecSysCommand(command);
+	string s = command;
+	list<string> parts;
+	Split(s, ' ', parts);
+	if (parts.size() == 0)
+		return 0;
+
+	if (parts.front().compare("restart") == 0) {
+		HandleRestartCommand();
+	} else {
+		ExecSysCommand(command);
+	}
+
+	return 1;
 }
 
 
+//
+void CommandExecClient::HandleRestartCommand() {
+	string command = "killall emustarter\n~/bin/run_starter.sh\n";
+	system(command.c_str());
+
+}
+
+
+
 int CommandExecClient::ExecSysCommand(char* command) {
-	cout << "I received a command: " << command << endl;
-		FILE* pFile = popen(command, "r");
-		if (pFile != NULL) {
-			char output[BUFFER_SIZE];
-			int bytes = fread(output, 1, BUFFER_SIZE, pFile);
-			output[bytes] = '\0';
-			pclose(pFile);
-			SendMessage(COMMAND_RESPONSE, output);
-		} else {
-			cout << "Cannot get output from execution." << endl;
-		}
-		return 1;
+	FILE* pFile = popen(command, "r");
+	if (pFile != NULL) {
+		char output[BUFFER_SIZE];
+		int bytes = fread(output, 1, BUFFER_SIZE, pFile);
+		output[bytes] = '\0';
+		pclose(pFile);
+		SendMessage(COMMAND_RESPONSE, output);
+	} else {
+		cout << "Cannot get output from execution." << endl;
+	}
+	return 1;
 }
 
 
@@ -125,6 +145,31 @@ int CommandExecClient::SendMessage(int msg_type, string msg) {
 	}
 	else
 		return 1;
+}
+
+
+
+// Divide string s into sub strings separated by the character c
+void CommandExecClient::Split(string s, char c, list<string>& slist) {
+	const char* ptr = s.c_str();
+	int start = 0;
+	int cur_pos = 0;
+	for (; *ptr != '\0'; ptr++) {
+		if (*ptr == c) {
+			if (cur_pos != start) {
+				string subs = s.substr(start, cur_pos - start);
+				slist.push_back(subs);
+			}
+			start = cur_pos + 1;
+		}
+
+		cur_pos++;
+	}
+
+	if (cur_pos != start) {
+		string subs = s.substr(start, cur_pos - start);
+		slist.push_back(subs);
+	}
 }
 
 

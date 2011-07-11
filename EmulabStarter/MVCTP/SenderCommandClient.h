@@ -16,8 +16,6 @@ public:
 	SenderCommandClient(MVCTPComm* psender);
 	SenderCommandClient(int sock, MVCTPComm* psender);
 
-	void Split(string s, char c, list<string>& slist);
-
 protected:
 	virtual int HandleCommand(char* command);
 	int HandleSendCommand(list<string>& slist);
