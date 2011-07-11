@@ -10,6 +10,8 @@
 
 #include <pthread.h>
 #include <list>
+#include <unistd.h>
+#include <cstdlib>
 #include "CommUtil.h"
 
 
