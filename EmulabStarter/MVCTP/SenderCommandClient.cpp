@@ -31,6 +31,7 @@ int SenderCommandClient::HandleCommand(char* command) {
 		return 0;
 
 	if (parts.front().compare("send") == 0) {
+		parts.erase(parts.begin());
 		HandleSendCommand(parts);
 	}
 	else {
