@@ -104,7 +104,7 @@ int CommandExecClient::HandleCommand(char* command) {
 
 //
 void CommandExecClient::HandleRestartCommand() {
-	string command = "killall emustarter\n~/bin/run_starter.sh\n";
+	string command = "sudo killall emustarter\n~/bin/run_starter.sh\n";
 	system(command.c_str());
 
 }
