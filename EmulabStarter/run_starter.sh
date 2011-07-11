@@ -1,6 +1,6 @@
 HOST=`hostname -f`
 
-cd ~/$HOST/src/Test/EmulabStarter
+cd ~/$HOST/Test/EmulabStarter
 make
 make clean
 sudo ./emustarter config
