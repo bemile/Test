@@ -25,6 +25,7 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, MulticastComm* mcomm) {
 
 	in_addr * address = (in_addr * )record->h_addr;
 	memcpy(&sender_udp_addr.sin_addr, address, sizeof(address));
+	cout << "Sender address: " << inet_ntoa(*address);
 	//inet_pton(AF_INET, record->h_addr_list, &sender_udp_addr.sin_addr);
 }
 

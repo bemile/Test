@@ -11,6 +11,7 @@
 #include "mvctp.h"
 #include "MVCTPBuffer.h"
 #include "UdpComm.h"
+#include <netinet/in.h>
 #include <pthread.h>
 
 
