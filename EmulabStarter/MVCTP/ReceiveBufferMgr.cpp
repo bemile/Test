@@ -17,6 +17,15 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, MulticastComm* mcomm) {
 	recv_buf = new MVCTPBuffer(size);
 	comm = mcomm;
 	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
+
+	//TODO: remove this after the problem of getting sender address info is fixed
+	hostent * record = gethostbyname("node0.ldm-test.MVC.emulab.net");
+	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
+	sender_udp_addr.sin_family = AF_INET;
+
+	in_addr * address = (in_addr * )record->h_addr;
+	memcpy(&sender_udp_addr.sin_addr, address, sizeof(address));
+	//inet_pton(AF_INET, record->h_addr_list, &sender_udp_addr.sin_addr);
 }
 
 
@@ -138,10 +147,6 @@ void ReceiveBufferMgr::Run() {
 
 			last_recv_packet_id = header->packet_id - 1;
 			last_del_packet_id = header->packet_id - 1;
-			//memcpy(&sender_udp_addr, &sender_multicast_addr, sizeof(sender_multicast_addr));
-			sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
-			sender_udp_addr.sin_family = AF_INET;
-			inet_pton(AF_INET, "155.98.36.111", &sender_udp_addr.sin_addr);
 			is_first_packet = false;
 		}
 
