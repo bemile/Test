@@ -26,7 +26,8 @@ private:
 	MVCTPBuffer* 	recv_buf;
 	MulticastComm* 	comm;
 	UdpComm*		udp_comm;
-	sockaddr_in		sender_multicast_addr, sender_udp_addr;
+	sockaddr		sender_multicast_addr;
+	sockaddr_in		sender_udp_addr;
 	socklen_t 		sender_socklen;
 
 	int 	num_entry;		// number of buffer entries in the buffer

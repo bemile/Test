@@ -112,18 +112,18 @@ void CommandExecClient::HandleRestartCommand() {
 		return;
 	}
 
-	if (pid == 0) {	//child process
+	if (pid == 0) { //child process
+		keep_alive = false;
+		exit(0);
+	} else {
 		wait(&status);
 
 		chdir("/users/jieli/bin");
-		execl( "/bin/sh", "sh", "/users/jieli/bin/run_starter.sh", (char *)0);
+		execl("/bin/sh", "sh", "/users/jieli/bin/run_starter.sh", (char *) 0);
 		//string command = "sudo killall emustarter\n/users/jieli/bin/run_starter.sh\n";
 		//system(command.c_str());
 		exit(0);
-	}
-	else {
-		keep_alive = false;
-		exit(0);
+
 	}
 
 	exit(0);
