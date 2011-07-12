@@ -12,6 +12,7 @@
 #include <list>
 #include <unistd.h>
 #include <cstdlib>
+#include <sys/wait.h>
 #include "CommUtil.h"
 
 

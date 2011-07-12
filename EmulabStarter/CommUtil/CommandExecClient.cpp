@@ -104,23 +104,26 @@ int CommandExecClient::HandleCommand(char* command) {
 
 //
 void CommandExecClient::HandleRestartCommand() {
-	pid_t child = 0;
-	child = fork();
-	if (child < 0) {
+	pid_t pid = 0;
+	pid = fork();
+	int status;
+	if (pid < 0) {
 		perror("process failed to fork" );
 		return;
 	}
 
-	if (child == 0) {
-		wait();
+	if (pid == 0) {	//child process
 		keep_alive = false;
-		exit(1);
+		exit(0);
 	}
 	else {
-		execl( "/bin/ls", "ls");
-		string command = "sudo killall emustarter\n~/bin/run_starter.sh\n";
-		system(command.c_str());
-		exit(1);
+		if (wait(&status) != pid)
+			return;
+
+		execl( "~/bin/run_starter.sh", "run_starter.sh");
+		//string command = "sudo killall emustarter\n~/bin/run_starter.sh\n";
+		//system(command.c_str());
+		exit(0);
 	}
 
 	exit(0);
