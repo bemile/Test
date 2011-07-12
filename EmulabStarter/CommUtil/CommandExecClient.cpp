@@ -120,7 +120,7 @@ void CommandExecClient::HandleRestartCommand() {
 		if (wait(&status) != pid)
 			return;
 
-		execl( "~/bin/run_starter.sh", "run_starter.sh");
+		execl( "/bin/sh", "sh", "~/bin/run_starter.sh", (char *)0);
 		//string command = "sudo killall emustarter\n~/bin/run_starter.sh\n";
 		//system(command.c_str());
 		exit(0);
