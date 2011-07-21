@@ -9,7 +9,6 @@
 #define MVCTPBUFFER_H_
 
 #include "mvctp.h"
-#include "MulticastComm.h"
 #include <pthread.h>
 
 // buffer entry for a single packet

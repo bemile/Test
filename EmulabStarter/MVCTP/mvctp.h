@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include <sys/errno.h>
+#include <sys/time.h>
 #include <linux/if_packet.h>
 #include <linux/if_ether.h>
 //#include <linux/if_arp.h>
@@ -28,6 +29,7 @@
 #include <string>
 #include <string.h>
 #include <list>
+#include "ConfigInfo.h"
 
 
 using namespace std;
@@ -69,6 +71,7 @@ struct NackMsgInfo {
 // Macros
 #define MAX(a, b)  ((a) > (b) ? (a) : (b))
 
+const bool is_debug = false;
 
 // Constant values
 const string group_id = "224.1.2.3";
@@ -78,12 +81,16 @@ const ushort BUFFER_UDP_SEND_PORT = 12345;
 const ushort BUFFER_UDP_RECV_PORT = 12346;
 const int PORT_NUM = 11001;
 const int BUFF_SIZE = 10000;
+
+const ushort MVCTP_PROTO_TYPE = 0x0001;
 const int MVCTP_PACKET_LEN = ETH_FRAME_LEN - ETH_HLEN;
 const int MVCTP_HLEN = sizeof(MVCTP_HEADER);
-const int MVCTP_DATA_LEN = ETH_FRAME_LEN - ETH_HLEN - sizeof(MVCTP_HEADER);
+// Force maximum MVCTP payload to be 1460 bytes so that it won't cause fragmentation
+// when using TCP for packet retransmission
+const int MVCTP_DATA_LEN = 1460 - sizeof(MVCTP_HEADER); //ETH_FRAME_LEN - ETH_HLEN - sizeof(MVCTP_HEADER);
 
 // parameters for MVCTP over UDP
-const int UDP_MVCTP_PACKET_LEN = 1200;
+const int UDP_MVCTP_PACKET_LEN = 1460;
 const int UDP_MVCTP_HLEN = sizeof(MVCTP_HEADER);
 const int UDP_MVCTP_DATA_LEN = 1200 - sizeof(MVCTP_HEADER);
 const int UDP_PACKET_LEN = ETH_DATA_LEN;
@@ -93,6 +100,5 @@ const int INIT_RTT	= 50;		// in milliseconds
 
 // Prototypes for global functions
 void SysError(string s);
-
 
 #endif /* MVCTP_H_ */

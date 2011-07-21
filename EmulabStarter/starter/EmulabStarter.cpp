@@ -13,13 +13,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "../CommUtil/StatusMonitor.h"
-#include "ConfigParser.h"
+#include "../MVCTP/ConfigInfo.h"
 #include "Logger.h"
 #include "../MVCTP/Tester.h"
 
 using namespace std;
 
-ConfigParser* ptr_parser;
+ConfigInfo* ptr_config_info;
 StatusMonitor* ptr_monitor;
 
 void StartStatusMonitor();
@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
 	}
 
 	// Parse configuration file
-	ptr_parser = new ConfigParser();
-	ptr_parser->Parse(argv[1]);
+	ptr_config_info = ConfigInfo::GetInstance();
+	ptr_config_info->Parse(argv[1]);
 
 	// Start status monitor
 	//StartStatusMonitor();
@@ -62,8 +62,8 @@ void StartStatusMonitor() {
 		chdir("/");
 		umask(0);
 
-		string serv_addr = ptr_parser->GetValue("Monitor Server");
-		string port = ptr_parser->GetValue("Monitor Server Port");
+		string serv_addr = ptr_config_info->GetValue("Monitor Server");
+		string port = ptr_config_info->GetValue("Monitor Server Port");
 		if (serv_addr.length() > 0) {
 			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
 			ptr_monitor->ConnectServer();
@@ -74,6 +74,6 @@ void StartStatusMonitor() {
 
 
 void Clean() {
-	delete ptr_parser;
+	delete ptr_config_info;
 	delete ptr_monitor;
 }

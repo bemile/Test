@@ -1,37 +1,43 @@
 CC=g++
 CFLAGS=-lpthread
 VPATH=starter:CommUtil:MVCTP
-OBJ=EmulabStarter.o ConfigParser.o Logger.o mvctp.o Tester.o MVCTPComm.o \
-SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MulticastComm.o UdpComm.o \
-ReceiverCommExecClient.o \
-SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o \
-MVCTPManager.o RawSocketComm.o  NetInterfaceManager.o
+OBJ=EmulabStarter.o ConfigInfo.o Logger.o mvctp.o Tester.o MVCTPComm.o \
+SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MVCTPSender.o MVCTPReceiver.o \
+MulticastComm.o RawSocketComm.o InetComm.o UdpComm.o NetInterfaceManager.o \
+ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o
+
 
 
 all: emustarter
 
 emustarter: $(OBJ)
-	$(CC) -o $@ $(OBJ) -lpthread
+	$(CC) -o $@ $(OBJ) $(CFLAGS)
 
-EmulabStarter.o: ConfigParser.o Logger.o Tester.o
+EmulabStarter.o: ConfigInfo.o Logger.o Tester.o
 
-ConfigParser.o Logger.o: 
+ConfigInfo.o Logger.o: 
 
-Tester.o: mvctp.o MulticastComm.o MVCTPComm.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o UdpComm.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o MVCTPManager.o RawSocketComm.o NetInterfaceManager.o
+Tester.o: mvctp.o MulticastComm.o RawSocketComm.o InetComm.o MVCTPComm.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MVCTPSender.o MVCTPReceiver.o UdpComm.o ReceiverCommExecClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o NetInterfaceManager.o
 
-SenderCommandClient.o ReceiverCommExecClient.o : CommandExecClient.o MVCTPComm.o
+SenderCommandClient.o : CommandExecClient.o MVCTPSender.o MVCTPComm.o
 
-MVCTPComm.o: mvctp.o MulticastComm.o MVCTPManager.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o
+ReceiverCommExecClient.o : CommandExecClient.o MVCTPReceiver.o MVCTPComm.o
 
-SendBufferMgr.o ReceiveBufferMgr.o: mvctp.o MVCTPBuffer.o UdpComm.o
+MVCTPSender.o: mvctp.o MVCTPComm.o SendBufferMgr.o 
 
-MVCTPBuffer.o: mvctp.o MulticastComm.o
+MVCTPReceiver.o: mvctp.o MVCTPComm.o ReceiveBufferMgr.o 
 
-MulticastComm.o UdpComm.o: mvctp.o  
+MVCTPComm.o: mvctp.o MulticastComm.o RawSocketComm.o NetInterfaceManager.o
 
-MVCTPManager.o: mvctp.o RawSocketComm.o NetInterfaceManager.o 
+SendBufferMgr.o ReceiveBufferMgr.o: mvctp.o MVCTPBuffer.o UdpComm.o InetComm.o
 
-RawSocketComm.o NetInterfaceManager.o: mvctp.o
+MVCTPBuffer.o: mvctp.o
+
+MulticastComm.o RawSocketComm.o: mvctp.o InetComm.o 
+
+InetComm.o : mvctp.o
+
+UdpComm.o NetInterfaceManager.o: mvctp.o
 
 mvctp.o:
 

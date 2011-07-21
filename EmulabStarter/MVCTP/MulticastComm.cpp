@@ -105,8 +105,8 @@ int MulticastComm::SetLoopBack(int onoff) {
 }
 
 
-ssize_t MulticastComm::SendData(const void* buff, size_t len, int flags) {
-	return sendto(sock_fd, buff, len, flags, &dst_addr, sizeof(sockaddr_in));
+ssize_t MulticastComm::SendData(const void* buff, size_t len, int flags, void* dst_addr) {
+	return sendto(sock_fd, buff, len, flags, &this->dst_addr, sizeof(sockaddr_in));
 }
 
 

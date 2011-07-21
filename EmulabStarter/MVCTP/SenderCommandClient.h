@@ -9,19 +9,21 @@
 #define SENDERCOMMANDCLIENT_H_
 
 #include "../CommUtil/CommandExecClient.h"
-#include "MVCTPComm.h"
+#include "MVCTPSender.h"
+#include <sys/time.h>
 
 class SenderCommandClient : public CommandExecClient {
 public:
-	SenderCommandClient(MVCTPComm* psender);
-	SenderCommandClient(int sock, MVCTPComm* psender);
+	SenderCommandClient(MVCTPSender* psender);
+	SenderCommandClient(int sock, MVCTPSender* psender);
 
 protected:
 	virtual int HandleCommand(char* command);
 	int HandleSendCommand(list<string>& slist);
+	int MemoryTransfer(int size);
 
 private:
-	MVCTPComm* ptr_sender;
+	MVCTPSender* ptr_sender;
 };
 
 

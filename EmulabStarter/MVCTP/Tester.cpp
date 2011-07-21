@@ -8,7 +8,6 @@
 #include "Tester.h"
 
 Tester::Tester() {
-
 }
 
 Tester::~Tester() {
@@ -16,15 +15,16 @@ Tester::~Tester() {
 }
 
 void Tester::StartTest() {
-	string serv_addr = ptr_parser->GetValue("Monitor_Server");
-	string port = ptr_parser->GetValue("Monitor_Server_Port");
+	string serv_addr = ConfigInfo::GetInstance()->GetValue("Monitor_Server");
+	string port = ConfigInfo::GetInstance()->GetValue("Monitor_Server_Port");
 
-	int send_buf_size = atoi(ptr_parser->GetValue("Send_Buffer_Size").c_str());
-	int recv_buf_size = atoi(ptr_parser->GetValue("Recv_Buffer_Size").c_str());
+	int send_buf_size = atoi(ConfigInfo::GetInstance()->GetValue("Send_Buffer_Size").c_str());
+	int recv_buf_size = atoi(ConfigInfo::GetInstance()->GetValue("Recv_Buffer_Size").c_str());
 
 	if (IsSender()) {
-		MVCTPComm mvctp_sender(send_buf_size, recv_buf_size);
+		MVCTPSender mvctp_sender(send_buf_size);
 		mvctp_sender.JoinGroup(group_id, mvctp_port);
+		mvctp_sender.SetSendRate(5);
 
 		SenderCommandClient command_client(&mvctp_sender);
 		if (serv_addr.length() > 0) {
@@ -49,7 +49,7 @@ void Tester::StartTest() {
 			ptr_monitor->StartClients();
 		}
 
-		MVCTPComm mvctp_receiver(send_buf_size, recv_buf_size);
+		MVCTPReceiver mvctp_receiver(recv_buf_size);
 		mvctp_receiver.JoinGroup(group_id, mvctp_port);
 		this->Log(INFORMATIONAL, "Receiver joined group.");
 
@@ -58,11 +58,11 @@ void Tester::StartTest() {
 		sockaddr_in from;
 		socklen_t socklen = sizeof(from);
 		int bytes;
-		while ( (bytes = mvctp_receiver.IPReceive(buff, BUFF_SIZE, 0, (SA *)&from, &socklen)) > 0) {
-			buff[bytes] = '\0';
-			string s = "I received a message: ";
-			s.append(buff);
-			this->Log(INFORMATIONAL, s);
+		while ( (bytes = mvctp_receiver.RawReceive(buff, BUFF_SIZE, 0, (SA *)&from, &socklen)) > 0) {
+			//buff[bytes] = '\0';
+			//string s = "I received a message: ";
+			//s.append(buff);
+			//this->Log(INFORMATIONAL, s);
 		}
 	}
 }

@@ -9,12 +9,10 @@
 #define TESTER_H_
 
 #include "mvctp.h"
-#include "MVCTPComm.h"
+#include "MVCTPSender.h"
+#include "MVCTPReceiver.h"
 #include "SenderCommandClient.h"
 #include "../CommUtil/StatusMonitor.h"
-#include "../starter/ConfigParser.h"
-
-extern ConfigParser* ptr_parser;
 
 class Tester {
 public:

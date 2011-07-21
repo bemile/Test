@@ -7,7 +7,7 @@
 
 #include "SendBufferMgr.h"
 
-SendBufferMgr::SendBufferMgr(int size, MulticastComm* mcomm) {
+SendBufferMgr::SendBufferMgr(int size, InetComm* mcomm) {
 	max_size = size;
 	num_entry = 0;
 	actual_size = 0;
@@ -30,7 +30,7 @@ SendBufferMgr::~SendBufferMgr() {
 // Send out data through the multicast socket
 // send_out: whether or not actually send out the packet (for testing reliability)
 //              should be removed in real implementation
-int SendBufferMgr::SendData(const char* data, size_t length, bool send_out) {
+int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, bool send_out) {
 	int bytes_left = length;
 	int bytes_sent = 0;
 	const char* pos = data;
@@ -38,8 +38,8 @@ int SendBufferMgr::SendData(const char* data, size_t length, bool send_out) {
 	pthread_mutex_lock(&buf_mutex);
 	while (bytes_left > 0) {
 		int len;
-		if (bytes_left > UDP_MVCTP_DATA_LEN)
-			len = UDP_MVCTP_DATA_LEN;
+		if (bytes_left > MVCTP_DATA_LEN)
+			len = MVCTP_DATA_LEN;
 		else
 			len = bytes_left;
 
@@ -55,10 +55,10 @@ int SendBufferMgr::SendData(const char* data, size_t length, bool send_out) {
 		entry->data = ptr_data;
 
 		if (send_out) {
-			if (SendPacket(entry) <= 0) {
+			if (SendPacket(entry, dst_addr) <= 0) {
 				SysError("SendBuffer error on sending packet");
 			}
-			cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
+			//cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
 		}
 
 		pos += len;
@@ -75,8 +75,8 @@ int SendBufferMgr::SendData(const char* data, size_t length, bool send_out) {
 }
 
 
-int SendBufferMgr::SendPacket(BufferEntry* entry) {
-	return comm->SendData(entry->data, entry->data_len, 0);
+int SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr) {
+	return comm->SendData(entry->data, entry->data_len, 0, dst_addr);
 }
 
 

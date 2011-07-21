@@ -7,7 +7,7 @@
 
 #include "ReceiveBufferMgr.h"
 
-ReceiveBufferMgr::ReceiveBufferMgr(int size, MulticastComm* mcomm) {
+ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	max_size = size;
 	num_entry = 0;
 	actual_size = 0;
@@ -18,14 +18,14 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, MulticastComm* mcomm) {
 	comm = mcomm;
 	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
 
-	//TODO: remove this after the problem of getting sender address info is fixed
+	//TODO: remove this after the problem of getting sender address info is solved
 	hostent * record = gethostbyname("node0.ldm-test.MVC.emulab.net");
 	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 	sender_udp_addr.sin_family = AF_INET;
 
 	in_addr * address = (in_addr * )record->h_addr;
 	memcpy(&sender_udp_addr.sin_addr, address, sizeof(address));
-	cout << "Sender address: " << inet_ntoa(*address);
+	cout << "Sender address: " << inet_ntoa(*address) << endl;
 	//inet_pton(AF_INET, record->h_addr_list, &sender_udp_addr.sin_addr);
 }
 
@@ -48,7 +48,6 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	while (recv_buf->IsEmpty() || recv_buf->Front()->packet_id != last_del_packet_id  + 1) {
 		usleep(10000);
 	}
-	cout << "New packets are ready." << endl;
 
 	int sleep_turns = 0;
 	while (true) {
@@ -124,15 +123,15 @@ void* ReceiveBufferMgr::StartReceivingData(void* ptr) {
 void ReceiveBufferMgr::Run() {
 	MVCTP_HEADER* header;
 	int bytes;
-	char buf[1500];
+	char buf[ETH_DATA_LEN];
 	header = (MVCTP_HEADER*)buf;
 	bool is_first_packet = true;
 
 	while (true) {
-		if ( (bytes = comm->RecvData(buf, 1500, 0, (SA*)&sender_multicast_addr, &sender_socklen)) <= 0) {
+		if ( (bytes = comm->RecvData(buf, ETH_DATA_LEN, 0, (SA*)&sender_multicast_addr, &sender_socklen)) <= 0) {
 			SysError("MVCTPBuffer error on receiving data");
 		}
-		cout << "I received one packet. Packet length: " << bytes << endl;
+		//cout << "I received one packet. Packet length: " << bytes << endl;
 
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
@@ -176,7 +175,6 @@ void ReceiveBufferMgr::Run() {
 		last_recv_packet_id = header->packet_id;
 		num_entry++;
 		pthread_mutex_unlock(&buf_mutex);
-		cout << "Packet added to the buffer." << endl;
 	}
 }
 
@@ -246,8 +244,6 @@ void ReceiveBufferMgr::UdpReceive() {
 		actual_size += header->data_len;
 		num_entry++;
 		pthread_mutex_unlock(&buf_mutex);
-
-
 
 		cout << "Retransmission packet added to the buffer." << endl;
 	}

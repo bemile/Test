@@ -124,7 +124,7 @@ int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
 
 	Insert(it, entry);
 	//PushBack(entry);
-	cout << "Entry added. New front packet ID: " << Front()->packet_id << endl;
+	//cout << "Entry added. New front packet ID: " << Front()->packet_id << endl;
 	return 1;
 }
 

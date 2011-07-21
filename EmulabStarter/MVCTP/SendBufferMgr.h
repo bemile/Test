@@ -10,21 +10,22 @@
 
 #include "mvctp.h"
 #include "MVCTPBuffer.h"
+#include "InetComm.h"
 #include "UdpComm.h"
 #include <pthread.h>
 
 class SendBufferMgr {
 public:
-	SendBufferMgr(int size, MulticastComm* mcomm);
+	SendBufferMgr(int size, InetComm* mcomm);
 	~SendBufferMgr();
 
-	int SendData(const char* data, size_t length, bool send_out);
-	int SendPacket(BufferEntry* entry);
+	int SendData(const char* data, size_t length, void* dst_addr, bool send_out);
+	int SendPacket(BufferEntry* entry, void* dst_addr);
 	void StartUdpThread();
 
 private:
-	MVCTPBuffer* send_buf;
-	MulticastComm* comm;
+	MVCTPBuffer* 	send_buf;
+	InetComm* 		comm;
 	UdpComm*		udp_comm;
 	sockaddr_in		sender_addr;
 	socklen_t 		sender_socklen;
