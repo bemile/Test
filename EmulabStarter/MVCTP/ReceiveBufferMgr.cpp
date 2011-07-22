@@ -8,9 +8,6 @@
 #include "ReceiveBufferMgr.h"
 
 ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
-	max_size = size;
-	num_entry = 0;
-	actual_size = 0;
 	last_recv_packet_id = 0;
 	last_del_packet_id = 0;
 
@@ -19,7 +16,7 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
 
 	//TODO: remove this after the problem of getting sender address info is solved
-	hostent * record = gethostbyname("node0.ldm-test.MVC.emulab.net");
+	hostent * record = gethostbyname("node0.ldm-hs-lan.MVC.emulab.net");
 	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 	sender_udp_addr.sin_family = AF_INET;
 
@@ -38,6 +35,13 @@ ReceiveBufferMgr::~ReceiveBufferMgr() {
 	delete recv_buf;
 }
 
+void ReceiveBufferMgr::SetBufferSize(size_t buff_size) {
+	recv_buf->SetMaxBufferSize(buff_size);
+}
+
+size_t ReceiveBufferMgr::GetBufferSize() {
+	return recv_buf->GetMaxBufferSize();
+}
 
 size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	char* pos = (char*)buff;
@@ -86,7 +90,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 			return bytes_copied;
 		}
 		else {
-			usleep(10000);
+			usleep(5000);
 			sleep_turns++;
 		}
 	}
@@ -171,9 +175,7 @@ void ReceiveBufferMgr::Run() {
 		// Add the received packet to the buffer
 		pthread_mutex_lock(&buf_mutex);
 		recv_buf->AddEntry(header, data);
-		actual_size += header->data_len;
 		last_recv_packet_id = header->packet_id;
-		num_entry++;
 		pthread_mutex_unlock(&buf_mutex);
 	}
 }
@@ -208,6 +210,7 @@ void ReceiveBufferMgr::NackRun() {
 // Send a retransmission request to the sender
 int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
 	NackMsg msg;
+	msg.proto = MVCTP_PROTO_TYPE;
 	msg.packet_id = packet_id;
 	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
 			(SA*)&sender_udp_addr, sizeof(sender_udp_addr));
@@ -241,8 +244,7 @@ void ReceiveBufferMgr::UdpReceive() {
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
 		pthread_mutex_lock(&buf_mutex);
 		recv_buf->AddEntry(header, data);
-		actual_size += header->data_len;
-		num_entry++;
+		DeleteNackFromList(header->packet_id);
 		pthread_mutex_unlock(&buf_mutex);
 
 		cout << "Retransmission packet added to the buffer." << endl;

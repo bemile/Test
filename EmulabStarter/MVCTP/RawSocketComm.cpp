@@ -74,24 +74,21 @@ void RawSocketComm::WaitForNewToken() {
 	current_size_token = unit_size_token;
 }
 
+
 int RawSocketComm::SendData(const void* buff, size_t len, int flags, void* dst_addr) {
 	// set the destination address
 	memcpy(dest_address.sll_addr, dst_addr, ETH_ALEN);
 	// set the frame header
 	memcpy(send_frame.dst_addr, dst_addr, ETH_ALEN);
 
-	int remained_len = len;
-	unsigned char* pos = (unsigned char*)buff;
-	while (remained_len > ETH_DATA_LEN) {
-		memcpy(send_frame.data, pos, ETH_DATA_LEN);
-		SendFrame(send_frame.frame_buffer, ETH_FRAME_LEN);
-		pos += ETH_DATA_LEN;
-		remained_len -= ETH_DATA_LEN;
-	}
-
-	if (remained_len > 0 ) {
-		memcpy(send_frame.data, pos, remained_len);
-		SendFrame(send_frame.frame_buffer, ETH_HLEN + remained_len);
+	size_t remained_len = len;
+	u_char* pos = (u_char*)buff;
+	while (remained_len > 0) {
+		int payload_size = remained_len > ETH_DATA_LEN ? ETH_DATA_LEN : remained_len;
+		memcpy(send_frame.data, pos, payload_size);
+		SendFrame(send_frame.frame_buffer, payload_size + ETH_HLEN);
+		pos += payload_size;
+		remained_len -= payload_size;
 	}
 
 	return len;
@@ -109,7 +106,7 @@ int RawSocketComm::SendFrame(void* buffer, size_t length) {
 		SysError("RawSocketComm::SendFrame()::sendto() error.");
 	}
 
-	current_size_token -= length;
+	current_size_token -= res;
 	return res;
 }
 
@@ -130,6 +127,12 @@ int RawSocketComm::RecvData(void* buff, size_t len, int flags, SA* from, socklen
 			int data_len = bytes - ETH_HLEN;
 			recv_frame.payload_size = data_len;
 			memcpy(ptr, recv_frame.data, data_len);
+
+//			cout << "One RAW frame received." << endl;
+//			cout << "Source Addr: " << this->GetMacAddrString(recv_frame.src_addr) << endl;
+//			cout << "Dest Addr: " << this->GetMacAddrString(recv_frame.dst_addr) << endl;
+//			cout << "Payload Size: " << recv_frame.payload_size << endl;
+
 			received_bytes += data_len;
 			ptr += data_len;
 			remained_len -= data_len;
@@ -154,11 +157,6 @@ int RawSocketComm::ReceiveFrame(void* buffer) {
 bool RawSocketComm::IsMyPacket() {
 	if (memcmp(recv_frame.dst_addr, bind_mac_addr, 6) == 0
 		&& recv_frame.proto == htons(MVCTP_PROTO_TYPE)) {
-//		cout << "One RAW frame received." << endl;
-//		cout << "Source Addr: " << this->GetMacAddrString(recv_frame.src_addr) << endl;
-//		cout << "Dest Addr: " << this->GetMacAddrString(recv_frame.dst_addr) << endl;
-//		cout << "Payload Size: " << recv_frame.payload_size << endl;
-
 		return true;
 	}
 	else

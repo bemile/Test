@@ -23,6 +23,8 @@ public:
 
 	size_t 	GetData(void* buff, size_t len);
 	void StartReceiveThread();
+	void SetBufferSize(size_t buff_size);
+	size_t GetBufferSize();
 
 private:
 	MVCTPBuffer* 	recv_buf;
@@ -32,10 +34,7 @@ private:
 	sockaddr_in		sender_udp_addr;
 	socklen_t 		sender_socklen;
 
-	int 	num_entry;		// number of buffer entries in the buffer
-	int 	max_size;		// maximum data bytes for the buffer
-	int 	actual_size;	// actual assigned data bytes in the buffer
-	int32_t				last_recv_packet_id;	// ID number for the latest sent/received packet
+	int32_t				last_recv_packet_id;	// packet ID assigned to the latest received packet
 	int32_t				last_del_packet_id;
 	list<NackMsgInfo> 	missing_packet_list;
 

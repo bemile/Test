@@ -30,11 +30,22 @@ int SenderCommandClient::HandleCommand(char* command) {
 	if (parts.size() == 0)
 		return 0;
 
-	if (parts.front().compare("send") == 0) {
+	if (parts.front().compare("Send") == 0) {
 		parts.erase(parts.begin());
 		HandleSendCommand(parts);
 	}
-	else {
+	else if (parts.front().compare("SetRate") == 0) {
+		if (parts.size() == 2) {
+			ptr_sender->SetSendRate(atoi(parts.back().c_str()));
+			SendMessage(COMMAND_RESPONSE, "Data sending rate has been set.");
+		}
+	}
+	else if (parts.front().compare("SetBufferSize") == 0) {
+		if (parts.size() == 2) {
+			ptr_sender->SetBufferSize(atoi(parts.back().c_str()));
+			SendMessage(COMMAND_RESPONSE, "Buffer size has been set.");
+		}
+	} else {
 		CommandExecClient::HandleCommand(command);
 		//ExecSysCommand(command);
 	}
@@ -47,8 +58,8 @@ int SenderCommandClient::HandleCommand(char* command) {
 
 //
 int SenderCommandClient::HandleSendCommand(list<string>& slist) {
-	bool file_transfer = false;
 	bool memory_transfer = false;
+	bool file_transfer = false;
 	bool send_out_packets = true;
 
 	int 	mem_transfer_size = 0;
@@ -81,13 +92,13 @@ int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 
 	//ptr_sender->IPSend(&command[index + 1], args.length(), true);
 	if (memory_transfer) {
-		MemoryTransfer(mem_transfer_size);
+		TransferMemoryData(mem_transfer_size);
 	}
 	else if (file_transfer) {
 
 	}
 	else {
-		ptr_sender->RawSend(arg.c_str(), arg.length(), send_out_packets);
+		TransferString(arg, send_out_packets);
 	}
 
 	// Send result status back to the monitor
@@ -103,7 +114,12 @@ int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 
 // Transfer memory-to-memory data to all receivers
 // size: the size of data to transfer (in megabytes)
-int SenderCommandClient::MemoryTransfer(int size) {
+int SenderCommandClient::TransferMemoryData(int size) {
+	TransferMessage msg;
+	msg.msg_type = MEMORY_TRANSFER;
+	msg.data_len = size;
+	ptr_sender->RawSend((char*)&msg, sizeof(msg), true);
+
 	char buffer[MVCTP_DATA_LEN];
 	memset(buffer, 1, MVCTP_DATA_LEN);
 
@@ -111,13 +127,19 @@ int SenderCommandClient::MemoryTransfer(int size) {
 	long size_count = 0;
 	long time_diff;
 	gettimeofday(&last_time, NULL);
-	long num_packets = (int) (size / MVCTP_DATA_LEN);
-	for (long i = 0; i < num_packets; i++) {
-		ptr_sender->RawSend(buffer, MVCTP_DATA_LEN, true);
-		size_count += ETH_FRAME_LEN;
+
+	int remained_size = size;
+	while (remained_size > 0) {
+		int packet_size = remained_size > MVCTP_DATA_LEN ? MVCTP_DATA_LEN
+				: remained_size;
+		ptr_sender->RawSend(buffer, packet_size, true);
+		remained_size -= packet_size;
+
+		// periodically calculate transfer speed
+		size_count += (packet_size + ETH_HLEN);
 		gettimeofday(&cur_time, NULL);
 		time_diff = (cur_time.tv_sec - last_time.tv_sec) * 1000000
-					+ (cur_time.tv_usec - last_time.tv_usec);
+				+ (cur_time.tv_usec - last_time.tv_usec);
 		if (time_diff > 1000000) {
 			last_time = cur_time;
 			float rate = size_count / 1024.0 / 1024.0 * 8;
@@ -127,6 +149,17 @@ int SenderCommandClient::MemoryTransfer(int size) {
 			SendMessage(COMMAND_RESPONSE, buf);
 		}
 	}
+
+	return 1;
+}
+
+
+int SenderCommandClient::TransferString(string str, bool send_out_packets) {
+	TransferMessage msg;
+	msg.msg_type = STRING_TRANSFER;
+	msg.data_len = str.length();
+	ptr_sender->RawSend((char*)&msg, sizeof(msg), send_out_packets);
+	ptr_sender->RawSend(str.c_str(), msg.data_len, send_out_packets);
 
 	return 1;
 }

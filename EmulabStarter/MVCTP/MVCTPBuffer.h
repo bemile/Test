@@ -23,24 +23,36 @@ typedef struct BufferEntry {
 //	information for an MVCTP send/receive buffer
 class MVCTPBuffer {
 public:
-	MVCTPBuffer(int size);
+	MVCTPBuffer(int buf_size);
 	~MVCTPBuffer();
 
-	BufferEntry* Begin();
-	BufferEntry* End();
-	BufferEntry* Front();
-	BufferEntry* Back();
-	int PushBack(BufferEntry* entry);
-	int Insert(BufferEntry* pos, BufferEntry* entry);
-	int Delete(BufferEntry*	entry);
-	int DeleteUntil(BufferEntry* entry);
-	BufferEntry* Find(int32_t pid);
-	bool 	IsEmpty();
-	int ShrinkEntry(BufferEntry* entry, size_t new_size);
-	int		AddEntry(MVCTP_HEADER* header, char* data);
+	size_t 	GetMaxBufferSize() {return max_buffer_size;};
+	void 	SetMaxBufferSize(size_t buff_size) {max_buffer_size = buff_size;}
+	size_t 	GetCurrentBufferSize() {return current_buffer_size;}
+	size_t 	GetAvailableBufferSize() {return max_buffer_size - current_buffer_size;}
+	int 	GetNumEntries() {return num_entry;}
+
+
+	BufferEntry* 	Begin();
+	BufferEntry* 	End();
+	BufferEntry* 	Front();
+	BufferEntry* 	Back();
+
+	BufferEntry* 	Find(int32_t pid);
+	int 			PushBack(BufferEntry* entry);
+	int 			Insert(BufferEntry* pos, BufferEntry* entry);
+	int 			Delete(BufferEntry*	entry);
+	int 			DeleteUntil(BufferEntry* entry);
+	bool 			IsEmpty();
+	int 			ShrinkEntry(BufferEntry* entry, size_t new_size);
+	int				AddEntry(MVCTP_HEADER* header, char* data);
 
 
 protected:
+	int 		num_entry;				// number of packet entries in the buffer
+	size_t 		max_buffer_size;		// maximum data bytes assigned to the buffer
+	size_t 		current_buffer_size;	// current occupied data bytes in the buffer
+
 	PTR_BUFFER_ENTRY	nil;		// pointer to the first and last entry
 
 	void DestroyEntry(BufferEntry* entry);

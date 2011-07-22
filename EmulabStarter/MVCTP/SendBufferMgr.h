@@ -20,8 +20,9 @@ public:
 	~SendBufferMgr();
 
 	int SendData(const char* data, size_t length, void* dst_addr, bool send_out);
-	int SendPacket(BufferEntry* entry, void* dst_addr);
+	void SendPacket(BufferEntry* entry, void* dst_addr, bool send_out);
 	void StartUdpThread();
+	void SetBufferSize(size_t buff_size);
 
 private:
 	MVCTPBuffer* 	send_buf;
@@ -30,17 +31,14 @@ private:
 	sockaddr_in		sender_addr;
 	socklen_t 		sender_socklen;
 
-	int 	num_entry;		// number of buffer entries in the buffer
-	int 	max_size;		// Maximum data bytes for the buffer
-	int 	actual_size;	// actual assigned data bytes in the buffer
-	int32_t		last_packet_id;	// ID number for the latest sent/received packet
-
+	int32_t		last_packet_id;			// packet ID assigned to the latest received packet
 
 	pthread_t udp_thread;
 	pthread_mutex_t buf_mutex;
 	static void* StartUdpNackReceive(void* ptr);
 	void ReceiveNack();
 	void Retransmit(int32_t packet_id);
+	void MakeRoomForNewPacket(size_t room_size);
 };
 
 #endif /* SENDBUFFERMGR_H_ */

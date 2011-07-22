@@ -20,6 +20,8 @@ public:
 	int JoinGroup(string addr, ushort port);
 	int RawReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 	int IPReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
+	void SetBufferSize(size_t buff_size);
+	size_t GetBufferSize();
 
 private:
 	ReceiveBufferMgr *ptr_recv_buf_mgr;

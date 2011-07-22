@@ -12,6 +12,7 @@
 #include "MVCTPSender.h"
 #include "MVCTPReceiver.h"
 #include "SenderCommandClient.h"
+#include "ReceiverCommandClient.h"
 #include "../CommUtil/StatusMonitor.h"
 
 class Tester {
@@ -22,8 +23,13 @@ public:
 	void Log(int level, string msg);
 
 private:
-	StatusMonitor* ptr_monitor;
+	StatusMonitor* 	ptr_monitor;
+	MVCTPSender*	ptr_mvctp_sender;
+	MVCTPReceiver* 	ptr_mvctp_receiver;
 
+	void HandleStringTransfer(TransferMessage& msg);
+	void HandleMemoryTransfer(TransferMessage& msg, size_t buff_size);
+	void HandleFileTransfer(TransferMessage& msg, size_t buff_size);
 	bool IsSender();
 
 };

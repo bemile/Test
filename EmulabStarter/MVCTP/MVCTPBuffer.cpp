@@ -7,7 +7,11 @@
 
 #include "MVCTPBuffer.h"
 
-MVCTPBuffer::MVCTPBuffer(int size) {
+MVCTPBuffer::MVCTPBuffer(int buf_size) {
+	max_buffer_size = buf_size;
+	current_buffer_size = 0;
+	num_entry = 0;
+
 	nil = (BufferEntry*) malloc(sizeof(BufferEntry));
 	memset(nil, 0, sizeof(BufferEntry));
 	nil->prev = nil;	// list back
@@ -48,14 +52,21 @@ int MVCTPBuffer::PushBack(BufferEntry* entry) {
 
 
 int MVCTPBuffer::Insert(BufferEntry* pos, BufferEntry* entry) {
+	current_buffer_size += entry->data_len;
+	num_entry++;
+
 	entry->prev = pos;
 	entry->next = pos->next;
 	pos->next = pos->next->prev = entry;
+
 	return 1;
 }
 
 
 int MVCTPBuffer::Delete(BufferEntry* entry) {
+	current_buffer_size -= entry->data_len;
+	num_entry--;
+
 	entry->prev->next = entry->next;
 	entry->next->prev = entry->prev;
 	DestroyEntry(entry);
@@ -63,16 +74,18 @@ int MVCTPBuffer::Delete(BufferEntry* entry) {
 	return 1;
 }
 
-
+// Safe-implementation of iterate-and-delete for the entry list
 int MVCTPBuffer::DeleteUntil(BufferEntry* entry) {
 	if (entry == NULL)
 		return 0;
 
-	BufferEntry *tmp = NULL;
-	for (tmp = Begin(); tmp != End(); tmp = tmp->next) {
-		if (tmp == entry)
+	BufferEntry *it = NULL;
+	for (it = Begin(); it != End();) {
+		if (it == entry)
 			break;
 
+		BufferEntry* tmp = it;
+		it = it->next;
 		Delete(tmp);
 	}
 	return 1;
@@ -91,6 +104,11 @@ BufferEntry* MVCTPBuffer::Find(int32_t pid) {
 
 
 int MVCTPBuffer::ShrinkEntry(BufferEntry* entry, size_t new_size) {
+	if (entry->data_len < new_size)
+		return -1;
+
+	current_buffer_size -= entry->data_len - new_size;
+
 	char* new_data = (char*)malloc(new_size);
 	memcpy(new_data, entry->data + (entry->data_len - new_size), new_size);
 	free(entry->data);

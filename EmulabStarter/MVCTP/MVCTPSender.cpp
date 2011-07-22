@@ -23,6 +23,10 @@ void MVCTPSender::SetSendRate(int num_mbps) {
 	ptr_raw_sock_comm->SetSendRate(num_mbps);
 }
 
+void MVCTPSender::SetBufferSize(size_t buff_size) {
+	ptr_send_buf_mgr->SetBufferSize(buff_size);
+}
+
 // Send data through RAW socket
 int MVCTPSender::RawSend(const char* data, size_t length, bool send_out) {
 	return ptr_send_buf_mgr->SendData(data, length, mac_group_addr, send_out);

@@ -59,11 +59,12 @@ typedef struct MVCTPHeader {
 */
 
 struct NackMsg {
+	int32_t proto;
 	int32_t packet_id;
 };
 
 struct NackMsgInfo {
-	int32_t	packet_id;
+	int32_t		packet_id;
 	clock_t		time_stamp;
 	short		num_retries;
 };

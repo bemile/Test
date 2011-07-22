@@ -15,7 +15,6 @@
 #include <sys/wait.h>
 #include "CommUtil.h"
 
-
 using namespace std;
 
 class CommandExecClient {
