@@ -125,10 +125,12 @@ int SenderCommandClient::TransferMemoryData(int size) {
 
 	timeval last_time, cur_time;
 	long size_count = 0;
-	long time_diff;
+	float time_diff;
 	gettimeofday(&last_time, NULL);
 
 	int remained_size = size;
+	int period = size / MVCTP_DATA_LEN / 10;
+	int send_count = 0;
 	while (remained_size > 0) {
 		int packet_size = remained_size > MVCTP_DATA_LEN ? MVCTP_DATA_LEN
 				: remained_size;
@@ -136,13 +138,15 @@ int SenderCommandClient::TransferMemoryData(int size) {
 		remained_size -= packet_size;
 
 		// periodically calculate transfer speed
-		size_count += (packet_size + ETH_HLEN);
-		gettimeofday(&cur_time, NULL);
-		time_diff = (cur_time.tv_sec - last_time.tv_sec) * 1000000
-				+ (cur_time.tv_usec - last_time.tv_usec);
-		if (time_diff > 1000000) {
+		size_count += (packet_size + MVCTP_HLEN + ETH_HLEN);
+		send_count++;
+		if (send_count % period == 0) {
+			gettimeofday(&cur_time, NULL);
+			time_diff = (cur_time.tv_sec - last_time.tv_sec)
+					+ (cur_time.tv_usec - last_time.tv_usec) / 1000000.0;
+
 			last_time = cur_time;
-			float rate = size_count / 1024.0 / 1024.0 * 8;
+			float rate = size_count / time_diff / 1024.0 / 1024.0 * 8;
 			size_count = 0;
 			char buf[100];
 			sprintf(buf, "Data sending rate: %3.2f Mbps", rate);

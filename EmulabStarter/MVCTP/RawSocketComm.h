@@ -12,7 +12,7 @@
 #include "InetComm.h"
 #include <cstdio>
 
-#define RATE_CHECK_PERIOD 	50		// in milliseconds
+#define RATE_CHECK_PERIOD 	20		// in milliseconds
 
 struct MacFrame {
 	u_char 		dst_addr[ETH_ALEN];

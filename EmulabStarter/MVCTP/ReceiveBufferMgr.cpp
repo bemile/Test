@@ -16,7 +16,7 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
 
 	//TODO: remove this after the problem of getting sender address info is solved
-	hostent * record = gethostbyname("node0.ldm-hs-lan.MVC.emulab.net");
+	hostent * record = gethostbyname("node0.ldm-test.MVC.emulab.net");
 	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 	sender_udp_addr.sin_family = AF_INET;
 
@@ -174,8 +174,10 @@ void ReceiveBufferMgr::Run() {
 
 		// Add the received packet to the buffer
 		pthread_mutex_lock(&buf_mutex);
-		recv_buf->AddEntry(header, data);
-		last_recv_packet_id = header->packet_id;
+		if (header->data_len <= recv_buf->GetAvailableBufferSize()) {
+			recv_buf->AddEntry(header, data);
+			last_recv_packet_id = header->packet_id;
+		}
 		pthread_mutex_unlock(&buf_mutex);
 	}
 }

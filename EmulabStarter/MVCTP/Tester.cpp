@@ -24,7 +24,7 @@ void Tester::StartTest() {
 	if (IsSender()) {
 		ptr_mvctp_sender = new MVCTPSender(send_buf_size);
 		ptr_mvctp_sender->JoinGroup(group_id, mvctp_port);
-		ptr_mvctp_sender->SetSendRate(5);
+		ptr_mvctp_sender->SetSendRate(50);
 
 		SenderCommandClient command_client(ptr_mvctp_sender);
 		if (serv_addr.length() > 0) {
@@ -121,7 +121,8 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 		remained_size -= bytes;
 	}
 	gettimeofday(&end_time, NULL);
-	float trans_time = end_time.tv_sec - start_time.tv_sec + (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
+	float trans_time = end_time.tv_sec - start_time.tv_sec +
+			(end_time.tv_usec - start_time.tv_usec) / 1000000.0;
 
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
 	this->Log(INFORMATIONAL, s);
