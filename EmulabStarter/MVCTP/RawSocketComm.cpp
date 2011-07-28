@@ -11,6 +11,11 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 			SysError("Cannot create new socket.");
 	}
 
+	int buff_size = 16000000;
+	if (setsockopt(sock_fd, SOL_SOCKET, SO_RCVBUFFORCE, &buff_size, sizeof(buff_size)) < 0) {
+		SysError("Cannot set receive buffer size for raw socket.");
+	}
+
 	// get the index of the network device
 	memset(&if_req, 0, sizeof(if_req));
 	strncpy(if_req.ifr_name, if_name, sizeof(if_req.ifr_name));
