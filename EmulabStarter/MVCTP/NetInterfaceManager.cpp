@@ -67,6 +67,7 @@ void NetInterfaceManager::InitIfiInfo(int family, int doaliases) {
 			continue;		// ignore if interface not up
 
 		ifi = (PTR_IFI_INFO)calloc(1, sizeof(struct ifi_info));
+		memset(ifi, 0, sizeof(ifi));
 		*ifipnext = ifi;
 		ifipnext = &ifi->ifi_next;
 

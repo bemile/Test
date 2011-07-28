@@ -17,12 +17,14 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
 
 	//TODO: remove this after the problem of getting sender address info is solved
-	hostent * record = gethostbyname("node0.ldm-hs-lan.MVC.emulab.net");
-	in_addr* address = (in_addr *)record->h_addr_list[0];
+	//hostent * record = gethostbyname("node0.ldm-hs-lan.MVC.emulab.net");
+	//in_addr* address = (in_addr *)record->h_addr_list[0];
+	in_addr address;
+	inet_aton("10.1.1.2", &address);
 	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 	sender_udp_addr.sin_family = AF_INET;
-	memcpy(&sender_udp_addr.sin_addr, address, sizeof(address));
-	cout << "Sender address: " << inet_ntoa(*address) << endl;
+	memcpy(&sender_udp_addr.sin_addr, &address, sizeof(address));
+	cout << "Sender address: " << inet_ntoa(address) << endl;
 
 //	int index = 0;
 //	while( (address = (in_addr *)record->h_addr_list[index++]) != NULL) {

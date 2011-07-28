@@ -22,17 +22,17 @@ MVCTPComm::MVCTPComm() {
 	string if_name;
 	for (PTR_IFI_INFO ptr_ifi = if_manager->GetIfiHead(); ptr_ifi != NULL;
 			ptr_ifi = ptr_ifi->ifi_next) {
-//		string ip = inet_ntoa(*(in_addr *)ptr_ifi->ifi_addr);
-//		if (ip.find("10.1.") != ip.npos) {
-//			if_name = ptr_ifi->ifi_name;
-//			cout << "Sender address: " << ip << endl;
-//			break;
-//		}
-
-		if_name = ptr_ifi->ifi_name;
-		if (if_name.find("eth") != string::npos) {
+		sockaddr_in* addr = (sockaddr_in*)ptr_ifi->ifi_addr;
+		string ip = inet_ntoa(addr->sin_addr);
+		if (ip.find("10.1.") != ip.npos) {
+			if_name = ptr_ifi->ifi_name;
 			break;
 		}
+
+//		if_name = ptr_ifi->ifi_name;
+//		if (if_name.find("eth") != string::npos) {
+//			break;
+//		}
 	}
 	cout << "interface name: " << if_name << endl;
 	ptr_raw_sock_comm = new RawSocketComm(if_name.c_str());
