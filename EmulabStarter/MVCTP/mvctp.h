@@ -58,7 +58,7 @@ typedef struct MVCTPHeader {
 #endif
 */
 
-const int MAX_NACK_IDS = 20;
+const int MAX_NACK_IDS = 1;
 struct NackMsg {
 	int32_t 	proto;
 	int32_t 	num_missing_packets;

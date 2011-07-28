@@ -256,7 +256,7 @@ void ReceiveBufferMgr::NackRun() {
 			SendNackMsg(msg);
 		}
 
-		usleep(5000);
+		usleep(10000);
 	}
 }
 
