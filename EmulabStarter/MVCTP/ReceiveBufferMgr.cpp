@@ -196,7 +196,7 @@ void ReceiveBufferMgr::Run() {
 					<< "  Supposed ID:" << last_recv_packet_id + 1 << endl;
 
 			pthread_mutex_lock(&nack_list_mutex);
-			clock_t time = clock() - 0.1 * CLOCKS_PER_SEC;
+			clock_t time = clock() - 0.5 * CLOCKS_PER_SEC;
 			for (int32_t i = last_recv_packet_id + 1; i != header->packet_id; i++) {
 				NackMsgInfo info;
 				info.packet_id = i;
