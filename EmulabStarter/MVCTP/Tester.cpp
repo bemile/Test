@@ -42,9 +42,9 @@ void Tester::StartTest() {
 	}
 	else {  //Is receiver
 		// Set the receiver process to real-time scheduling mode
-		struct sched_param sp;
-		sp.__sched_priority = sched_get_priority_max(SCHED_RR);
-		sched_setscheduler(0, SCHED_RR, &sp);
+//		struct sched_param sp;
+//		sp.__sched_priority = sched_get_priority_max(SCHED_RR);
+//		sched_setscheduler(0, SCHED_RR, &sp);
 
 		ptr_mvctp_receiver = new MVCTPReceiver(recv_buf_size);
 		ptr_mvctp_receiver->JoinGroup(group_id, mvctp_port);
