@@ -196,7 +196,10 @@ void ReceiveBufferMgr::Run() {
 					<< "  Supposed ID:" << last_recv_packet_id + 1 << endl;
 
 			pthread_mutex_lock(&nack_list_mutex);
-			clock_t time = clock() - 0.5 * CLOCKS_PER_SEC;
+			clock_t time = clock(); //- 0.5 * CLOCKS_PER_SEC;
+			NackMsg msg;
+			memset(&msg, 0, sizeof(msg));
+			msg.proto = MVCTP_PROTO_TYPE;
 			for (int32_t i = last_recv_packet_id + 1; i != header->packet_id; i++) {
 				NackMsgInfo info;
 				info.packet_id = i;
@@ -204,6 +207,17 @@ void ReceiveBufferMgr::Run() {
 				info.num_retries = 0;
 				missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
 				buffer_stats.num_retransmitted_packets++;
+
+				msg.packet_ids[msg.num_missing_packets] = i;
+				msg.num_missing_packets++;
+				if (msg.num_missing_packets == MAX_NACK_IDS) {
+					SendNackMsg(msg);
+					msg.num_missing_packets = 0;
+				}
+			}
+
+			if (msg.num_missing_packets > 0) {
+				SendNackMsg(msg);
 			}
 			pthread_mutex_unlock(&nack_list_mutex);
 			cout << "Missing packets added to the retransmit list." << endl;
