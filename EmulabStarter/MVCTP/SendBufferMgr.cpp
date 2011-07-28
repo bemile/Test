@@ -135,7 +135,7 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 			if (it->packet_id == packet_id) {
 				udp_comm->SendTo((void *)it->data, it->data_len, 0,
 							(SA*)&sender_addr, sender_socklen);
-				//cout << "One packet retransmitted." << endl;
+				cout << "One packet retransmitted. Packet ID: " << packet_id << endl;
 			}
 		}
 	}
