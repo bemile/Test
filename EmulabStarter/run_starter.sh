@@ -1,6 +1,6 @@
 HOST=`hostname -f`
 
-cd ~/$HOST/src/Test/EmulabStarter
+cd ~/$HOST/src/EmulabStarter
 make
 make clean
 cp ./emustarter ~/$HOST/
