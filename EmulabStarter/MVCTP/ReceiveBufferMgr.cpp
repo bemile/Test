@@ -87,7 +87,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty() || recv_buf->Front()->packet_id != last_del_packet_id  + 1) {
-		//usleep(10000);
+		usleep(5000);
 	}
 
 	int sleep_turns = 0;
