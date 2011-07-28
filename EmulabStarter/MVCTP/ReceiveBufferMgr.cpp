@@ -87,7 +87,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty() || recv_buf->Front()->packet_id != last_del_packet_id  + 1) {
-		usleep(10000);
+		//usleep(10000);
 	}
 
 	int sleep_turns = 0;
@@ -191,7 +191,7 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Record missing packets if there is a gap in the packet_id
-		if (header->packet_id - last_recv_packet_id > 1) {
+		if (header->packet_id > last_recv_packet_id + 1) {
 			cout << "Packet loss detected. Received Packet ID: " << header->packet_id
 					<< "  Supposed ID:" << last_recv_packet_id + 1 << endl;
 
@@ -220,7 +220,6 @@ void ReceiveBufferMgr::Run() {
 				SendNackMsg(msg);
 			}
 			pthread_mutex_unlock(&nack_list_mutex);
-			cout << "Missing packets added to the retransmit list." << endl;
 		}
 
 		// Add the received packet to the buffer
