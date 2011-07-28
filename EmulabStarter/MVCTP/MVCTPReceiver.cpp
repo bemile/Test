@@ -15,6 +15,10 @@ MVCTPReceiver::~MVCTPReceiver() {
 	delete ptr_recv_buf_mgr;
 }
 
+const struct ReceiveBufferStats MVCTPReceiver::GetBufferStats() {
+	return ptr_recv_buf_mgr->GetBufferStats();
+}
+
 void MVCTPReceiver::SetBufferSize(size_t buff_size) {
 	ptr_recv_buf_mgr->SetBufferSize(buff_size);
 }

@@ -31,6 +31,7 @@ private:
 	void HandleMemoryTransfer(TransferMessage& msg, size_t buff_size);
 	void HandleFileTransfer(TransferMessage& msg, size_t buff_size);
 	bool IsSender();
+	string ExecSysCommand(char* cmd);
 
 };
 

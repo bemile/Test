@@ -22,6 +22,13 @@ MVCTPComm::MVCTPComm() {
 	string if_name;
 	for (PTR_IFI_INFO ptr_ifi = if_manager->GetIfiHead(); ptr_ifi != NULL;
 			ptr_ifi = ptr_ifi->ifi_next) {
+//		string ip = inet_ntoa(*(in_addr *)ptr_ifi->ifi_addr);
+//		if (ip.find("10.1.") != ip.npos) {
+//			if_name = ptr_ifi->ifi_name;
+//			cout << "Sender address: " << ip << endl;
+//			break;
+//		}
+
 		if_name = ptr_ifi->ifi_name;
 		if (if_name.find("eth") != string::npos) {
 			break;

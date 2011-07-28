@@ -15,6 +15,10 @@
 #include <netinet/in.h>
 #include <pthread.h>
 
+struct ReceiveBufferStats {
+	uint num_received_packets;
+	uint num_retransmitted_packets;
+};
 
 class ReceiveBufferMgr {
 public:
@@ -25,6 +29,8 @@ public:
 	void StartReceiveThread();
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
+	void ResetBufferStats();
+	const struct ReceiveBufferStats GetBufferStats();
 
 private:
 	MVCTPBuffer* 	recv_buf;
@@ -36,7 +42,8 @@ private:
 
 	int32_t				last_recv_packet_id;	// packet ID assigned to the latest received packet
 	int32_t				last_del_packet_id;
-	list<NackMsgInfo> 	missing_packet_list;
+	map<int32_t, NackMsgInfo> 	missing_packets;
+	struct ReceiveBufferStats buffer_stats;
 
 	int SendNackMsg(int32_t packet_id);
 

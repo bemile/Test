@@ -10,20 +10,31 @@
 ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	last_recv_packet_id = 0;
 	last_del_packet_id = 0;
+	ResetBufferStats();
 
 	recv_buf = new MVCTPBuffer(size);
 	comm = mcomm;
 	udp_comm = new UdpComm(BUFFER_UDP_RECV_PORT);
 
 	//TODO: remove this after the problem of getting sender address info is solved
-	hostent * record = gethostbyname("node0.ldm-test.MVC.emulab.net");
+	hostent * record = gethostbyname("node0.ldm-hs-lan.MVC.emulab.net");
+	in_addr* address = (in_addr *)record->h_addr_list[0];
 	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 	sender_udp_addr.sin_family = AF_INET;
-
-	in_addr * address = (in_addr * )record->h_addr;
 	memcpy(&sender_udp_addr.sin_addr, address, sizeof(address));
 	cout << "Sender address: " << inet_ntoa(*address) << endl;
-	//inet_pton(AF_INET, record->h_addr_list, &sender_udp_addr.sin_addr);
+
+//	int index = 0;
+//	while( (address = (in_addr *)record->h_addr_list[index++]) != NULL) {
+//		string ip = inet_ntoa(*address);
+//		if (ip.find("10.1.") != ip.npos) {
+//			sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
+//			sender_udp_addr.sin_family = AF_INET;
+//			memcpy(&sender_udp_addr.sin_addr, address, sizeof(address));
+//			cout << "Sender address: " << ip << endl;
+//			break;
+//		}
+//	}
 }
 
 
@@ -41,6 +52,16 @@ void ReceiveBufferMgr::SetBufferSize(size_t buff_size) {
 
 size_t ReceiveBufferMgr::GetBufferSize() {
 	return recv_buf->GetMaxBufferSize();
+}
+
+const ReceiveBufferStats ReceiveBufferMgr::GetBufferStats() {
+	return buffer_stats;
+}
+
+
+void ReceiveBufferMgr::ResetBufferStats() {
+	buffer_stats.num_received_packets = 0;
+	buffer_stats.num_retransmitted_packets = 0;
 }
 
 size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
@@ -166,7 +187,7 @@ void ReceiveBufferMgr::Run() {
 				info.packet_id = i;
 				info.time_stamp = time;
 				info.num_retries = 0;
-				missing_packet_list.push_back(info);
+				missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
 			}
 			pthread_mutex_unlock(&nack_list_mutex);
 			cout << "Missing packets added to the retransmit list." << endl;
@@ -190,15 +211,16 @@ void* ReceiveBufferMgr::StartNackThread(void* ptr) {
 
 // Keep checking the missing list for retransmission request
 void ReceiveBufferMgr::NackRun() {
-	list<NackMsgInfo>::iterator it;
+	map<int32_t, NackMsgInfo>::iterator it;
 	while (true) {
 		clock_t cur_time = clock();
 		pthread_mutex_lock(&nack_list_mutex);
-		for (it = missing_packet_list.begin(); it != missing_packet_list.end(); it++) {
-			if ( (cur_time - it->time_stamp) > INIT_RTT / 1000 * CLOCKS_PER_SEC ) {
-				SendNackMsg(it->packet_id);
-				it->num_retries++;
-				it->time_stamp = cur_time;
+		for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
+			if ( (cur_time - it->second.time_stamp) > INIT_RTT / 1000 * CLOCKS_PER_SEC &&
+					it->second.num_retries < 5) {
+				SendNackMsg(it->first);
+				it->second.num_retries++;
+				it->second.time_stamp = cur_time;
 				cout << "One NACK message sent." << endl;
 			}
 		}
@@ -239,30 +261,25 @@ void ReceiveBufferMgr::UdpReceive() {
 
 		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
 		// Discard duplicated packet that has already been used and deleted from the buffer
-		if (header->packet_id <= last_del_packet_id)
+		if (header->packet_id <= last_del_packet_id) {
+			DeleteNackFromList(header->packet_id);
 			continue;
+		}
 
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
 		pthread_mutex_lock(&buf_mutex);
 		recv_buf->AddEntry(header, data);
-		DeleteNackFromList(header->packet_id);
 		pthread_mutex_unlock(&buf_mutex);
 
-		cout << "Retransmission packet added to the buffer." << endl;
+		DeleteNackFromList(header->packet_id);
 	}
 }
 
 
 void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
 	pthread_mutex_lock(&nack_list_mutex);
-	list<NackMsgInfo>::iterator it;
-	for (it = missing_packet_list.begin(); it != missing_packet_list.end(); it++) {
-		if (it->packet_id == packet_id) {
-			missing_packet_list.erase(it);
-			break;
-		}
-	}
+	missing_packets.erase(packet_id);
 	pthread_mutex_unlock(&nack_list_mutex);
 }
 

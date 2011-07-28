@@ -22,6 +22,7 @@ public:
 	int IPReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
+	const struct ReceiveBufferStats GetBufferStats();
 
 private:
 	ReceiveBufferMgr *ptr_recv_buf_mgr;

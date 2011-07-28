@@ -106,7 +106,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	socklen_t socklen = sizeof(from);
 
 	timeval start_time, end_time;
-	char s[100];
+	char s[256];
 	sprintf(s, "Start memory transfer... Total size to transfer: %d", msg.data_len);
 	this->Log(INFORMATIONAL, s);
 	gettimeofday(&start_time, NULL);
@@ -128,18 +128,21 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	this->Log(INFORMATIONAL, s);
 
 
-//	char file_name[30];
-//	sprintf(file_name, "/users/jieli/results/mem_transfer_size%d_buff%d.csv",
-//			msg.data_len, ptr_mvctp_receiver->GetBufferSize());
-//	srand ( time(NULL) );
-//	usleep(rand() % 1000000);
-//
-//	ofstream fout(file_name,ios::app);
-//	if (!fout.fail()) {
-//		sprintf(s, "%.2f\n", trans_time);
-//		fout << s;
-//		fout.close();
-//	}
+	char file_name[30];
+	sprintf(file_name, "/users/jieli/results/mem_transfer_size%d_buff%d_%s.csv",
+			msg.data_len, ptr_mvctp_receiver->GetBufferSize(),
+			ExecSysCommand("hostname -f").c_str());
+
+	ofstream fout(file_name,ios::app);
+	if (!fout.fail()) {
+		struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
+		float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
+		fout << "Transfer Time (Sec), #Packets, #Retransmitted Packets, #Retransmission Rate" << endl;
+		sprintf(s, "%.2f,%d,%d,%f\n", trans_time, stats.num_received_packets,
+				stats.num_retransmitted_packets, retrans_rate);
+		fout << s;
+		fout.close();
+	}
 }
 
 
@@ -162,5 +165,18 @@ bool Tester::IsSender() {
 	}
 	else
 		return false;
+}
+
+string Tester::ExecSysCommand(char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    string result = "";
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+                result += buffer;
+    }
+    pclose(pipe);
+    return result;
 }
 
