@@ -104,28 +104,6 @@ int CommandExecClient::HandleCommand(char* command) {
 
 //
 void CommandExecClient::HandleRestartCommand() {
-//	pid_t parent_pid = getpid();
-//	pid_t pid = 0;
-//	pid = fork();
-//
-//	if (pid < 0) {
-//		perror("process failed to fork" );
-//		return;
-//	}
-//
-//	if (pid == 0) { //child process
-//		//wait(&status);
-//		char command[100];
-//		sprintf(command, "sudo kill %d", parent_pid);
-//		//string command = "sudo killall emustarter";
-//		system(command);
-//		cout << "Parent process killed." << endl;
-//	} else {
-//		keep_alive = false;
-//		exit(0);
-//	}
-
-
 	//TODO: Ugly way to close all opened file descriptors (sockets).
 	//How to fix it?
 	for (int i = 3; i < 10; i++) {
