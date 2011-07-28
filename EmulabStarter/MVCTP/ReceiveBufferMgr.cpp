@@ -157,7 +157,7 @@ void ReceiveBufferMgr::Run() {
 			SysError("MVCTPBuffer error on receiving data");
 		}
 		//cout << "I received one packet. Packet length: " << bytes << endl;
-
+		buffer_stats.num_received_packets++;
 		char* data = (char*)malloc(header->data_len);
 		memcpy(data, buf + MVCTP_HLEN, header->data_len);
 
@@ -188,6 +188,7 @@ void ReceiveBufferMgr::Run() {
 				info.time_stamp = time;
 				info.num_retries = 0;
 				missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
+				buffer_stats.num_retransmitted_packets++;
 			}
 			pthread_mutex_unlock(&nack_list_mutex);
 			cout << "Missing packets added to the retransmit list." << endl;

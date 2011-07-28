@@ -127,22 +127,29 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
 	this->Log(INFORMATIONAL, s);
 
+	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
+	float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
+	sprintf(s, "%.2f,%d,%d,%f\n", trans_time, stats.num_received_packets,
+					stats.num_retransmitted_packets, retrans_rate);
+	this->Log(INFORMATIONAL, s);
 
-	char file_name[30];
-	sprintf(file_name, "/users/jieli/results/mem_transfer_size%d_buff%d_%s.csv",
-			msg.data_len, ptr_mvctp_receiver->GetBufferSize(),
-			ExecSysCommand("hostname -f").c_str());
-
-	ofstream fout(file_name,ios::app);
-	if (!fout.fail()) {
-		struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
-		float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
-		fout << "Transfer Time (Sec), #Packets, #Retransmitted Packets, #Retransmission Rate" << endl;
-		sprintf(s, "%.2f,%d,%d,%f\n", trans_time, stats.num_received_packets,
-				stats.num_retransmitted_packets, retrans_rate);
-		fout << s;
-		fout.close();
-	}
+//	char file_name[30];
+//	string host_name = ExecSysCommand("hostname -f");
+//	int index = host_name.find('-');
+//	host_name = host_name.substr(0, index);
+//	sprintf(file_name, "/users/jieli/results/mem_transfer_size%d_buff%d_%s.csv",
+//			msg.data_len, ptr_mvctp_receiver->GetBufferSize(), host_name.c_str());
+//
+//	ofstream fout(file_name);
+//	if (!fout.fail()) {
+//		struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
+//		float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
+//		fout << "Transfer Time (Sec), #Packets, #Retransmitted Packets, #Retransmission Rate" << endl;
+//		sprintf(s, "%.2f,%d,%d,%f\n", trans_time, stats.num_received_packets,
+//				stats.num_retransmitted_packets, retrans_rate);
+//		fout << s;
+//		fout.close();
+//	}
 }
 
 
@@ -170,11 +177,12 @@ bool Tester::IsSender() {
 string Tester::ExecSysCommand(char* cmd) {
     FILE* pipe = popen(cmd, "r");
     if (!pipe) return "ERROR";
-    char buffer[128];
+    char output[4096];
     string result = "";
     while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
-                result += buffer;
+    	int bytes = fread(output, 1, 4095, pipe);
+    	output[bytes] = '\0';
+    	result += output;
     }
     pclose(pipe);
     return result;
