@@ -35,7 +35,12 @@ int ReceiverCommandClient::HandleCommand(char* command) {
 			ptr_receiver->SetBufferSize(atoi(parts.back().c_str()));
 			SendMessage(COMMAND_RESPONSE, "Buffer size has been set.");
 		}
-	} else {
+	}
+	else if (parts.front().compare("ResetBuffer") == 0) {
+		ptr_receiver->ResetBuffer();
+		SendMessage(COMMAND_RESPONSE, "Receive buffer has been reset.");
+	}
+	else {
 		CommandExecClient::HandleCommand(command);
 		//ExecSysCommand(command);
 	}

@@ -120,20 +120,23 @@ void SendBufferMgr::ReceiveNack() {
 		}
 
 		if (nack_msg->proto == MVCTP_PROTO_TYPE) {
-			cout << "One retransmission request received. Packet ID: " << nack_msg->packet_id << endl;
-			Retransmit(nack_msg->packet_id);
+			//cout << "One retransmission request received. Packet Number: " << nack_msg->num_missing_packets << endl;
+			Retransmit(nack_msg);
 		}
 	}
 }
 
 
-void SendBufferMgr::Retransmit(int32_t packet_id) {
+void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 	pthread_mutex_lock(&buf_mutex);
-	for (BufferEntry* it = send_buf->Back(); it != send_buf->Begin()->prev; it = it->prev) {
-		if (it->packet_id == packet_id) {
-			udp_comm->SendTo((void *)it->data, it->data_len, 0,
-						(SA*)&sender_addr, sender_socklen);
-			cout << "One packet retransmitted." << endl;
+	for (int i = 0; i < ptr_msg->num_missing_packets; i++) {
+		int32_t packet_id = ptr_msg->packet_ids[i];
+		for (BufferEntry* it = send_buf->Back(); it != send_buf->Begin()->prev; it = it->prev) {
+			if (it->packet_id == packet_id) {
+				udp_comm->SendTo((void *)it->data, it->data_len, 0,
+							(SA*)&sender_addr, sender_socklen);
+				//cout << "One packet retransmitted." << endl;
+			}
 		}
 	}
 	pthread_mutex_unlock(&buf_mutex);

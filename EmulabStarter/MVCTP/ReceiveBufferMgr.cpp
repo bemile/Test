@@ -10,7 +10,9 @@
 ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	last_recv_packet_id = 0;
 	last_del_packet_id = 0;
-	ResetBufferStats();
+	is_first_packet = true;
+	buffer_stats.num_received_packets = 0;
+	buffer_stats.num_retransmitted_packets = 0;
 
 	recv_buf = new MVCTPBuffer(size);
 	comm = mcomm;
@@ -61,9 +63,21 @@ const ReceiveBufferStats ReceiveBufferMgr::GetBufferStats() {
 }
 
 
-void ReceiveBufferMgr::ResetBufferStats() {
+void ReceiveBufferMgr::ResetBuffer() {
 	buffer_stats.num_received_packets = 0;
 	buffer_stats.num_retransmitted_packets = 0;
+
+	pthread_mutex_lock(&nack_list_mutex);
+	missing_packets.clear();
+	pthread_mutex_unlock(&nack_list_mutex);
+
+	pthread_mutex_lock(&buf_mutex);
+	recv_buf->Clear();
+	pthread_mutex_unlock(&buf_mutex);
+
+	last_recv_packet_id = 0;
+	last_del_packet_id = 0;
+	is_first_packet = true;
 }
 
 size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
@@ -152,7 +166,6 @@ void ReceiveBufferMgr::Run() {
 	int bytes;
 	char buf[ETH_DATA_LEN];
 	header = (MVCTP_HEADER*)buf;
-	bool is_first_packet = true;
 
 	while (true) {
 		if ( (bytes = comm->RecvData(buf, ETH_DATA_LEN, 0, (SA*)&sender_multicast_addr, &sender_socklen)) <= 0) {
@@ -217,28 +230,39 @@ void ReceiveBufferMgr::NackRun() {
 	map<int32_t, NackMsgInfo>::iterator it;
 	while (true) {
 		clock_t cur_time = clock();
+		NackMsg msg;
+		memset(&msg, 0, sizeof(msg));
+		msg.proto = MVCTP_PROTO_TYPE;
+
 		pthread_mutex_lock(&nack_list_mutex);
 		for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
 			if ( (cur_time - it->second.time_stamp) > INIT_RTT / 1000 * CLOCKS_PER_SEC &&
 					it->second.num_retries < 5) {
-				SendNackMsg(it->first);
+				msg.packet_ids[msg.num_missing_packets] = it->first;
+				msg.num_missing_packets++;
+				if (msg.num_missing_packets == MAX_NACK_IDS) {
+					SendNackMsg(msg);
+					msg.num_missing_packets = 0;
+				}
+
 				it->second.num_retries++;
 				it->second.time_stamp = cur_time;
-				cout << "One NACK message sent." << endl;
+				//cout << "One NACK message sent." << endl;
 			}
 		}
 		pthread_mutex_unlock(&nack_list_mutex);
 
-		usleep(10000);
+		if (msg.num_missing_packets > 0) {
+			SendNackMsg(msg);
+		}
+
+		usleep(5000);
 	}
 }
 
 
 // Send a retransmission request to the sender
-int ReceiveBufferMgr::SendNackMsg(int32_t packet_id) {
-	NackMsg msg;
-	msg.proto = MVCTP_PROTO_TYPE;
-	msg.packet_id = packet_id;
+int ReceiveBufferMgr::SendNackMsg(NackMsg& msg) {
 	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
 			(SA*)&sender_udp_addr, sizeof(sender_udp_addr));
 }
@@ -262,7 +286,7 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
-		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
+		//cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
 		// Discard duplicated packet that has already been used and deleted from the buffer
 		if (header->packet_id <= last_del_packet_id) {
 			DeleteNackFromList(header->packet_id);

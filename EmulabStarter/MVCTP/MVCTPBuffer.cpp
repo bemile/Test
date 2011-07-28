@@ -91,6 +91,9 @@ int MVCTPBuffer::DeleteUntil(BufferEntry* entry) {
 	return 1;
 }
 
+void MVCTPBuffer::Clear() {
+	DeleteUntil(End());
+}
 
 BufferEntry* MVCTPBuffer::Find(int32_t pid) {
 	BufferEntry *tmp = NULL;

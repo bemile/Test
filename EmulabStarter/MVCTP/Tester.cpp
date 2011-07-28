@@ -129,9 +129,14 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 
 	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
 	float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
-	sprintf(s, "%.2f,%d,%d,%f\n", trans_time, stats.num_received_packets,
+	float throughput = msg.data_len * 8 / 1024.0 / 1024.0 / trans_time;
+
+	// Format:Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
+	sprintf(s, "%.2f,%.2f,%d,%d,%f\n", trans_time, throughput, stats.num_received_packets,
 					stats.num_retransmitted_packets, retrans_rate);
 	this->Log(INFORMATIONAL, s);
+
+	ptr_mvctp_receiver->ResetBuffer();
 
 //	char file_name[30];
 //	string host_name = ExecSysCommand("hostname -f");

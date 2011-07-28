@@ -21,7 +21,7 @@ void CommandExecClient::Start() {
 	pthread_mutex_init(&mutex, 0);
 	keep_alive = true;
 	is_connected = true;
-	int val = pthread_create(&thread, NULL, &CommandExecClient::StartThread, this);
+	pthread_create(&thread, NULL, &CommandExecClient::StartThread, this);
 }
 
 void CommandExecClient::Stop() {
@@ -92,7 +92,7 @@ int CommandExecClient::HandleCommand(char* command) {
 	if (parts.size() == 0)
 		return 0;
 
-	if (parts.front().compare("restart") == 0) {
+	if (parts.front().compare("Restart") == 0) {
 		HandleRestartCommand();
 	} else {
 		ExecSysCommand(command);
@@ -104,28 +104,37 @@ int CommandExecClient::HandleCommand(char* command) {
 
 //
 void CommandExecClient::HandleRestartCommand() {
-	pid_t pid = 0;
-	pid = fork();
-	int status;
-	if (pid < 0) {
-		perror("process failed to fork" );
-		return;
+//	pid_t parent_pid = getpid();
+//	pid_t pid = 0;
+//	pid = fork();
+//
+//	if (pid < 0) {
+//		perror("process failed to fork" );
+//		return;
+//	}
+//
+//	if (pid == 0) { //child process
+//		//wait(&status);
+//		char command[100];
+//		sprintf(command, "sudo kill %d", parent_pid);
+//		//string command = "sudo killall emustarter";
+//		system(command);
+//		cout << "Parent process killed." << endl;
+//	} else {
+//		keep_alive = false;
+//		exit(0);
+//	}
+
+
+	//TODO: Ugly way to close all opened file descriptors (sockets).
+	//How to fix it?
+	for (int i = 3; i < 10; i++) {
+		close(i);
 	}
 
-	if (pid == 0) { //child process
-		keep_alive = false;
-		exit(0);
-	} else {
-		wait(&status);
-
-		chdir("/users/jieli/bin");
-		execl("/bin/sh", "sh", "/users/jieli/bin/run_starter.sh", (char *) 0);
-		//string command = "sudo killall emustarter\n/users/jieli/bin/run_starter.sh\n";
-		//system(command.c_str());
-		exit(0);
-
-	}
-
+	// Restart the emulab test
+	chdir("/users/jieli/bin");
+	execl("/bin/sh", "sh", "/users/jieli/bin/run_starter.sh", (char *) 0);
 	exit(0);
 }
 

@@ -29,7 +29,7 @@ public:
 	void StartReceiveThread();
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
-	void ResetBufferStats();
+	void ResetBuffer();
 	const struct ReceiveBufferStats GetBufferStats();
 
 private:
@@ -42,10 +42,11 @@ private:
 
 	int32_t				last_recv_packet_id;	// packet ID assigned to the latest received packet
 	int32_t				last_del_packet_id;
+	bool 				is_first_packet;
 	map<int32_t, NackMsgInfo> 	missing_packets;
 	struct ReceiveBufferStats buffer_stats;
 
-	int SendNackMsg(int32_t packet_id);
+	int SendNackMsg(NackMsg& msg);
 
 	pthread_t recv_thread, nack_thread, udp_thread;
 	pthread_mutex_t buf_mutex, nack_list_mutex;

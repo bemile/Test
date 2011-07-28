@@ -46,6 +46,7 @@ public:
 	bool 			IsEmpty();
 	int 			ShrinkEntry(BufferEntry* entry, size_t new_size);
 	int				AddEntry(MVCTP_HEADER* header, char* data);
+	void			Clear();
 
 
 protected:

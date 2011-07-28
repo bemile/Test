@@ -23,6 +23,7 @@ public:
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
 	const struct ReceiveBufferStats GetBufferStats();
+	void ResetBuffer();
 
 private:
 	ReceiveBufferMgr *ptr_recv_buf_mgr;

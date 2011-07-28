@@ -37,7 +37,7 @@ private:
 	pthread_mutex_t buf_mutex;
 	static void* StartUdpNackReceive(void* ptr);
 	void ReceiveNack();
-	void Retransmit(int32_t packet_id);
+	void Retransmit(NackMsg* msg);
 	void MakeRoomForNewPacket(size_t room_size);
 };
 
