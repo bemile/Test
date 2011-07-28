@@ -128,9 +128,12 @@ int SenderCommandClient::TransferMemoryData(int size) {
 	float time_diff;
 	gettimeofday(&last_time, NULL);
 
-	int remained_size = size;
 	int period = size / MVCTP_DATA_LEN / 10;
+	if (period == 0)
+		period = 1;
+
 	int send_count = 0;
+	int remained_size = size;
 	while (remained_size > 0) {
 		int packet_size = remained_size > MVCTP_DATA_LEN ? MVCTP_DATA_LEN
 				: remained_size;
@@ -143,7 +146,7 @@ int SenderCommandClient::TransferMemoryData(int size) {
 		if (send_count % period == 0) {
 			gettimeofday(&cur_time, NULL);
 			time_diff = (cur_time.tv_sec - last_time.tv_sec)
-					+ (cur_time.tv_usec - last_time.tv_usec) / 1000000.0;
+					+ (cur_time.tv_usec - last_time.tv_usec) / 1000000.0 + 0.001;
 
 			last_time = cur_time;
 			float rate = size_count / time_diff / 1024.0 / 1024.0 * 8;

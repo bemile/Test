@@ -42,9 +42,9 @@ void Tester::StartTest() {
 	}
 	else {  //Is receiver
 		// Set the receiver process to real-time scheduling mode
-		struct sched_param sp;
-		sp.__sched_priority = sched_get_priority_max(SCHED_RR);
-		sched_setscheduler(0, SCHED_RR, &sp);
+		//struct sched_param sp;
+		//sp.__sched_priority = sched_get_priority_max(SCHED_RR);
+		//sched_setscheduler(0, SCHED_RR, &sp);
 
 		ptr_mvctp_receiver = new MVCTPReceiver(recv_buf_size);
 		ptr_mvctp_receiver->JoinGroup(group_id, mvctp_port);
@@ -127,7 +127,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	}
 	gettimeofday(&end_time, NULL);
 	float trans_time = end_time.tv_sec - start_time.tv_sec +
-			(end_time.tv_usec - start_time.tv_usec) / 1000000.0;
+			(end_time.tv_usec - start_time.tv_usec) / 1000000.0 + 0.001;
 
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
 	this->Log(INFORMATIONAL, s);
