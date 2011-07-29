@@ -34,7 +34,7 @@ public:
 	ssize_t SendData(const void* buff, size_t len, int flags, void* dst_addr);
 	ssize_t RecvData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 
-	void Bind(u_char* mac_addr);
+	void Bind(const SA* sa, int sa_len, u_char* mac_addr);
 	int ReceiveFrame(void* buffer);
 	void SetSendRate(int num_mbps);
 	int SendFrame(void* buffer, size_t length);

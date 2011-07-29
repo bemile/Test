@@ -45,7 +45,7 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 }
 
 
-void RawSocketComm::Bind(u_char* mac_addr) {
+void RawSocketComm::Bind(const SA* sa, int sa_len, u_char* mac_addr) {
 	memcpy(bind_mac_addr, mac_addr, ETH_ALEN);
 }
 

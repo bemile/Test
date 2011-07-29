@@ -19,13 +19,13 @@ MVCTPComm::MVCTPComm() {
 	recv_data = (u_char*)recv_frame_buf + ETH_HLEN + sizeof(MVCTP_HEADER);
 
 	if_manager = new NetInterfaceManager();
-	string if_name;
 	for (PTR_IFI_INFO ptr_ifi = if_manager->GetIfiHead(); ptr_ifi != NULL;
 			ptr_ifi = ptr_ifi->ifi_next) {
 		sockaddr_in* addr = (sockaddr_in*)ptr_ifi->ifi_addr;
 		string ip = inet_ntoa(addr->sin_addr);
 		if (ip.find("10.1.") != ip.npos) {
 			if_name = ptr_ifi->ifi_name;
+			cout << "Raw Socket Interface: " << if_name << endl;
 			break;
 		}
 
@@ -50,11 +50,11 @@ int MVCTPComm::JoinGroup(string addr, ushort port) {
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(PORT_NUM);
 	inet_pton(AF_INET, addr.c_str(), &sa.sin_addr);
-	ptr_multicast_comm->JoinGroup((SA *)&sa, sizeof(sa), (char*)NULL);
+	ptr_multicast_comm->JoinGroup((SA *)&sa, sizeof(sa), if_name.c_str());//(char*)NULL);
 
 	mvctp_group_id = sa.sin_addr.s_addr;
 	GetMulticastMacAddressFromIP(mac_group_addr, mvctp_group_id);
-	ptr_raw_sock_comm->Bind(mac_group_addr);
+	ptr_raw_sock_comm->Bind((SA *)&sa, sizeof(sa), mac_group_addr);
 	send_mvctp_header->group_id  = mvctp_group_id;
 	send_mvctp_header->src_port = port;
 	return 1;
