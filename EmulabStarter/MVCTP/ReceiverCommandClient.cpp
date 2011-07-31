@@ -30,10 +30,21 @@ int ReceiverCommandClient::HandleCommand(char* command) {
 	if (parts.size() == 0)
 		return 0;
 
-	if (parts.front().compare("SetBufferSize") == 0) {
+	char msg[512];
+	if (parts.front().compare("SetRecvBuffSize") == 0) {
 		if (parts.size() == 2) {
-			ptr_receiver->SetBufferSize(atoi(parts.back().c_str()));
-			SendMessage(COMMAND_RESPONSE, "Buffer size has been set.");
+			size_t size = atoi(parts.back().c_str());
+			ptr_receiver->SetBufferSize(size);
+			sprintf(msg, "Receive buffer size has been set to %d bytes.", size);
+			SendMessage(COMMAND_RESPONSE, msg);
+		}
+	}
+	else if (parts.front().compare("SetSocketBuffSize") == 0) {
+		if (parts.size() == 2) {
+			size_t size = atoi(parts.back().c_str());
+			ptr_receiver->SetSocketBufferSize(size);
+			sprintf(msg, "Socket buffer size has been set to %d bytes.", size);
+			SendMessage(COMMAND_RESPONSE, msg);
 		}
 	}
 	else if (parts.front().compare("ResetBuffer") == 0) {

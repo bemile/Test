@@ -10,7 +10,7 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 	if ( (sock_fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL))) < 0) {
 			SysError("Cannot create new socket.");
 	}
-	SetBufferSize(2000000);
+	SetBufferSize(2048000);
 
 
 	// get the index of the network device

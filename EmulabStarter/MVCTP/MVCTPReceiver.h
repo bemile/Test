@@ -23,6 +23,7 @@ public:
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
 	const struct ReceiveBufferStats GetBufferStats();
+	void SetSocketBufferSize(size_t buff_size);
 	void ResetBuffer();
 
 private:

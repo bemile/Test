@@ -31,6 +31,10 @@ size_t MVCTPReceiver::GetBufferSize() {
 	return ptr_recv_buf_mgr->GetBufferSize();
 }
 
+void MVCTPReceiver::SetSocketBufferSize(size_t buff_size) {
+	ptr_recv_buf_mgr->SetSocketBufferSize(buff_size);
+}
+
 int MVCTPReceiver::JoinGroup(string addr, ushort port) {
 	MVCTPComm::JoinGroup(group_id, port);
 	ptr_recv_buf_mgr->StartReceiveThread();

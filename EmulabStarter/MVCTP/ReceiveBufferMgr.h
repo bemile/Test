@@ -29,6 +29,7 @@ public:
 	void StartReceiveThread();
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
+	void SetSocketBufferSize(size_t buff_size);
 	void ResetBuffer();
 	const struct ReceiveBufferStats GetBufferStats();
 
