@@ -24,12 +24,13 @@
 #include <unistd.h>
 
 enum MsgType {
-	NODE_NAME = 1,
+    NODE_NAME = 1,
     IP_ADDRESS = 2,
     INFORMATIONAL = 3,
     WARNING = 4,
     COMMAND = 5,
-    COMMAND_RESPONSE = 6
+    COMMAND_RESPONSE = 6,
+    EXP_RESULT_REPORT = 7
 };
 
 

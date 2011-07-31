@@ -139,7 +139,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	// Format:Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
 	sprintf(s, "%.2f,%.2f,%d,%d,%f\n", trans_time, throughput, stats.num_received_packets,
 					stats.num_retransmitted_packets, retrans_rate);
-	this->Log(INFORMATIONAL, s);
+	this->Log(EXP_RESULT_REPORT, s);
 
 	ptr_mvctp_receiver->ResetBuffer();
 
