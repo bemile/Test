@@ -26,8 +26,8 @@ enum TransferMsgType {
 
 struct TransferMessage {
 	 TransferMsgType	msg_type;
-	 int 		data_len;
-	 char       file_name[30];
+	 size_t 			data_len;
+	 char       		file_name[30];
 };
 
 
