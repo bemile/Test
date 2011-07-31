@@ -136,8 +136,8 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
 	float throughput = msg.data_len * 8 / 1024.0 / 1024.0 / trans_time;
 
-	// Format:Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
-	sprintf(s, "%.2f,%.2f,%d,%d,%f\n", trans_time, throughput, stats.num_received_packets,
+	// Format:TransferBytes, Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
+	sprintf(s, "%d,%.2f,%.2f,%d,%d,%f\n", msg.data_len, trans_time, throughput, stats.num_received_packets,
 					stats.num_retransmitted_packets, retrans_rate);
 	this->Log(EXP_RESULT_REPORT, s);
 

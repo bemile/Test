@@ -10,11 +10,8 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 	if ( (sock_fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL))) < 0) {
 			SysError("Cannot create new socket.");
 	}
+	SetBufferSize(2000000);
 
-	int buff_size = 16000000;
-	if (setsockopt(sock_fd, SOL_SOCKET, SO_RCVBUFFORCE, &buff_size, sizeof(buff_size)) < 0) {
-		SysError("Cannot set receive buffer size for raw socket.");
-	}
 
 	// get the index of the network device
 	memset(&if_req, 0, sizeof(if_req));
@@ -49,6 +46,13 @@ RawSocketComm::RawSocketComm(const char* if_name) {
 	send_frame.proto = htons(MVCTP_PROTO_TYPE);
 }
 
+
+void RawSocketComm::SetBufferSize(size_t buf_size) {
+	int size = buf_size;
+	if (setsockopt(sock_fd, SOL_SOCKET, SO_RCVBUFFORCE, &size, sizeof(size)) < 0) {
+		SysError("Cannot set receive buffer size for raw socket.");
+	}
+}
 
 void RawSocketComm::Bind(const SA* sa, int sa_len, u_char* mac_addr) {
 	memcpy(bind_mac_addr, mac_addr, ETH_ALEN);

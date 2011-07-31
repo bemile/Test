@@ -31,6 +31,7 @@ public:
 	//int SendData(const u_char* dest_addr, void* buffer, size_t length);
 	//int ReceiveData(void* buffer, size_t length);
 
+	void SetBufferSize(size_t buf_size);
 	ssize_t SendData(const void* buff, size_t len, int flags, void* dst_addr);
 	ssize_t RecvData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 

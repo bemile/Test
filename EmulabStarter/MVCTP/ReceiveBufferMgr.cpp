@@ -52,6 +52,7 @@ ReceiveBufferMgr::~ReceiveBufferMgr() {
 
 void ReceiveBufferMgr::SetBufferSize(size_t buff_size) {
 	recv_buf->SetMaxBufferSize(buff_size);
+	comm->SetBufferSize(buff_size);
 }
 
 size_t ReceiveBufferMgr::GetBufferSize() {

@@ -15,3 +15,7 @@ InetComm::InetComm() {
 InetComm::~InetComm() {
 	// TODO Auto-generated destructor stub
 }
+
+void InetComm::SetBufferSize(size_t buf_size) {
+
+}
