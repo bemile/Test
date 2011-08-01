@@ -74,7 +74,7 @@ void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out
 	if (avail_buf_size < entry->data_len) {
 		MakeRoomForNewPacket(entry->data_len - avail_buf_size);
 	}
-	send_buf->Insert(entry);
+	//send_buf->Insert(entry);
 
 	if (send_out) {
 		if (comm->SendData(entry->data, entry->data_len, 0, dst_addr) < 0) {
