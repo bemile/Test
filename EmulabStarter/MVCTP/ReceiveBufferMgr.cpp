@@ -165,6 +165,10 @@ void* ReceiveBufferMgr::StartReceivingData(void* ptr) {
 
 
 void ReceiveBufferMgr::Run() {
+	struct sched_param sp;
+	sp.__sched_priority = sched_get_priority_max(SCHED_RR);
+	sched_setscheduler(0, SCHED_RR, &sp);
+
 	MVCTP_HEADER* header;
 	int bytes;
 	char buf[ETH_DATA_LEN];
