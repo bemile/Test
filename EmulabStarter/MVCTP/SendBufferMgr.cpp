@@ -31,6 +31,7 @@ void SendBufferMgr::SetBufferSize(size_t buff_size) {
 
 void SendBufferMgr::ResetBuffer() {
 	send_buf->Clear();
+	last_packet_id = 0;
 }
 
 // Send out data through the multicast socket
