@@ -30,22 +30,32 @@ int SenderCommandClient::HandleCommand(char* command) {
 	if (parts.size() == 0)
 		return 0;
 
+	char msg[512];
 	if (parts.front().compare("Send") == 0) {
 		parts.erase(parts.begin());
 		HandleSendCommand(parts);
 	}
 	else if (parts.front().compare("SetRate") == 0) {
 		if (parts.size() == 2) {
-			ptr_sender->SetSendRate(atoi(parts.back().c_str()));
-			SendMessage(COMMAND_RESPONSE, "Data sending rate has been set.");
+			int rate = atoi(parts.back().c_str());
+			ptr_sender->SetSendRate(rate);
+			sprintf(msg, "Data sending rate has been set to %d Mbps.", rate);
+			SendMessage(COMMAND_RESPONSE, msg);
 		}
 	}
 	else if (parts.front().compare("SetBufferSize") == 0) {
 		if (parts.size() == 2) {
-			ptr_sender->SetBufferSize(atoi(parts.back().c_str()));
-			SendMessage(COMMAND_RESPONSE, "Buffer size has been set.");
+			int size = atoi(parts.back().c_str());
+			ptr_sender->SetBufferSize(size);
+			sprintf(msg, "Buffer size has been set to %d bytes.", size);
+			SendMessage(COMMAND_RESPONSE, msg);
 		}
-	} else {
+	}
+	else if (parts.front().compare("ResetBuffer") == 0) {
+		ptr_sender->ResetBuffer();
+		SendMessage(COMMAND_RESPONSE, "Buffer has been reset.");
+	}
+	else {
 		CommandExecClient::HandleCommand(command);
 		//ExecSysCommand(command);
 	}

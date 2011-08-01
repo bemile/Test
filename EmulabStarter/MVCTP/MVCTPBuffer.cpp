@@ -78,6 +78,8 @@ void MVCTPBuffer::Clear() {
 	}
 	buffer_pool.clear();
 
+	current_buffer_size = 0;
+	num_entry = 0;
 	min_packet_id = 2100000000;
 	max_packet_id = -1;
 }

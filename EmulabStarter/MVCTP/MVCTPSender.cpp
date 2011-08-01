@@ -27,6 +27,11 @@ void MVCTPSender::SetBufferSize(size_t buff_size) {
 	ptr_send_buf_mgr->SetBufferSize(buff_size);
 }
 
+
+void MVCTPSender::ResetBuffer() {
+	ptr_send_buf_mgr->ResetBuffer();
+}
+
 // Send data through RAW socket
 int MVCTPSender::RawSend(const char* data, size_t length, bool send_out) {
 	return ptr_send_buf_mgr->SendData(data, length, mac_group_addr, send_out);

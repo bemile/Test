@@ -21,6 +21,7 @@ public:
 	int IPSend(const char* data, size_t length, bool send_out);
 	void SetSendRate(int num_mbps);
 	void SetBufferSize(size_t buff_size);
+	void ResetBuffer();
 
 private:
 	//MVCTPComm* ptr_mvctp_comm;

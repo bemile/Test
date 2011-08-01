@@ -23,6 +23,7 @@ public:
 	void SendPacket(BufferEntry* entry, void* dst_addr, bool send_out);
 	void StartUdpThread();
 	void SetBufferSize(size_t buff_size);
+	void ResetBuffer();
 
 private:
 	MVCTPBuffer* 	send_buf;

@@ -28,6 +28,11 @@ void SendBufferMgr::SetBufferSize(size_t buff_size) {
 	send_buf->SetMaxBufferSize(buff_size);
 }
 
+
+void SendBufferMgr::ResetBuffer() {
+	send_buf->Clear();
+}
+
 // Send out data through the multicast socket
 // send_out: whether or not actually send out the packet (for testing reliability)
 //              should be removed in real implementation
