@@ -16,7 +16,6 @@ typedef struct BufferEntry {
 	int32_t 	packet_id;
 	size_t		data_len;
 	char*		data;
-	BufferEntry	*prev, *next;
 } BUFFER_ENTRY, * PTR_BUFFER_ENTRY;
 
 
@@ -31,18 +30,14 @@ public:
 	size_t 	GetCurrentBufferSize() {return current_buffer_size;}
 	size_t 	GetAvailableBufferSize() {return max_buffer_size - current_buffer_size;}
 	int 	GetNumEntries() {return num_entry;}
-
-
-	BufferEntry* 	Begin();
-	BufferEntry* 	End();
-	BufferEntry* 	Front();
-	BufferEntry* 	Back();
+	int32_t	GetMinPacketId() {return min_packet_id;}
+	int32_t GetMaxPacketId() {return max_packet_id;}
 
 	BufferEntry* 	Find(int32_t pid);
 	int 			PushBack(BufferEntry* entry);
-	int 			Insert(BufferEntry* pos, BufferEntry* entry);
+	int 			Insert(BufferEntry* entry);
 	int 			Delete(BufferEntry*	entry);
-	int 			DeleteUntil(BufferEntry* entry);
+	int 			DeleteUntil(int32_t start_id, int32_t end_id);
 	bool 			IsEmpty();
 	int 			ShrinkEntry(BufferEntry* entry, size_t new_size);
 	int				AddEntry(MVCTP_HEADER* header, char* data);
@@ -53,8 +48,11 @@ protected:
 	int 		num_entry;				// number of packet entries in the buffer
 	size_t 		max_buffer_size;		// maximum data bytes assigned to the buffer
 	size_t 		current_buffer_size;	// current occupied data bytes in the buffer
+	int32_t		min_packet_id;
+	int32_t		max_packet_id;
 
 	PTR_BUFFER_ENTRY	nil;		// pointer to the first and last entry
+	map<int32_t, BufferEntry*> buffer_pool;
 
 	void DestroyEntry(BufferEntry* entry);
 };

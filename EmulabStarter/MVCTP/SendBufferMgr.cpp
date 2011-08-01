@@ -68,7 +68,7 @@ void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out
 	if (avail_buf_size < entry->data_len) {
 		MakeRoomForNewPacket(entry->data_len - avail_buf_size);
 	}
-	send_buf->PushBack(entry);
+	send_buf->Insert(entry);
 
 	if (send_out) {
 		if (comm->SendData(entry->data, entry->data_len, 0, dst_addr) < 0) {
@@ -81,15 +81,17 @@ void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out
 
 void SendBufferMgr::MakeRoomForNewPacket(size_t room_size) {
 	size_t size = 0;
+	int32_t pid;
 	BufferEntry* it;
-	for (it = send_buf->Begin(); it != send_buf->End(); it = it->next) {
+	for (pid = send_buf->GetMinPacketId(); pid <= send_buf->GetMaxPacketId(); pid++) {
 		if (size > room_size)
 			break;
 
-		size += it->data_len;
+		if ( (it = send_buf->Find(pid)) != NULL)
+			size += it->data_len;
 	}
 
-	send_buf->DeleteUntil(it);
+	send_buf->DeleteUntil(send_buf->GetMinPacketId(), pid);
 }
 
 
@@ -131,12 +133,11 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 	pthread_mutex_lock(&buf_mutex);
 	for (int i = 0; i < ptr_msg->num_missing_packets; i++) {
 		int32_t packet_id = ptr_msg->packet_ids[i];
-		for (BufferEntry* it = send_buf->Back(); it != send_buf->Begin()->prev; it = it->prev) {
-			if (it->packet_id == packet_id) {
-				udp_comm->SendTo((void *)it->data, it->data_len, 0,
-							(SA*)&sender_addr, sender_socklen);
-				cout << "One packet retransmitted. Packet ID: " << packet_id << endl;
-			}
+		BufferEntry* entry = send_buf->Find(packet_id);
+		if (entry != NULL) {
+			udp_comm->SendTo((void *)entry->data, entry->data_len, 0,
+						(SA*)&sender_addr, sender_socklen);
+			cout << "One packet retransmitted. Packet ID: " << packet_id << endl;
 		}
 	}
 	pthread_mutex_unlock(&buf_mutex);

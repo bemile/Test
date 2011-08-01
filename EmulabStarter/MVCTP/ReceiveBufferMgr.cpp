@@ -90,23 +90,20 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	size_t bytes_remained = len;
 
 	//wait until there are some data in the buffer
-	while (recv_buf->IsEmpty() || recv_buf->Front()->packet_id != last_del_packet_id  + 1) {
+	while (recv_buf->IsEmpty() || recv_buf->Find(last_del_packet_id  + 1) == NULL) {
 		usleep(5000);
 	}
 
 	int sleep_turns = 0;
 	while (true) {
 		pthread_mutex_lock(&buf_mutex);
-		int32_t last_pid = recv_buf->Front()->packet_id - 1;
-		BufferEntry *tmp;
-		for (tmp = recv_buf->Begin(); tmp != recv_buf->End(); tmp = tmp->next) {
-			if (tmp->packet_id != (last_pid + 1))
+		int32_t next_pid = last_del_packet_id  + 1;
+		BufferEntry * tmp = NULL;
+		while (bytes_remained > 0) {
+			if ( (tmp = recv_buf->Find(next_pid)) == NULL)
 				break;
 
-			last_pid = tmp->packet_id;
-			if (bytes_remained <= 0)
-				break;
-			else if (bytes_remained < tmp->data_len) {
+			if (bytes_remained < tmp->data_len) {
 				memcpy(pos, tmp->data, bytes_remained);
 				pos += bytes_remained;
 				bytes_copied += bytes_remained;
@@ -119,11 +116,13 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 				bytes_copied += tmp->data_len;
 				bytes_remained -= tmp->data_len;
 			}
+
+			next_pid++;
 		}
 
-		if (tmp != recv_buf->Begin()) {
-			last_del_packet_id = tmp->prev->packet_id;
-			recv_buf->DeleteUntil(tmp);
+		if (tmp != NULL) {
+			recv_buf->DeleteUntil(last_del_packet_id + 1, next_pid);
+			last_del_packet_id = next_pid - 1;
 		}
 		pthread_mutex_unlock(&buf_mutex);
 
