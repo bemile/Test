@@ -77,12 +77,13 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 
 void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out) {
 	size_t avail_buf_size = send_buf->GetAvailableBufferSize();
+	cout << "Available buffer size: " << avail_buf_size << endl;
 	if (avail_buf_size < entry->data_len) {
 		cout << "Not enough buffer space. Make room for new packet." << endl;
 		MakeRoomForNewPacket(entry->data_len - avail_buf_size);
 	}
-	send_buf->Insert(entry);
 
+	send_buf->Insert(entry);
 	if (send_out) {
 		if (comm->SendData(entry->packet_buffer, entry->data_len, 0, dst_addr) < 0) {
 			SysError("SendBufferMgr::SendPacket()::SendData() error");
