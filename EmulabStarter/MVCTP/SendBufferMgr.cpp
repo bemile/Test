@@ -59,7 +59,8 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 
 		entry->packet_id = header->packet_id;
 		entry->data_len = len + MVCTP_HLEN;
-		memcpy(entry->packet_buffer + MVCTP_HLEN, pos, len);
+		entry->data = entry->packet_buffer + MVCTP_HLEN;
+		memcpy(entry->data, pos, len);
 		//entry->data = ptr_data;
 
 		SendPacket(entry, dst_addr, send_out);
@@ -99,7 +100,7 @@ void SendBufferMgr::MakeRoomForNewPacket(size_t room_size) {
 			break;
 
 		if ( (it = send_buf->Find(pid)) != NULL)
-			size += MVCTP_PACKET_LEN; //it->data_len;
+			size += MVCTP_DATA_LEN; //it->data_len;
 	}
 
 	send_buf->DeleteUntil(send_buf->GetMinPacketId(), pid);

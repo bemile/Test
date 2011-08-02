@@ -42,7 +42,8 @@ void MVCTPBuffer::AllocateFreePackets() {
 	for (int i = 0; i < numPackets; i++) {
 		BufferEntry* entry = (BufferEntry*)malloc(sizeof(BufferEntry));
 		entry->packet_buffer = ptr;
-		entry->data = ptr;
+		entry->mvctp_header = ptr;
+		entry->data = ptr + MVCTP_HLEN;
 		free_packet_list.push_back(entry);
 		ptr += MVCTP_PACKET_LEN;
 	}
