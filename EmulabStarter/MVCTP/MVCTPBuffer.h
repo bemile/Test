@@ -31,7 +31,7 @@ public:
 	size_t 	GetMaxBufferSize() {return max_buffer_size;};
 	void 	SetMaxBufferSize(size_t buff_size) {max_buffer_size = buff_size;}
 	size_t 	GetCurrentBufferSize() {return current_buffer_size;}
-	size_t 	GetAvailableBufferSize() {return max_buffer_size - current_buffer_size;}
+	int 	GetAvailableBufferSize() {return max_buffer_size - current_buffer_size;}
 	int 	GetNumEntries() {return num_entry;}
 	int32_t	GetMinPacketId() {return min_packet_id;}
 	int32_t GetMaxPacketId() {return max_packet_id;}
