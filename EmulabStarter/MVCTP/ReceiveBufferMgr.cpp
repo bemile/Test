@@ -240,11 +240,10 @@ void* ReceiveBufferMgr::AddEntry(MVCTP_HEADER* header, void* buf) {
 	if (header->data_len <= recv_buf->GetAvailableBufferSize()) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
+		last_recv_packet_id = header->packet_id;
+		buffer_stats.num_received_packets++;
 	}
 	pthread_mutex_unlock(&buf_mutex);
-
-	last_recv_packet_id = header->packet_id;
-	buffer_stats.num_received_packets++;
 }
 
 
