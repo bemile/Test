@@ -229,7 +229,7 @@ void ReceiveBufferMgr::Run() {
 }
 
 
-void* ReceiveBufferMgr::AddEntry(MVCTP_HEADER* header, void* buf) {
+void ReceiveBufferMgr::AddEntry(MVCTP_HEADER* header, void* buf) {
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
 	entry->data_len = header->data_len;
@@ -242,6 +242,9 @@ void* ReceiveBufferMgr::AddEntry(MVCTP_HEADER* header, void* buf) {
 		recv_buf->Insert(entry);
 		last_recv_packet_id = header->packet_id;
 		buffer_stats.num_received_packets++;
+	}
+	else {
+		cout << "Not enough space in the buffer to add the new packet." << endl;
 	}
 	pthread_mutex_unlock(&buf_mutex);
 }
