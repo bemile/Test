@@ -94,6 +94,7 @@ int MVCTPBuffer::Delete(BufferEntry* entry) {
 
 	current_buffer_size -= entry->data_len;
 	num_entry--;
+
 	if (min_packet_id == entry->packet_id)
 		min_packet_id++;
 	else if (max_packet_id == entry->packet_id)

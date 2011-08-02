@@ -77,7 +77,7 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 
 void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out) {
 	size_t avail_buf_size = send_buf->GetAvailableBufferSize();
-	cout << "Available buffer size: " << avail_buf_size << endl;
+	cout << "Current buffer size: "<< send_buf->GetCurrentBufferSize() << "    " << "Available buffer size: " << avail_buf_size << endl;
 	if (avail_buf_size < entry->data_len) {
 		cout << "Not enough buffer space. Make room for new packet." << endl;
 		MakeRoomForNewPacket(entry->data_len - avail_buf_size);
