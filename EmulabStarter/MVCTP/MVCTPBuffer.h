@@ -15,7 +15,10 @@
 typedef struct BufferEntry {
 	int32_t 	packet_id;
 	size_t		data_len;
+	char*		eth_header;
+	char*		mvctp_header;
 	char*		data;
+	char* 		packet_buffer;
 } BUFFER_ENTRY, * PTR_BUFFER_ENTRY;
 
 
@@ -43,6 +46,7 @@ public:
 	int				AddEntry(MVCTP_HEADER* header, char* data);
 	void			Clear();
 
+	BufferEntry* 				GetFreePacket();
 
 protected:
 	int 		num_entry;				// number of packet entries in the buffer
@@ -51,8 +55,10 @@ protected:
 	int32_t		min_packet_id;
 	int32_t		max_packet_id;
 
-	PTR_BUFFER_ENTRY	nil;		// pointer to the first and last entry
-	map<int32_t, BufferEntry*> buffer_pool;
+	map<int32_t, BufferEntry*> 	buffer_pool;
+	list<BufferEntry*> 			free_packet_list;
+	void 						AllocateFreePackets();
+	void						AddFreePacket(BufferEntry* entry);
 
 	void DestroyEntry(BufferEntry* entry);
 };

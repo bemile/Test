@@ -13,11 +13,53 @@ MVCTPBuffer::MVCTPBuffer(int buf_size) {
 	num_entry = 0;
 	min_packet_id = 2100000000;
 	max_packet_id = -1;
+
+	AllocateFreePackets();
 }
 
 
 MVCTPBuffer::~MVCTPBuffer() {
 	Clear();
+
+	list<BufferEntry*>::iterator it;
+	for (it = free_packet_list.begin(); it != free_packet_list.end(); it++) {
+		DestroyEntry(*it);
+	}
+}
+
+
+void MVCTPBuffer::AllocateFreePackets() {
+	int numPackets = max_buffer_size / MVCTP_PACKET_LEN;
+	if (numPackets > 10000) {
+		numPackets = 10000;
+	}
+
+	char* ptr = (char*)malloc(numPackets * MVCTP_PACKET_LEN);
+	if (ptr == NULL) {
+		SysError("MVCTPBuffer::InitializeFreePackets()::malloc()");
+	}
+
+	for (int i = 0; i < numPackets; i++) {
+		BufferEntry* entry = (BufferEntry*)malloc(sizeof(BufferEntry));
+		entry->packet_buffer = ptr;
+		entry->data = ptr;
+		free_packet_list.push_back(entry);
+		ptr += MVCTP_PACKET_LEN;
+	}
+}
+
+void MVCTPBuffer::AddFreePacket(BufferEntry* entry) {
+	if (entry != NULL)
+		free_packet_list.push_back(entry);
+}
+
+BufferEntry* MVCTPBuffer::GetFreePacket() {
+	if (free_packet_list.empty()) {
+		AllocateFreePackets();
+	}
+	BufferEntry* ptr = free_packet_list.front();
+	free_packet_list.pop_front();
+	return ptr;
 }
 
 
@@ -55,7 +97,8 @@ int MVCTPBuffer::Delete(BufferEntry* entry) {
 		max_packet_id--;
 
 	buffer_pool.erase(entry->packet_id);
-	DestroyEntry(entry);
+	AddFreePacket(entry);
+	//DestroyEntry(entry);
 
 	return 1;
 }
@@ -65,7 +108,7 @@ int MVCTPBuffer::DeleteUntil(int32_t start_id, int32_t end_id) {
 	for (int32_t i = start_id; i < end_id; i++) {
 		if (buffer_pool.find(i) != buffer_pool.end()) {
 			Delete(buffer_pool.at(i));
-			buffer_pool.erase(i);
+			//buffer_pool.erase(i);
 		}
 	}
 	return 1;
@@ -74,7 +117,8 @@ int MVCTPBuffer::DeleteUntil(int32_t start_id, int32_t end_id) {
 void MVCTPBuffer::Clear() {
 	map<int32_t, BufferEntry*>::iterator it;
 	for (it = buffer_pool.begin(); it != buffer_pool.end(); it++) {
-		DestroyEntry(it->second);
+		AddFreePacket(it->second);
+		//DestroyEntry(it->second);
 	}
 	buffer_pool.clear();
 
@@ -98,28 +142,31 @@ int MVCTPBuffer::ShrinkEntry(BufferEntry* entry, size_t new_size) {
 	if (entry->data_len < new_size)
 		return -1;
 
-	current_buffer_size -= entry->data_len - new_size;
-
-	char* new_data = (char*)malloc(new_size);
-	memcpy(new_data, entry->data + (entry->data_len - new_size), new_size);
-	free(entry->data);
-	entry->data = new_data;
+	entry->data = entry->data + entry->data_len - new_size;
 	entry->data_len = new_size;
+
+//	current_buffer_size -= entry->data_len - new_size;
+//	char* new_data = (char*) malloc(new_size);
+//	memcpy(new_data, entry->data + (entry->data_len - new_size), new_size);
+//	free(entry->data);
+//	entry->data = new_data;
+//	entry->data_len = new_size;
 
 	return 1;
 }
 
 void MVCTPBuffer::DestroyEntry(BufferEntry* entry) {
-	free(entry->data);
+	free(entry->packet_buffer);
 	free(entry);
 }
 
 
 int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
-	BufferEntry* entry = (BufferEntry*)malloc(sizeof(BufferEntry));
+	BufferEntry* entry = GetFreePacket(); //(BufferEntry*)malloc(sizeof(BufferEntry));
 	entry->packet_id = header->packet_id;
 	entry->data_len = header->data_len;
-	entry->data = data;
+	memcpy(entry->packet_buffer, data, header->data_len);
+	//entry->data = data;
 
 	buffer_pool.insert(pair<int32_t, BufferEntry*>(entry->packet_id, entry));
 

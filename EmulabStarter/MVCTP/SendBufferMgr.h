@@ -25,6 +25,7 @@ public:
 	void SetBufferSize(size_t buff_size);
 	void ResetBuffer();
 
+
 private:
 	MVCTPBuffer* 	send_buf;
 	InetComm* 		comm;
@@ -32,7 +33,7 @@ private:
 	sockaddr_in		sender_addr;
 	socklen_t 		sender_socklen;
 
-	int32_t		last_packet_id;			// packet ID assigned to the latest received packet
+	int32_t				last_packet_id;			// packet ID assigned to the latest received packet
 
 	pthread_t udp_thread;
 	pthread_mutex_t buf_mutex;

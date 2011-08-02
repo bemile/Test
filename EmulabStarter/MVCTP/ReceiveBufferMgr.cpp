@@ -179,9 +179,6 @@ void ReceiveBufferMgr::Run() {
 			SysError("MVCTPBuffer error on receiving data");
 		}
 		//cout << "I received one packet. Packet length: " << bytes << endl;
-		buffer_stats.num_received_packets++;
-		char* data = (char*)malloc(header->data_len);
-		memcpy(data, buf + MVCTP_HLEN, header->data_len);
 
 		// Initialize the packet id information on receiving the first packet
 		if (is_first_packet) {
@@ -230,13 +227,27 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Add the received packet to the buffer
-		pthread_mutex_lock(&buf_mutex);
-		if (header->data_len <= recv_buf->GetAvailableBufferSize()) {
-			recv_buf->AddEntry(header, data);
-			last_recv_packet_id = header->packet_id;
-		}
-		pthread_mutex_unlock(&buf_mutex);
+		AddEntry(header, buf);
 	}
+}
+
+
+void* ReceiveBufferMgr::AddEntry(MVCTP_HEADER* header, void* buf) {
+	BufferEntry* entry = recv_buf->GetFreePacket();
+	entry->packet_id = header->packet_id;
+	entry->data_len = header->data_len;
+	memcpy(entry->packet_buffer, buf, MVCTP_HLEN + header->data_len);
+	entry->data = entry->packet_buffer + MVCTP_HLEN;
+
+	pthread_mutex_lock(&buf_mutex);
+	if (header->data_len <= recv_buf->GetAvailableBufferSize()) {
+		//recv_buf->AddEntry(header, data);
+		recv_buf->Insert(entry);
+	}
+	pthread_mutex_unlock(&buf_mutex);
+
+	last_recv_packet_id = header->packet_id;
+	buffer_stats.num_received_packets++;
 }
 
 
@@ -313,11 +324,13 @@ void ReceiveBufferMgr::UdpReceive() {
 			continue;
 		}
 
-		char* data = (char*)malloc(header->data_len);
-		memcpy(data, buf + MVCTP_HLEN, header->data_len);
-		pthread_mutex_lock(&buf_mutex);
-		recv_buf->AddEntry(header, data);
-		pthread_mutex_unlock(&buf_mutex);
+//		char* data = (char*)malloc(header->data_len);
+//		memcpy(data, buf + MVCTP_HLEN, header->data_len);
+//		pthread_mutex_lock(&buf_mutex);
+//		recv_buf->AddEntry(header, data);
+//		pthread_mutex_unlock(&buf_mutex);
+
+		AddEntry(header, buf);
 
 		DeleteNackFromList(header->packet_id);
 	}

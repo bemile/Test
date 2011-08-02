@@ -53,6 +53,7 @@ private:
 	pthread_mutex_t buf_mutex, nack_list_mutex;
 	static void* StartReceivingData(void* ptr);
 	void Run();
+	void* AddEntry(MVCTP_HEADER* header, void* buf);
 	static void* StartNackThread(void* ptr);
 	void NackRun();
 	void DeleteNackFromList(int32_t packet_id);
