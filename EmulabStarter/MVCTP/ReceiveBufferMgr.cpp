@@ -85,20 +85,20 @@ void ReceiveBufferMgr::ResetBuffer() {
 }
 
 size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
-	char* pos = (char*)buff;
-	size_t bytes_copied = 0;
-	size_t bytes_remained = len;
-
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty() || recv_buf->Find(last_del_packet_id  + 1) == NULL) {
 		usleep(5000);
 	}
 
+	char* pos = (char*)buff;
+	size_t bytes_copied = 0;
+	size_t bytes_remained = len;
 	int sleep_turns = 0;
 	while (true) {
-		pthread_mutex_lock(&buf_mutex);
 		int32_t next_pid = last_del_packet_id  + 1;
 		BufferEntry * tmp = NULL;
+
+		pthread_mutex_lock(&buf_mutex);
 		while (bytes_remained > 0) {
 			if ( (tmp = recv_buf->Find(next_pid)) == NULL)
 				break;
@@ -120,10 +120,8 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 			next_pid++;
 		}
 
-		if (tmp != NULL) {
-			recv_buf->DeleteUntil(last_del_packet_id + 1, next_pid);
-			last_del_packet_id = next_pid - 1;
-		}
+		recv_buf->DeleteUntil(last_del_packet_id + 1, next_pid);
+		last_del_packet_id = next_pid - 1;
 		pthread_mutex_unlock(&buf_mutex);
 
 		if (bytes_remained <= 0 || sleep_turns >= 5) {
@@ -165,14 +163,13 @@ void* ReceiveBufferMgr::StartReceivingData(void* ptr) {
 
 
 void ReceiveBufferMgr::Run() {
-	struct sched_param sp;
-	sp.__sched_priority = sched_get_priority_max(SCHED_RR);
-	sched_setscheduler(0, SCHED_RR, &sp);
+//	struct sched_param sp;
+//	sp.__sched_priority = sched_get_priority_max(SCHED_RR);
+//	sched_setscheduler(0, SCHED_RR, &sp);
 
-	MVCTP_HEADER* header;
-	int bytes;
 	char buf[ETH_DATA_LEN];
-	header = (MVCTP_HEADER*)buf;
+	MVCTP_HEADER* header = (MVCTP_HEADER*)buf;
+	int bytes;
 
 	while (true) {
 		if ( (bytes = comm->RecvData(buf, ETH_DATA_LEN, 0, (SA*)&sender_multicast_addr, &sender_socklen)) <= 0) {
@@ -331,7 +328,6 @@ void ReceiveBufferMgr::UdpReceive() {
 //		pthread_mutex_unlock(&buf_mutex);
 
 		AddEntry(header, buf);
-
 		DeleteNackFromList(header->packet_id);
 	}
 }

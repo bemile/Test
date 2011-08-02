@@ -74,7 +74,7 @@ BufferEntry* MVCTPBuffer::GetFreePacket() {
 
 
 bool MVCTPBuffer::IsEmpty() {
-	return (buffer_pool.size() == 0);
+	return (buffer_pool.empty());
 }
 
 
