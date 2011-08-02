@@ -28,6 +28,14 @@ MVCTPBuffer::~MVCTPBuffer() {
 }
 
 
+size_t 	MVCTPBuffer::GetAvailableBufferSize() {
+	if (max_buffer_size < current_buffer_size )
+		return 0;
+	else
+		return max_buffer_size - current_buffer_size;
+}
+
+
 void MVCTPBuffer::AllocateFreePackets() {
 	cout << "AllocateFreePackets() called." << endl;
 	int numPackets = max_buffer_size / MVCTP_PACKET_LEN;

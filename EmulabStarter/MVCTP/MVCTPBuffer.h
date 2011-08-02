@@ -28,10 +28,10 @@ public:
 	MVCTPBuffer(int buf_size);
 	~MVCTPBuffer();
 
-	int 	GetMaxBufferSize() {return max_buffer_size;};
-	void 	SetMaxBufferSize(int buff_size) {max_buffer_size = buff_size;}
-	int 	GetCurrentBufferSize() {return current_buffer_size;}
-	int 	GetAvailableBufferSize() {return max_buffer_size - current_buffer_size;}
+	size_t 	GetMaxBufferSize() {return max_buffer_size;};
+	void 	SetMaxBufferSize(size_t buff_size) {max_buffer_size = buff_size;}
+	size_t 	GetCurrentBufferSize() {return current_buffer_size;}
+	size_t 	GetAvailableBufferSize();
 	int 	GetNumEntries() {return num_entry;}
 	int32_t	GetMinPacketId() {return min_packet_id;}
 	int32_t GetMaxPacketId() {return max_packet_id;}
@@ -50,8 +50,8 @@ public:
 
 protected:
 	int 		num_entry;				// number of packet entries in the buffer
-	int 		max_buffer_size;		// maximum data bytes assigned to the buffer
-	int 		current_buffer_size;	// current occupied data bytes in the buffer
+	size_t 		max_buffer_size;		// maximum data bytes assigned to the buffer
+	size_t 		current_buffer_size;	// current occupied data bytes in the buffer
 	int32_t		min_packet_id;
 	int32_t		max_packet_id;
 
