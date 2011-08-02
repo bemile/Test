@@ -224,12 +224,12 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Add the received packet to the buffer
-		AddEntry(header, buf);
+		AddNewEntry(header, buf);
 	}
 }
 
 
-void ReceiveBufferMgr::AddEntry(MVCTP_HEADER* header, void* buf) {
+void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
 	entry->data_len = header->data_len;
@@ -332,10 +332,25 @@ void ReceiveBufferMgr::UdpReceive() {
 //		recv_buf->AddEntry(header, data);
 //		pthread_mutex_unlock(&buf_mutex);
 
-		AddEntry(header, buf);
+		AddRetransmittedEntry(header, buf);
 		DeleteNackFromList(header->packet_id);
 	}
 }
+
+void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
+	BufferEntry* entry = recv_buf->GetFreePacket();
+	entry->packet_id = header->packet_id;
+	entry->data_len = header->data_len;
+	memcpy(entry->packet_buffer, buf, MVCTP_HLEN + header->data_len);
+	entry->data = entry->packet_buffer + MVCTP_HLEN;
+
+	pthread_mutex_lock(&buf_mutex);
+		recv_buf->Insert(entry);
+		last_recv_packet_id = header->packet_id;
+		buffer_stats.num_received_packets++;
+	pthread_mutex_unlock(&buf_mutex);
+}
+
 
 
 void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
