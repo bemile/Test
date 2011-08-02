@@ -346,7 +346,7 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 
 	pthread_mutex_lock(&buf_mutex);
 		recv_buf->Insert(entry);
-		last_recv_packet_id = header->packet_id;
+		//last_recv_packet_id = header->packet_id;
 		buffer_stats.num_received_packets++;
 	pthread_mutex_unlock(&buf_mutex);
 }
