@@ -29,6 +29,7 @@ MVCTPBuffer::~MVCTPBuffer() {
 
 
 void MVCTPBuffer::AllocateFreePackets() {
+	cout << "AllocateFreePackets() called." << endl;
 	int numPackets = max_buffer_size / MVCTP_PACKET_LEN;
 	if (numPackets > 10000) {
 		numPackets = 10000;
@@ -44,6 +45,7 @@ void MVCTPBuffer::AllocateFreePackets() {
 		entry->packet_buffer = ptr;
 		entry->mvctp_header = ptr;
 		entry->data = ptr + MVCTP_HLEN;
+
 		free_packet_list.push_back(entry);
 		ptr += MVCTP_PACKET_LEN;
 	}
