@@ -316,6 +316,9 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
+		if (header->proto != MVCTP_PROTO_TYPE)
+			continue;
+
 		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
 		// Discard duplicated packet that has already been used and deleted from the buffer
 		if (header->packet_id <= last_del_packet_id) {

@@ -54,6 +54,7 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 
 		BufferEntry* entry = send_buf->GetFreePacket(); //(BufferEntry*) malloc(sizeof(BufferEntry));
 		MVCTP_HEADER* header = (MVCTP_HEADER*) entry->packet_buffer;
+		header->proto = MVCTP_PROTO_TYPE;
 		header->packet_id = ++last_packet_id;
 		header->data_len = len;
 

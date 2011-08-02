@@ -39,6 +39,7 @@ typedef struct ifreq	IFREQ;
 
 
 typedef struct MVCTPHeader {
+	int32_t 		proto;
 	u_int32_t		group_id;
 	u_int16_t		src_port;
 	u_int16_t		dest_port;
