@@ -62,30 +62,35 @@ void RawSocketComm::SetSendRate(int num_mbps) {
 	send_rate_in_mbps = num_mbps;
 	unit_size_token = num_mbps * 1024 * 1024 / 8 * RATE_CHECK_PERIOD / 1000;	// change to number of bytes
 	current_size_token = unit_size_token;
-	gettimeofday(&last_check_time, NULL);
+	AccessCPUCounter(&last_checked_counter.hi, &last_checked_counter.lo);
+	//gettimeofday(&last_check_time, NULL);
 }
 
 void RawSocketComm::WaitForNewToken() {
-	timeval cur_time;
-	long time_diff;
-	long diff_unit = RATE_CHECK_PERIOD * 1000;
+	//timeval cur_time;
+	CpuCycleCounter cur_counter;
+	double time_diff;
+	double diff_unit = RATE_CHECK_PERIOD / 1000.0;
 	int  new_token = unit_size_token;
 	//bool isConstrained = false;
 
-	gettimeofday(&cur_time, NULL);
-	time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
-			+ (cur_time.tv_usec - last_check_time.tv_usec);
+	//gettimeofday(&cur_time, NULL);
+	//time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
+	//		+ (cur_time.tv_usec - last_check_time.tv_usec);
+	time_diff = GetElapsedSeconds(last_checked_counter);
 	while (time_diff < diff_unit) {
-		//usleep(5000);
-		gettimeofday(&cur_time, NULL);
-		time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
-					+ (cur_time.tv_usec - last_check_time.tv_usec);
+		usleep(5000);
+		time_diff = GetElapsedSeconds(last_checked_counter);
+//		gettimeofday(&cur_time, NULL);
+//		time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
+//					+ (cur_time.tv_usec - last_check_time.tv_usec);
 	}
 
-	//new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
-
-	last_check_time = cur_time;
+	new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
 	current_size_token += new_token;
+	last_checked_counter = cur_counter;
+	//last_check_time = cur_time;
+
 }
 
 

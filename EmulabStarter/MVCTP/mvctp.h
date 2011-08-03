@@ -34,10 +34,24 @@
 
 using namespace std;
 
+struct CpuCycleCounter {
+	unsigned hi;
+	unsigned lo;
+};
+
+//global functions
+void SysError(string s);
+void AccessCPUCounter(unsigned *hi, unsigned *lo);
+double GetElapsedCycles(unsigned hi, unsigned lo);
+double GetElapsedSeconds(CpuCycleCounter lastCount);
+double GetCPUMhz();
+
+// Linux network struct typedefs
 typedef struct sockaddr SA;
 typedef struct ifreq	IFREQ;
 
 
+// MVCTP structs
 typedef struct MVCTPHeader {
 	int32_t 		proto;
 	u_int32_t		group_id;
@@ -102,8 +116,6 @@ const int UDP_PACKET_LEN = ETH_DATA_LEN;
 
 const int INIT_RTT	= 100;		// in milliseconds
 
-
-// Prototypes for global functions
-void SysError(string s);
+const double CPU_MHZ = GetCPUMhz();
 
 #endif /* MVCTP_H_ */

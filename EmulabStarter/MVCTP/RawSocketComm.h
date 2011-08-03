@@ -52,8 +52,8 @@ private:
 	int send_rate_in_mbps;
 	size_t unit_size_token;
 	size_t current_size_token;
-	timeval last_check_time;
-
+	//timeval last_check_time;
+	CpuCycleCounter last_checked_counter;
 	void WaitForNewToken();
 	bool IsMyPacket();
 	string GetMacAddrString(const unsigned char* addr);
