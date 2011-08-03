@@ -240,6 +240,7 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 	if (entry->packet_len <= recv_buf->GetAvailableBufferSize()) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
+		buffer_stats.num_received_packets++;
 	}
 	else {
 		cout << "Not enough space in the buffer to add the new packet." << endl;
@@ -250,12 +251,10 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		info.time_stamp = time;
 		info.num_retries = 0;
 		missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
-		buffer_stats.num_retransmitted_packets++;
 		pthread_mutex_unlock(&nack_list_mutex);
 	}
 
 	last_recv_packet_id = header->packet_id;
-	buffer_stats.num_received_packets++;
 	pthread_mutex_unlock(&buf_mutex);
 }
 
@@ -354,6 +353,7 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 	pthread_mutex_lock(&buf_mutex);
 		recv_buf->Insert(entry);
 		//last_recv_packet_id = header->packet_id;
+		buffer_stats.num_retransmitted_packets++;
 		buffer_stats.num_received_packets++;
 	pthread_mutex_unlock(&buf_mutex);
 }
