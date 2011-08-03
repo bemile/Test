@@ -77,7 +77,7 @@ void RawSocketComm::WaitForNewToken() {
 			+ (cur_time.tv_usec - last_check_time.tv_usec);
 	while (time_diff < diff_unit) {
 		isConstrained = true;
-		//usleep(5000);
+		usleep(5000);
 		gettimeofday(&cur_time, NULL);
 		time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
 					+ (cur_time.tv_usec - last_check_time.tv_usec);
