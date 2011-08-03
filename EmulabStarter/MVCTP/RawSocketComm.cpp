@@ -92,7 +92,7 @@ void RawSocketComm::WaitForNewToken() {
 	}
 
 	current_size_token += new_token;
-	last_checked_counter = cur_counter;
+	AccessCPUCounter(&last_checked_counter.hi, &last_checked_counter.lo);
 	//last_check_time = cur_time;
 
 }
