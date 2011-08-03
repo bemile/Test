@@ -232,20 +232,30 @@ void ReceiveBufferMgr::Run() {
 void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
+	entry->packet_len = MVCTP_HLEN + header->data_len;
 	entry->data_len = header->data_len;
-	memcpy(entry->packet_buffer, buf, MVCTP_HLEN + header->data_len);
-	entry->data = entry->packet_buffer + MVCTP_HLEN;
+	memcpy(entry->mvctp_header, buf, entry->packet_len);
 
 	pthread_mutex_lock(&buf_mutex);
-	if (header->data_len <= recv_buf->GetAvailableBufferSize()) {
+	if (entry->packet_len <= recv_buf->GetAvailableBufferSize()) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
-		last_recv_packet_id = header->packet_id;
-		buffer_stats.num_received_packets++;
 	}
 	else {
 		cout << "Not enough space in the buffer to add the new packet." << endl;
+		pthread_mutex_lock(&nack_list_mutex);
+		clock_t time = clock();
+		NackMsgInfo info;
+		info.packet_id = header->packet_id;
+		info.time_stamp = time;
+		info.num_retries = 0;
+		missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
+		buffer_stats.num_retransmitted_packets++;
+		pthread_mutex_unlock(&nack_list_mutex);
 	}
+
+	last_recv_packet_id = header->packet_id;
+	buffer_stats.num_received_packets++;
 	pthread_mutex_unlock(&buf_mutex);
 }
 
@@ -316,9 +326,6 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
-		//if (header->proto != MVCTP_PROTO_TYPE)
-		//	continue;
-
 		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
 		// Discard duplicated packet that has already been used and deleted from the buffer
 		if (header->packet_id <= last_del_packet_id) {
@@ -340,9 +347,9 @@ void ReceiveBufferMgr::UdpReceive() {
 void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
+	entry->packet_len = MVCTP_HLEN + header->data_len;
 	entry->data_len = header->data_len;
-	memcpy(entry->packet_buffer, buf, MVCTP_HLEN + header->data_len);
-	entry->data = entry->packet_buffer + MVCTP_HLEN;
+	memcpy(entry->mvctp_header, buf, entry->packet_len);
 
 	pthread_mutex_lock(&buf_mutex);
 		recv_buf->Insert(entry);

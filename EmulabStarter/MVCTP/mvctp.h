@@ -89,6 +89,7 @@ const int BUFF_SIZE = 10000;
 const ushort MVCTP_PROTO_TYPE = 0x0001;
 // Force maximum MVCTP packet length to be 1460 bytes so that it won't cause fragmentation
 // when using TCP for packet retransmission
+const int MVCTP_ETH_FRAME_LEN = 1460 + ETH_HLEN;
 const int MVCTP_PACKET_LEN = 1460; //ETH_FRAME_LEN - ETH_HLEN;
 const int MVCTP_HLEN = sizeof(MVCTP_HEADER);
 const int MVCTP_DATA_LEN = MVCTP_PACKET_LEN - sizeof(MVCTP_HEADER); //ETH_FRAME_LEN - ETH_HLEN - sizeof(MVCTP_HEADER);

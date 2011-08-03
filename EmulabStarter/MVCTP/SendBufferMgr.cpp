@@ -53,14 +53,15 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 //		memcpy(ptr_data + MVCTP_HLEN, pos, len);
 
 		BufferEntry* entry = send_buf->GetFreePacket(); //(BufferEntry*) malloc(sizeof(BufferEntry));
-		MVCTP_HEADER* header = (MVCTP_HEADER*) entry->packet_buffer;
+		MVCTP_HEADER* header = (MVCTP_HEADER*) entry->mvctp_header;
 		header->proto = MVCTP_PROTO_TYPE;
 		header->packet_id = ++last_packet_id;
 		header->data_len = len;
 
 		entry->packet_id = header->packet_id;
-		entry->data_len = len + MVCTP_HLEN;
-		entry->data = entry->packet_buffer + MVCTP_HLEN;
+		entry->packet_len = len + MVCTP_HLEN;
+		entry->data_len = len;
+		//entry->data = entry->mvctp_header + MVCTP_HLEN;
 		memcpy(entry->data, pos, len);
 		//entry->data = ptr_data;
 
@@ -78,13 +79,13 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 
 void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out) {
 	size_t avail_buf_size = send_buf->GetAvailableBufferSize();
-	if (avail_buf_size < entry->data_len) {
-		MakeRoomForNewPacket(entry->data_len - avail_buf_size);
+	if (avail_buf_size < entry->packet_len) {
+		MakeRoomForNewPacket(entry->packet_len - avail_buf_size);
 	}
 
 	send_buf->Insert(entry);
 	if (send_out) {
-		if (comm->SendData(entry->packet_buffer, entry->data_len, 0, dst_addr) < 0) {
+		if (comm->SendData(entry->mvctp_header, entry->packet_len, 0, dst_addr) < 0) {
 			SysError("SendBufferMgr::SendPacket()::SendData() error");
 		}
 		//cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
@@ -148,7 +149,7 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 		int32_t packet_id = ptr_msg->packet_ids[i];
 		BufferEntry* entry = send_buf->Find(packet_id);
 		if (entry != NULL) {
-			udp_comm->SendTo((void *)entry->data, entry->data_len, 0,
+			udp_comm->SendTo((void *)entry->mvctp_header, entry->packet_len, 0,
 						(SA*)&sender_addr, sender_socklen);
 			cout << "One packet retransmitted. Packet ID: " << packet_id << endl;
 		}

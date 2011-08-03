@@ -14,6 +14,7 @@
 // buffer entry for a single packet
 typedef struct BufferEntry {
 	int32_t 	packet_id;
+	size_t		packet_len;
 	size_t		data_len;
 	char*		eth_header;
 	char*		mvctp_header;

@@ -37,12 +37,12 @@ size_t 	MVCTPBuffer::GetAvailableBufferSize() {
 
 
 void MVCTPBuffer::AllocateFreePackets() {
-	int numPackets = max_buffer_size / MVCTP_PACKET_LEN;
+	int numPackets = max_buffer_size / MVCTP_ETH_FRAME_LEN;
 	if (numPackets > 10000) {
 		numPackets = 10000;
 	}
 
-	char* ptr = (char*)malloc(numPackets * MVCTP_PACKET_LEN);
+	char* ptr = (char*)malloc(numPackets * MVCTP_ETH_FRAME_LEN);
 	if (ptr == NULL) {
 		SysError("MVCTPBuffer::InitializeFreePackets()::malloc()");
 	}
@@ -50,11 +50,12 @@ void MVCTPBuffer::AllocateFreePackets() {
 	for (int i = 0; i < numPackets; i++) {
 		BufferEntry* entry = (BufferEntry*)malloc(sizeof(BufferEntry));
 		entry->packet_buffer = ptr;
-		entry->mvctp_header = ptr;
-		entry->data = ptr + MVCTP_HLEN;
+		entry->eth_header = ptr;
+		entry->mvctp_header = ptr + ETH_HLEN;
+		entry->data = entry->mvctp_header + MVCTP_HLEN;
 
 		free_packet_list.push_back(entry);
-		ptr += MVCTP_PACKET_LEN;
+		ptr += MVCTP_ETH_FRAME_LEN;
 	}
 }
 
