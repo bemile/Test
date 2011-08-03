@@ -76,13 +76,13 @@ void RawSocketComm::WaitForNewToken() {
 	time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
 			+ (cur_time.tv_usec - last_check_time.tv_usec);
 	while (time_diff < diff_unit) {
-		usleep(5000);
+		//usleep(5000);
 		gettimeofday(&cur_time, NULL);
 		time_diff = (cur_time.tv_sec - last_check_time.tv_sec) * 1000000
 					+ (cur_time.tv_usec - last_check_time.tv_usec);
 	}
 
-	new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
+	//new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
 
 	last_check_time = cur_time;
 	current_size_token += new_token;
