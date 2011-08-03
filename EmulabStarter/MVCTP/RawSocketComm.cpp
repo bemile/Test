@@ -68,7 +68,6 @@ void RawSocketComm::SetSendRate(int num_mbps) {
 
 void RawSocketComm::WaitForNewToken() {
 	//timeval cur_time;
-	CpuCycleCounter cur_counter;
 	double time_diff;
 	double diff_unit = RATE_CHECK_PERIOD / 1000.0;
 	int  new_token = unit_size_token;
@@ -79,7 +78,7 @@ void RawSocketComm::WaitForNewToken() {
 	//		+ (cur_time.tv_usec - last_check_time.tv_usec);
 	time_diff = GetElapsedSeconds(last_checked_counter);
 	while (time_diff < diff_unit) {
-		isConstrained = true;
+		//isConstrained = true;
 		usleep(10000);
 		time_diff = GetElapsedSeconds(last_checked_counter);
 //		gettimeofday(&cur_time, NULL);
@@ -87,9 +86,7 @@ void RawSocketComm::WaitForNewToken() {
 //					+ (cur_time.tv_usec - last_check_time.tv_usec);
 	}
 
-	if (isConstrained) {
-		new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
-	}
+	new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
 
 	current_size_token += new_token;
 	AccessCPUCounter(&last_checked_counter.hi, &last_checked_counter.lo);

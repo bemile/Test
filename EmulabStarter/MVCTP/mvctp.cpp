@@ -11,6 +11,7 @@ void SysError(string s) {
 	exit(-1);
 }
 
+
 void AccessCPUCounter(unsigned *hi, unsigned *lo) {
 	asm("rdtsc; movl %%edx, %0; movl %%eax, %1"
 			: "=r" (*hi), "=r" (*lo)
