@@ -69,7 +69,7 @@ void RawSocketComm::WaitForNewToken() {
 	timeval cur_time;
 	long time_diff;
 	long diff_unit = RATE_CHECK_PERIOD * 1000;
-	long new_token = unit_size_token;
+	int  new_token = unit_size_token;
 	bool isConstrained = false;
 
 	gettimeofday(&cur_time, NULL);
@@ -83,9 +83,9 @@ void RawSocketComm::WaitForNewToken() {
 					+ (cur_time.tv_usec - last_check_time.tv_usec);
 	}
 
-	//if (isConstrained) {
-	//	new_token = (int)(new_token * time_diff * 1.0 / diff_unit);
-	//}
+	if (isConstrained) {
+		new_token = (int)(new_token * 1.0 * time_diff / diff_unit);
+	}
 
 	last_check_time = cur_time;
 	current_size_token += new_token;
