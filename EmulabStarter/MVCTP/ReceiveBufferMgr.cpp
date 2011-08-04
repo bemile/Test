@@ -190,7 +190,6 @@ void ReceiveBufferMgr::Run() {
 			is_first_packet = false;
 		}
 
-		cout << "New packet received." << endl;
 		// Record missing packets if there is a gap in the packet_id
 		if (header->packet_id > last_recv_packet_id + 1) {
 			Log("Packet loss detected. Received Packet ID: %d    Supposed ID:%d\n",
