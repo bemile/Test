@@ -87,9 +87,10 @@ void ReceiveBufferMgr::ResetBuffer() {
 size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty() || recv_buf->Find(last_del_packet_id  + 1) == NULL) {
-		Log("Reading data: waiting for the next continuous packet.\n");
 		usleep(5000);
 	}
+
+	Log("Packets available. Start reading data...\n");
 
 	char* pos = (char*)buff;
 	size_t bytes_copied = 0;
