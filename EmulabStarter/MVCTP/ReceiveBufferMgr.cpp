@@ -87,6 +87,7 @@ void ReceiveBufferMgr::ResetBuffer() {
 size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	//wait until there are some data in the buffer
 	while (recv_buf->IsEmpty() || recv_buf->Find(last_del_packet_id  + 1) == NULL) {
+		Log("Reading data: waiting for the next continuous packet.\n");
 		usleep(5000);
 	}
 
@@ -192,8 +193,8 @@ void ReceiveBufferMgr::Run() {
 
 		// Record missing packets if there is a gap in the packet_id
 		if (header->packet_id > last_recv_packet_id + 1) {
-			cout << "Packet loss detected. Received Packet ID: " << header->packet_id
-					<< "  Supposed ID:" << last_recv_packet_id + 1 << endl;
+			Log("Packet loss detected. Received Packet ID: %d    Supposed ID:%d\n",
+						header->packet_id, last_recv_packet_id + 1);
 
 			pthread_mutex_lock(&nack_list_mutex);
 			clock_t time = clock(); //- 0.5 * CLOCKS_PER_SEC;
@@ -229,6 +230,7 @@ void ReceiveBufferMgr::Run() {
 
 
 void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
+	Log("Adding a new packet. Packet ID: %d\n", header->packet_id);
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
 	entry->packet_len = MVCTP_HLEN + header->data_len;
@@ -240,8 +242,10 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
 		buffer_stats.num_received_packets++;
+		Log("New packet added.\n");
 	}
 	else {
+		Log("Not enough space. Sending retransmission request...\n");
 		pthread_mutex_lock(&nack_list_mutex);
 		clock_t time = clock();
 		NackMsgInfo info;
@@ -249,6 +253,7 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		info.time_stamp = time;
 		info.num_retries = 0;
 		missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
+		Log("Retransmission request sent...\n");
 		pthread_mutex_unlock(&nack_list_mutex);
 	}
 
@@ -323,7 +328,7 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
-		cout << "One retransmission packet received. Packet ID: " << header->packet_id << endl;
+		Log("One retransmission packet received. Packet ID: %d\n", header->packet_id);
 		// Discard duplicated packet that has already been used and deleted from the buffer
 		if (header->packet_id <= last_del_packet_id) {
 			DeleteNackFromList(header->packet_id);
@@ -336,6 +341,7 @@ void ReceiveBufferMgr::UdpReceive() {
 }
 
 void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
+	Log("Adding new retransmission packet...\n");
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
 	entry->packet_len = MVCTP_HLEN + header->data_len;
@@ -348,14 +354,17 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 		buffer_stats.num_retransmitted_packets++;
 		buffer_stats.num_received_packets++;
 	pthread_mutex_unlock(&buf_mutex);
+	Log("Retransmission packet added.\n");
 }
 
 
 
 void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
+	Log("Deleting nack message from list...\n");
 	pthread_mutex_lock(&nack_list_mutex);
 	missing_packets.erase(packet_id);
 	pthread_mutex_unlock(&nack_list_mutex);
+	Log("Nack message deleted from the list.\n");
 }
 
 

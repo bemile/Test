@@ -34,7 +34,7 @@ void Tester::StartTest() {
 			ptr_monitor->StartClients();
 		}
 
-		this->Log(INFORMATIONAL, "I'm the sender. Just joined the multicast group.");
+		this->SendMessage(INFORMATIONAL, "I'm the sender. Just joined the multicast group.");
 
 		while (true) {
 			sleep(1);
@@ -57,7 +57,7 @@ void Tester::StartTest() {
 			ptr_monitor->StartClients();
 		}
 
-		this->Log(INFORMATIONAL, "I'm a receiver. Just joined the multicast group.");
+		this->SendMessage(INFORMATIONAL, "I'm a receiver. Just joined the multicast group.");
 
 		TransferMessage msg;
 		sockaddr_in from;
@@ -100,7 +100,7 @@ void Tester::HandleStringTransfer(TransferMessage& msg) {
 	buff[bytes] = '\0';
 	string s = "I received a message: ";
 	s.append(buff);
-	this->Log(INFORMATIONAL, s);
+	this->SendMessage(INFORMATIONAL, s);
 }
 
 
@@ -113,7 +113,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	timeval start_time, end_time;
 	char s[256];
 	sprintf(s, "Start memory transfer... Total size to transfer: %d", msg.data_len);
-	this->Log(INFORMATIONAL, s);
+	this->SendMessage(INFORMATIONAL, s);
 	gettimeofday(&start_time, NULL);
 	int bytes = 0;
 	while (remained_size > 0) {
@@ -130,7 +130,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 			(end_time.tv_usec - start_time.tv_usec) / 1000000.0 + 0.001;
 
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
-	this->Log(INFORMATIONAL, s);
+	this->SendMessage(INFORMATIONAL, s);
 
 	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
 	float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
@@ -139,7 +139,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	// Format:TransferBytes, Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
 	sprintf(s, "%d,%.2f,%.2f,%d,%d,%.4f\n", msg.data_len, trans_time, throughput, stats.num_received_packets,
 					stats.num_retransmitted_packets, retrans_rate);
-	this->Log(EXP_RESULT_REPORT, s);
+	this->SendMessage(EXP_RESULT_REPORT, s);
 
 	ptr_mvctp_receiver->ResetBuffer();
 
@@ -168,7 +168,7 @@ void Tester::HandleFileTransfer(TransferMessage& msg, size_t buff_size) {
 }
 
 
-void Tester::Log(int level, string msg) {
+void Tester::SendMessage(int level, string msg) {
 	ptr_monitor->GetStatusReportClient()->SendMessage(level, msg);
 }
 

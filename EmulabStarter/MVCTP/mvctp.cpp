@@ -11,6 +11,20 @@ void SysError(string s) {
 	exit(-1);
 }
 
+void Log(char* format, ...) {
+	if (!is_debug)
+		return;
+
+	if (log_file == NULL) {
+		log_file = fopen("mvctp_run.log", "w");
+	}
+
+	va_list args;
+	va_start (args, format);
+	vfprintf (log_file, format, args);
+	va_end (args);
+}
+
 
 void AccessCPUCounter(unsigned *hi, unsigned *lo) {
 	asm("rdtsc; movl %%edx, %0; movl %%eax, %1"

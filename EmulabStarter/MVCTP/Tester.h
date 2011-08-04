@@ -20,7 +20,7 @@ public:
 	Tester();
 	~Tester();
 	void StartTest();
-	void Log(int level, string msg);
+	void SendMessage(int level, string msg);
 
 private:
 	StatusMonitor* 	ptr_monitor;

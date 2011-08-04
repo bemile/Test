@@ -26,6 +26,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <stdarg.h>
 #include <string>
 #include <string.h>
 #include <list>
@@ -40,11 +41,12 @@ struct CpuCycleCounter {
 };
 
 //global functions
-void SysError(string s);
 void AccessCPUCounter(unsigned *hi, unsigned *lo);
 double GetElapsedCycles(unsigned hi, unsigned lo);
 double GetElapsedSeconds(CpuCycleCounter lastCount);
 double GetCPUMhz();
+void SysError(string s);
+void Log(char* format, ...);
 
 // Linux network struct typedefs
 typedef struct sockaddr SA;
@@ -89,7 +91,7 @@ struct NackMsgInfo {
 // Macros
 #define MAX(a, b)  ((a) > (b) ? (a) : (b))
 
-const bool is_debug = false;
+const bool is_debug = true;
 
 // Constant values
 const string group_id = "224.1.2.3";
@@ -117,5 +119,7 @@ const int UDP_PACKET_LEN = ETH_DATA_LEN;
 const int INIT_RTT	= 100;		// in milliseconds
 
 const double CPU_MHZ = GetCPUMhz();
+
+static FILE*	log_file = NULL;
 
 #endif /* MVCTP_H_ */
