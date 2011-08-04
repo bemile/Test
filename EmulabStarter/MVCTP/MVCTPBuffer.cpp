@@ -118,10 +118,12 @@ int MVCTPBuffer::Delete(BufferEntry* entry) {
 // Safe-implementation of iterate-and-delete for the entry list
 int MVCTPBuffer::DeleteUntil(int32_t start_id, int32_t end_id) {
 	for (int32_t i = start_id; i < end_id; i++) {
-		if (buffer_pool.find(i) != buffer_pool.end()) {
-			Delete(buffer_pool.at(i));
-			//buffer_pool.erase(i);
-		}
+		Delete(Find(i));
+
+//		if (buffer_pool.find(i) != buffer_pool.end()) {
+//			Delete(buffer_pool.at(i));
+//			//buffer_pool.erase(i);
+//		}
 	}
 	return 1;
 }
@@ -171,21 +173,5 @@ void MVCTPBuffer::DestroyEntry(BufferEntry* entry) {
 	free(entry->packet_buffer);
 	free(entry);
 }
-
-
-int MVCTPBuffer::AddEntry(MVCTP_HEADER* header, char* data) {
-	BufferEntry* entry = GetFreePacket(); //(BufferEntry*)malloc(sizeof(BufferEntry));
-	entry->packet_id = header->packet_id;
-	entry->data_len = header->data_len;
-	memcpy(entry->packet_buffer, data, header->data_len);
-	//entry->data = data;
-
-	buffer_pool.insert(pair<int32_t, BufferEntry*>(entry->packet_id, entry));
-
-	//PushBack(entry);
-	//cout << "Entry added. New front packet ID: " << Front()->packet_id << endl;
-	return 1;
-}
-
 
 

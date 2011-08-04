@@ -93,11 +93,10 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	char* pos = (char*)buff;
 	size_t bytes_copied = 0;
 	size_t bytes_remained = len;
+	int32_t next_pid = last_del_packet_id  + 1;
+	BufferEntry * tmp = NULL;
 	int sleep_turns = 0;
 	while (true) {
-		int32_t next_pid = last_del_packet_id  + 1;
-		BufferEntry * tmp = NULL;
-
 		pthread_mutex_lock(&buf_mutex);
 		while (bytes_remained > 0) {
 			if ( (tmp = recv_buf->Find(next_pid)) == NULL)
@@ -243,7 +242,6 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		buffer_stats.num_received_packets++;
 	}
 	else {
-		cout << "Not enough space in the buffer to add the new packet." << endl;
 		pthread_mutex_lock(&nack_list_mutex);
 		clock_t time = clock();
 		NackMsgInfo info;
@@ -331,12 +329,6 @@ void ReceiveBufferMgr::UdpReceive() {
 			DeleteNackFromList(header->packet_id);
 			continue;
 		}
-
-//		char* data = (char*)malloc(header->data_len);
-//		memcpy(data, buf + MVCTP_HLEN, header->data_len);
-//		pthread_mutex_lock(&buf_mutex);
-//		recv_buf->AddEntry(header, data);
-//		pthread_mutex_unlock(&buf_mutex);
 
 		AddRetransmittedEntry(header, buf);
 		DeleteNackFromList(header->packet_id);

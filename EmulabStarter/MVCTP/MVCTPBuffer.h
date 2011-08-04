@@ -44,7 +44,6 @@ public:
 	int 			DeleteUntil(int32_t start_id, int32_t end_id);
 	bool 			IsEmpty();
 	int 			ShrinkEntry(BufferEntry* entry, size_t new_size);
-	int				AddEntry(MVCTP_HEADER* header, char* data);
 	void			Clear();
 
 	BufferEntry* 				GetFreePacket();
