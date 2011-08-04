@@ -232,6 +232,7 @@ void ReceiveBufferMgr::Run() {
 
 
 void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
+	pthread_mutex_lock(&buf_mutex);
 	Log("Adding a new packet. Packet ID: %d\n", header->packet_id);
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
@@ -239,7 +240,6 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 	entry->data_len = header->data_len;
 	memcpy(entry->mvctp_header, buf, entry->packet_len);
 
-	pthread_mutex_lock(&buf_mutex);
 	if (entry->packet_len <= recv_buf->GetAvailableBufferSize()) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
@@ -343,16 +343,16 @@ void ReceiveBufferMgr::UdpReceive() {
 }
 
 void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
-	Log("Adding new retransmission packet...\n");
-	BufferEntry* entry = recv_buf->GetFreePacket();
-	Log("Free packet assigned from receive buffer.\n");
-	entry->packet_id = header->packet_id;
-	entry->packet_len = MVCTP_HLEN + header->data_len;
-	entry->data_len = header->data_len;
-	memcpy(entry->mvctp_header, buf, entry->packet_len);
-	Log("Data copied to the free packet. Adding the retransmissionpacket...\n");
-
 	pthread_mutex_lock(&buf_mutex);
+		Log("Adding new retransmission packet...\n");
+		BufferEntry* entry = recv_buf->GetFreePacket();
+		Log("Free packet assigned from receive buffer.\n");
+		entry->packet_id = header->packet_id;
+		entry->packet_len = MVCTP_HLEN + header->data_len;
+		entry->data_len = header->data_len;
+		memcpy(entry->mvctp_header, buf, entry->packet_len);
+		Log("Data copied to the free packet. Adding the retransmissionpacket...\n");
+
 		recv_buf->Insert(entry);
 		Log("Packet inserted to the receive buffer.\n");
 		//last_recv_packet_id = header->packet_id;
