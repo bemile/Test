@@ -69,7 +69,7 @@ BufferEntry* MVCTPBuffer::GetFreePacket() {
 		AllocateFreePackets();
 	}
 	BufferEntry* ptr = free_packet_list.front();
-	free_packet_list.pop_front();
+	free_packet_list.remove(free_packet_list.front());
 	return ptr;
 }
 
@@ -83,13 +83,14 @@ int MVCTPBuffer::Insert(BufferEntry* entry) {
 	if (entry == NULL)
 		return 0;
 
-	current_buffer_size += entry->data_len;
-	num_entry++;
 	if (min_packet_id > entry->packet_id)
-		min_packet_id = entry->packet_id;
+			min_packet_id = entry->packet_id;
 
 	if (max_packet_id < entry->packet_id)
 			max_packet_id = entry->packet_id;
+
+	current_buffer_size += entry->data_len;
+	num_entry++;
 
 	buffer_pool.insert(pair<int32_t, BufferEntry*>(entry->packet_id, entry));
 	return 1;

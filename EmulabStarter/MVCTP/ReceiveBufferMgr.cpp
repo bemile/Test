@@ -343,15 +343,16 @@ void ReceiveBufferMgr::UdpReceive() {
 }
 
 void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
-	Log("Adding new retransmission packet...\n");
 	BufferEntry* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
 	entry->packet_len = MVCTP_HLEN + header->data_len;
 	entry->data_len = header->data_len;
 	memcpy(entry->mvctp_header, buf, entry->packet_len);
 
+	Log("Adding new retransmission packet...\n");
 	pthread_mutex_lock(&buf_mutex);
 		recv_buf->Insert(entry);
+		Log("Packet inserted to the receive buffer.\n");
 		//last_recv_packet_id = header->packet_id;
 		buffer_stats.num_retransmitted_packets++;
 		buffer_stats.num_received_packets++;
