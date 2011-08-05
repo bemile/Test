@@ -69,7 +69,7 @@ BufferEntry* MVCTPBuffer::GetFreePacket() {
 		AllocateFreePackets();
 	}
 	BufferEntry* ptr = free_packet_list.front();
-	free_packet_list.remove(free_packet_list.front());
+	free_packet_list.pop_front();
 	return ptr;
 }
 
