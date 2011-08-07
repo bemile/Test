@@ -194,8 +194,7 @@ void ReceiveBufferMgr::Run() {
 
 		// Record missing packets if there is a gap in the packet_id
 		if (header->packet_id > last_recv_packet_id + 1) {
-			Log("Packet loss detected. Received Packet ID: %d    Supposed ID:%d\n",
-						header->packet_id, last_recv_packet_id + 1);
+			//Log("Packet loss detected. Received Packet ID: %d    Supposed ID:%d\n", header->packet_id, last_recv_packet_id + 1);
 
 			pthread_mutex_lock(&nack_list_mutex);
 			clock_t time = clock(); //- 0.5 * CLOCKS_PER_SEC;
@@ -209,7 +208,6 @@ void ReceiveBufferMgr::Run() {
 				info.num_retries = 0;
 				info.packet_received = false;
 				missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
-				buffer_stats.num_retransmitted_packets++;
 
 				msg.packet_ids[msg.num_missing_packets] = i;
 				msg.num_missing_packets++;
@@ -226,7 +224,7 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Add the received packet to the buffer
-		if (rand() % 100 != 0) {
+		if (rand() % 50 != 0) {
 			AddNewEntry(header, buf);
 		}
 	}
@@ -246,10 +244,10 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
 		buffer_stats.num_received_packets++;
-		Log("One new packet received. Packet ID: %d\n", header->packet_id);
+		//Log("One new packet received. Packet ID: %d\n", header->packet_id);
 	}
 	else {
-		Log("Not enough buffer space for a new packet. Packet ID: %d\n", header->packet_id);
+		//Log("Not enough buffer space for a new packet. Packet ID: %d\n", header->packet_id);
 		pthread_mutex_lock(&nack_list_mutex);
 		clock_t time = clock();
 		NackMsgInfo info;
@@ -345,7 +343,7 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
-		Log("One retransmission packet received. Packet ID: %d\n", header->packet_id);
+		//Log("One retransmission packet received. Packet ID: %d\n", header->packet_id);
 		// Discard duplicated packet that has already been used and deleted from the buffer
 		if (header->packet_id <= last_del_packet_id) {
 			DeleteNackFromList(header->packet_id);
