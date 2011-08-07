@@ -151,7 +151,7 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 		if (entry != NULL) {
 			udp_comm->SendTo((void *)entry->mvctp_header, entry->packet_len, 0,
 						(SA*)&sender_addr, sender_socklen);
-			cout << "One packet retransmitted. Packet ID: " << packet_id << endl;
+			Log("One packet retransmitted. Packet ID: %d\n", packet_id);
 		}
 	}
 	pthread_mutex_unlock(&buf_mutex);

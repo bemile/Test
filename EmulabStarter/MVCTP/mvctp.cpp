@@ -12,8 +12,6 @@ void SysError(string s) {
 }
 
 void Log(char* format, ...) {
-	return;
-
 	if (!is_debug)
 		return;
 
