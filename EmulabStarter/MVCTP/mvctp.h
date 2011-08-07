@@ -86,6 +86,7 @@ struct NackMsgInfo {
 	int32_t		packet_id;
 	clock_t		time_stamp;
 	short		num_retries;
+	bool		packet_received;
 };
 
 // Macros

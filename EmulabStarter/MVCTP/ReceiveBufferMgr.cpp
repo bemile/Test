@@ -205,6 +205,7 @@ void ReceiveBufferMgr::Run() {
 				info.packet_id = i;
 				info.time_stamp = time;
 				info.num_retries = 0;
+				info.packet_received = false;
 				missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
 				buffer_stats.num_retransmitted_packets++;
 
@@ -249,6 +250,7 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		info.packet_id = header->packet_id;
 		info.time_stamp = time;
 		info.num_retries = 0;
+		info.packet_received = false;
 		missing_packets.insert(pair<int, NackMsgInfo>(info.packet_id, info));
 		pthread_mutex_unlock(&nack_list_mutex);
 	}
@@ -274,7 +276,7 @@ void ReceiveBufferMgr::NackRun() {
 
 		pthread_mutex_lock(&nack_list_mutex);
 		for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
-			if ( (cur_time - it->second.time_stamp) > INIT_RTT / 1000 * CLOCKS_PER_SEC
+			if ( /*(!it->second.packet_received) &&*/ (cur_time - it->second.time_stamp) > INIT_RTT * CLOCKS_PER_SEC / 1000
 						&& it->second.num_retries < 20) {
 				msg.packet_ids[msg.num_missing_packets] = it->first;
 				msg.num_missing_packets++;
@@ -354,6 +356,10 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 
 
 void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
+//	map<int32_t, NackMsgInfo>::iterator it = missing_packets.find(packet_id);
+//	if (it != missing_packets.end())
+//		it->second.packet_received = true;
+
 	pthread_mutex_lock(&nack_list_mutex);
 	missing_packets.erase(packet_id);
 	pthread_mutex_unlock(&nack_list_mutex);
