@@ -28,6 +28,8 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	memcpy(&sender_udp_addr.sin_addr, &address, sizeof(address));
 	cout << "Sender address: " << inet_ntoa(address) << endl;
 
+	srand(time(NULL));
+
 //	int index = 0;
 //	while( (address = (in_addr *)record->h_addr_list[index++]) != NULL) {
 //		string ip = inet_ntoa(*address);
@@ -224,7 +226,9 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Add the received packet to the buffer
-		AddNewEntry(header, buf);
+		if (rand() % 100 != 0) {
+			AddNewEntry(header, buf);
+		}
 	}
 }
 
