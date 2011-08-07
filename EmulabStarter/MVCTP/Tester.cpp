@@ -124,8 +124,9 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 			SysError("Tester::HandleMemoryTransfer::RawReceive() error");
 		}
 
-		remained_size -= bytes;
-		total_bytes += (bytes + MVCTP_HLEN + ETH_HLEN);
+		int actual_size = bytes + MVCTP_HLEN + ETH_HLEN;
+		remained_size -= actual_size; //bytes;
+		total_bytes += actual_size;
 	}
 	gettimeofday(&end_time, NULL);
 	float trans_time = end_time.tv_sec - start_time.tv_sec +
