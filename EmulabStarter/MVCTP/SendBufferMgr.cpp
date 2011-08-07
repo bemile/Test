@@ -153,6 +153,9 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 						(SA*)&sender_addr, sender_socklen);
 			Log("One packet retransmitted. Packet ID: %d\n", packet_id);
 		}
+		else {
+			Log("Could not find packet for retransmission. Packet ID: %d\n", packet_id);
+		}
 	}
 	pthread_mutex_unlock(&buf_mutex);
 }
