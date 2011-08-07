@@ -246,8 +246,10 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 		//recv_buf->AddEntry(header, data);
 		recv_buf->Insert(entry);
 		buffer_stats.num_received_packets++;
+		Log("One new packet received. Packet ID: %d\n", header->packet_id);
 	}
 	else {
+		Log("Not enough buffer space for a new packet. Packet ID: %d\n", header->packet_id);
 		pthread_mutex_lock(&nack_list_mutex);
 		clock_t time = clock();
 		NackMsgInfo info;

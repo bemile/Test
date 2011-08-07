@@ -105,7 +105,6 @@ void Tester::HandleStringTransfer(TransferMessage& msg) {
 
 
 void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
-	size_t remained_size = msg.data_len;
 	char buff[buff_size];
 	sockaddr_in from;
 	socklen_t socklen = sizeof(from);
@@ -116,6 +115,8 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	this->SendMessage(INFORMATIONAL, s);
 	gettimeofday(&start_time, NULL);
 	int bytes = 0;
+	size_t remained_size = msg.data_len;
+	size_t total_bytes = 0;
 	while (remained_size > 0) {
 		int recv_size = remained_size > buff_size ? buff_size : remained_size;
 		if ((bytes = ptr_mvctp_receiver->RawReceive(buff, recv_size, 0,
@@ -124,6 +125,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 		}
 
 		remained_size -= bytes;
+		total_bytes += (bytes + MVCTP_HLEN + ETH_HLEN);
 	}
 	gettimeofday(&end_time, NULL);
 	float trans_time = end_time.tv_sec - start_time.tv_sec +
@@ -134,7 +136,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 
 	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
 	float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
-	float throughput = msg.data_len * 8.0 / 1024.0 / 1024.0 / trans_time;
+	float throughput = total_bytes * 8.0 / 1024.0 / 1024.0 / trans_time;
 
 	// Format:TransferBytes, Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
 	sprintf(s, "%d,%.2f,%.2f,%d,%d,%.4f\n", msg.data_len, trans_time, throughput, stats.num_received_packets,

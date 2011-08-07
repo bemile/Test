@@ -145,13 +145,13 @@ int SenderCommandClient::TransferMemoryData(int size) {
 	int send_count = 0;
 	int remained_size = size;
 	while (remained_size > 0) {
-		int packet_size = remained_size > MVCTP_DATA_LEN ? MVCTP_DATA_LEN
+		int packet_size = remained_size > MVCTP_ETH_FRAME_LEN ? MVCTP_ETH_FRAME_LEN
 				: remained_size;
-		ptr_sender->RawSend(buffer, packet_size, true);
+		ptr_sender->RawSend(buffer, packet_size - MVCTP_HLEN - ETH_HLEN, true);
 		remained_size -= packet_size;
 
 		// periodically calculate transfer speed
-		size_count += (packet_size + MVCTP_HLEN + ETH_HLEN);
+		size_count += packet_size; //(packet_size + MVCTP_HLEN + ETH_HLEN);
 		send_count++;
 		if (send_count % period == 0) {
 			gettimeofday(&cur_time, NULL);
