@@ -224,7 +224,7 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Add the received packet to the buffer
-		if (rand() % 50 != 0) {
+		if (rand() % 100 != 0) {
 			AddNewEntry(header, buf);
 		}
 	}
