@@ -283,7 +283,7 @@ void ReceiveBufferMgr::NackRun() {
 			}
 
 			if ((cur_time - it->second.time_stamp) > INIT_RTT * CLOCKS_PER_SEC / 1000
-						&& it->second.num_retries < 20) {
+						&& it->second.num_retries < 200) {
 				msg.packet_ids[msg.num_missing_packets] = it->first;
 				msg.num_missing_packets++;
 				if (msg.num_missing_packets == MAX_NACK_IDS) {
