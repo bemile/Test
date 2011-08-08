@@ -383,13 +383,13 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 
 
 void ReceiveBufferMgr::DeleteNackFromList(int32_t packet_id) {
-	map<int32_t, NackMsgInfo>::iterator it = missing_packets.find(packet_id);
-	if (it != missing_packets.end())
-		it->second.packet_received = true;
+//	map<int32_t, NackMsgInfo>::iterator it = missing_packets.find(packet_id);
+//	if (it != missing_packets.end())
+//		it->second.packet_received = true;
 
-//	pthread_mutex_lock(&nack_list_mutex);
-//	missing_packets.erase(packet_id);
-//	pthread_mutex_unlock(&nack_list_mutex);
+	pthread_mutex_lock(&nack_list_mutex);
+	missing_packets.erase(packet_id);
+	pthread_mutex_unlock(&nack_list_mutex);
 }
 
 
