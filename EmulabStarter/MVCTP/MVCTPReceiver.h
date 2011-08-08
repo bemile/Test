@@ -22,6 +22,8 @@ public:
 	int IPReceive(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 	void SetBufferSize(size_t buff_size);
 	size_t GetBufferSize();
+	void SetPacketLossRate(int rate);
+	int GetPacketLossRate();
 	const struct ReceiveBufferStats GetBufferStats();
 	void SetSocketBufferSize(size_t buff_size);
 	void ResetBuffer();

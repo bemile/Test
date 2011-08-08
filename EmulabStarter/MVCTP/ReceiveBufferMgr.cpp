@@ -28,6 +28,7 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	memcpy(&sender_udp_addr.sin_addr, &address, sizeof(address));
 	cout << "Sender address: " << inet_ntoa(address) << endl;
 
+	packet_loss_rate = 0;
 	srand(time(NULL));
 
 //	int index = 0;
@@ -63,6 +64,15 @@ void ReceiveBufferMgr::SetSocketBufferSize(size_t buff_size) {
 size_t ReceiveBufferMgr::GetBufferSize() {
 	return recv_buf->GetMaxBufferSize();
 }
+
+void ReceiveBufferMgr::SetPacketLossRate(int rate) {
+	packet_loss_rate = rate;
+}
+
+int ReceiveBufferMgr::GetPacketLossRate() {
+	return packet_loss_rate;
+}
+
 
 const ReceiveBufferStats ReceiveBufferMgr::GetBufferStats() {
 	return buffer_stats;
@@ -224,7 +234,7 @@ void ReceiveBufferMgr::Run() {
 		}
 
 		// Add the received packet to the buffer
-		if (rand() % 200 != 0) {
+		if (rand() % 1000 >= packet_loss_rate) {
 			AddNewEntry(header, buf);
 		}
 	}

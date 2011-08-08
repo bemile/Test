@@ -31,6 +31,14 @@ size_t MVCTPReceiver::GetBufferSize() {
 	return ptr_recv_buf_mgr->GetBufferSize();
 }
 
+void MVCTPReceiver::SetPacketLossRate(int rate) {
+	ptr_recv_buf_mgr->SetPacketLossRate(rate);
+}
+
+int MVCTPReceiver::GetPacketLossRate() {
+	return ptr_recv_buf_mgr->GetPacketLossRate();
+}
+
 void MVCTPReceiver::SetSocketBufferSize(size_t buff_size) {
 	ptr_recv_buf_mgr->SetSocketBufferSize(buff_size);
 }

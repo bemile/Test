@@ -25,12 +25,14 @@ public:
 	ReceiveBufferMgr(int size, InetComm* mcomm);
 	~ReceiveBufferMgr();
 
-	size_t 	GetData(void* buff, size_t len);
-	void StartReceiveThread();
-	void SetBufferSize(size_t buff_size);
-	size_t GetBufferSize();
-	void SetSocketBufferSize(size_t buff_size);
-	void ResetBuffer();
+	size_t 		GetData(void* buff, size_t len);
+	void 		StartReceiveThread();
+	void 		SetBufferSize(size_t buff_size);
+	size_t 		GetBufferSize();
+	void 		SetPacketLossRate(int rate);		// rate is #loss per thousand packets
+	int 		GetPacketLossRate();
+	void 		SetSocketBufferSize(size_t buff_size);
+	void 		ResetBuffer();
 	const struct ReceiveBufferStats GetBufferStats();
 
 private:
@@ -46,6 +48,7 @@ private:
 	bool 				is_first_packet;
 	map<int32_t, NackMsgInfo> 	missing_packets;
 	struct ReceiveBufferStats buffer_stats;
+	int 			packet_loss_rate;
 
 	int SendNackMsg(NackMsg& msg);
 
