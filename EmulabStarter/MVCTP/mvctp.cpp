@@ -59,7 +59,12 @@ double GetCPUMhz() {
 	AccessCPUCounter(&hi, &lo);
 	sleep(1);
 	rate = GetElapsedCycles(hi, lo) / 1 / 1000000;
+	AccessCPUCounter(&start_time_counter.hi, &start_time_counter.lo);
 	return rate;
+}
+
+double GetCurrentTime() {
+	return GetElapsedCycles(start_time_counter.hi, start_time_counter.lo) / 1000000.0 / CPU_MHZ;
 }
 
 double GetElapsedSeconds(CpuCycleCounter lastCount) {

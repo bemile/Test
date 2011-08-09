@@ -45,6 +45,7 @@ void AccessCPUCounter(unsigned *hi, unsigned *lo);
 double GetElapsedCycles(unsigned hi, unsigned lo);
 double GetElapsedSeconds(CpuCycleCounter lastCount);
 double GetCPUMhz();
+double GetCurrentTime();
 void SysError(string s);
 void Log(char* format, ...);
 
@@ -122,5 +123,6 @@ const int INIT_RTT	= 10;		// in milliseconds
 const double CPU_MHZ = GetCPUMhz();
 
 static FILE*	log_file = NULL;
+static struct CpuCycleCounter start_time_counter;
 
 #endif /* MVCTP_H_ */
