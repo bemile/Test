@@ -15,6 +15,10 @@ MVCTPReceiver::~MVCTPReceiver() {
 	delete ptr_recv_buf_mgr;
 }
 
+ReceiveBufferMgr* MVCTPReceiver::GetReceiveBufferManager() {
+	return ptr_recv_buf_mgr;
+}
+
 const struct ReceiveBufferStats MVCTPReceiver::GetBufferStats() {
 	return ptr_recv_buf_mgr->GetBufferStats();
 }

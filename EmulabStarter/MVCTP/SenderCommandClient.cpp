@@ -163,10 +163,11 @@ int SenderCommandClient::TransferMemoryData(int size) {
 			size_count = 0;
 			char buf[100];
 			sprintf(buf, "Data sending rate: %3.2f Mbps", rate);
-			SendMessage(COMMAND_RESPONSE, buf);
+			SendMessage(INFORMATIONAL, buf);
 		}
 	}
 
+	SendMessage(COMMAND_RESPONSE, "Memory data transfer completed.");
 	return 1;
 }
 

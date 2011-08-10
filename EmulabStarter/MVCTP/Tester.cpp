@@ -110,7 +110,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	socklen_t socklen = sizeof(from);
 
 	timeval start_time, end_time;
-	char s[256];
+	char s[512];
 	sprintf(s, "Start memory transfer... Total size to transfer: %d", msg.data_len);
 	this->SendMessage(INFORMATIONAL, s);
 	gettimeofday(&start_time, NULL);
@@ -135,13 +135,17 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
 	this->SendMessage(INFORMATIONAL, s);
 
-	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetBufferStats();
-	float retrans_rate = stats.num_retransmitted_packets * 1.0 / stats.num_received_packets;
-	float throughput = total_bytes * 8.0 / 1024.0 / 1024.0 / trans_time;
+	// Data transfer statistics
+	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetReceiveBufferManager()->GetBufferStats();
+	sprintf(s, "Statistics:\n# Total Packets: %d\n# Retrans. Packets: %d\n # Dup. Retrans. Packets: %d",
+			stats.num_received_packets, stats.num_retrans_packets, stats.num_dup_retrans_packets);
+	this->SendMessage(INFORMATIONAL, s);
 
+	float retrans_rate = stats.num_retrans_packets * 1.0 / stats.num_received_packets;
+	float throughput = total_bytes * 8.0 / 1024.0 / 1024.0 / trans_time;
 	// Format:TransferBytes, Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
 	sprintf(s, "%d,%.2f,%.2f,%d,%d,%.4f\n", msg.data_len, trans_time, throughput, stats.num_received_packets,
-					stats.num_retransmitted_packets, retrans_rate);
+					stats.num_retrans_packets, retrans_rate);
 	this->SendMessage(EXP_RESULT_REPORT, s);
 
 	ptr_mvctp_receiver->ResetBuffer();

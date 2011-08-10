@@ -17,7 +17,8 @@
 
 struct ReceiveBufferStats {
 	uint num_received_packets;
-	uint num_retransmitted_packets;
+	uint num_retrans_packets;
+	uint num_dup_retrans_packets;
 };
 
 class ReceiveBufferMgr {

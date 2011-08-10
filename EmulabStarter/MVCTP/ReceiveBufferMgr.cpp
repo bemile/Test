@@ -11,8 +11,7 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	last_recv_packet_id = 0;
 	last_del_packet_id = 0;
 	is_first_packet = true;
-	buffer_stats.num_received_packets = 0;
-	buffer_stats.num_retransmitted_packets = 0;
+	memset(&buffer_stats, 0, sizeof(buffer_stats));
 
 	recv_buf = new MVCTPBuffer(size);
 	comm = mcomm;
@@ -80,8 +79,7 @@ const ReceiveBufferStats ReceiveBufferMgr::GetBufferStats() {
 
 
 void ReceiveBufferMgr::ResetBuffer() {
-	buffer_stats.num_received_packets = 0;
-	buffer_stats.num_retransmitted_packets = 0;
+	memset(&buffer_stats, 0, sizeof(buffer_stats));
 
 	pthread_mutex_lock(&nack_list_mutex);
 	missing_packets.clear();
@@ -204,8 +202,8 @@ void ReceiveBufferMgr::Run() {
 
 		// Record missing packets if there is a gap in the packet_id
 		if (header->packet_id > last_recv_packet_id + 1) {
-			Log("%.6f    Packet loss detected. Received Packet ID: %d    Supposed ID:%d\n",
-								GetCurrentTime(), header->packet_id, last_recv_packet_id + 1);
+			//Log("%.6f    Packet loss detected. Received Packet ID: %d    Supposed ID:%d\n",
+			//					GetCurrentTime(), header->packet_id, last_recv_packet_id + 1);
 
 			pthread_mutex_lock(&nack_list_mutex);
 			clock_t time = clock(); //- 0.5 * CLOCKS_PER_SEC;
@@ -290,16 +288,10 @@ void ReceiveBufferMgr::NackRun() {
 		memset(&msg, 0, sizeof(msg));
 		msg.proto = MVCTP_PROTO_TYPE;
 
-		list<int32_t>* plist = new list<int32_t>();
 		pthread_mutex_lock(&nack_list_mutex);
 		for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
-			if (it->second.packet_received) {
-				plist->push_back(it->first);
-				continue;
-			}
-
-			if ((cur_time - it->second.time_stamp) > INIT_RTT * CLOCKS_PER_SEC / 1000
-						&& it->second.num_retries < 200) {
+			if ((cur_time - it->second.time_stamp) > (INIT_RTT * it->second.num_retries * CLOCKS_PER_SEC / 1000)
+						&& it->second.num_retries < 50) {
 				msg.packet_ids[msg.num_missing_packets] = it->first;
 				msg.num_missing_packets++;
 				if (msg.num_missing_packets == MAX_NACK_IDS) {
@@ -313,19 +305,13 @@ void ReceiveBufferMgr::NackRun() {
 			}
 		}
 
-		list<int32_t>::iterator list_it;
-		for (list_it = plist->begin(); list_it != plist->end(); list_it++) {
-			missing_packets.erase(*list_it);
-		}
 		pthread_mutex_unlock(&nack_list_mutex);
 
 		if (msg.num_missing_packets > 0) {
 			SendNackMsg(msg);
 		}
 
-		delete plist;
-
-		usleep(20000);
+		usleep(5000);
 	}
 }
 
@@ -355,10 +341,11 @@ void ReceiveBufferMgr::UdpReceive() {
 			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
-		Log("%.6f    One retransmission packet received. Packet ID: %d\n", GetCurrentTime(), header->packet_id);
+		//Log("%.6f    One retransmission packet received. Packet ID: %d\n", GetCurrentTime(), header->packet_id);
 		// Discard duplicated packet that has already been used and deleted from the buffer
 		if (header->packet_id <= last_del_packet_id) {
 			DeleteNackFromList(header->packet_id);
+			buffer_stats.num_dup_retrans_packets++;
 			continue;
 		}
 
@@ -376,12 +363,13 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 		memcpy(entry->mvctp_header, buf, entry->packet_len);
 
 		recv_buf->Insert(entry);
-		//last_recv_packet_id = header->packet_id;
-		buffer_stats.num_retransmitted_packets++;
-		buffer_stats.num_received_packets++;
-
-		Log("%.6f    Retransmitted packet added to the buffer. Packet ID: %d\n", GetCurrentTime(), header->packet_id);
 	pthread_mutex_unlock(&buf_mutex);
+
+	//last_recv_packet_id = header->packet_id;
+	buffer_stats.num_retrans_packets++;
+	buffer_stats.num_received_packets++;
+
+	//Log("%.6f    Retransmitted packet added to the buffer. Packet ID: %d\n", GetCurrentTime(), header->packet_id);
 }
 
 
