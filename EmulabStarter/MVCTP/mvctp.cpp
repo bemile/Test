@@ -6,6 +6,12 @@
  */
 #include "mvctp.h"
 
+// Must be called before starting MVCTP activities
+void MVCTPInit() {
+	CPU_MHZ = GetCPUMhz();
+	log_file = NULL;
+}
+
 void SysError(string s) {
 	perror(s.c_str());
 	exit(-1);

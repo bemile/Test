@@ -41,6 +41,7 @@ struct CpuCycleCounter {
 };
 
 //global functions
+void MVCTPInit();
 void AccessCPUCounter(unsigned *hi, unsigned *lo);
 double GetElapsedCycles(unsigned hi, unsigned lo);
 double GetElapsedSeconds(CpuCycleCounter lastCount);
@@ -120,9 +121,8 @@ const int UDP_PACKET_LEN = ETH_DATA_LEN;
 
 const int INIT_RTT	= 10;		// in milliseconds
 
-const double CPU_MHZ = GetCPUMhz();
-
-static FILE*	log_file = NULL;
+static double CPU_MHZ;
+static FILE*  log_file;
 static struct CpuCycleCounter start_time_counter;
 
 #endif /* MVCTP_H_ */

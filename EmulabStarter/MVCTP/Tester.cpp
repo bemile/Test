@@ -15,6 +15,8 @@ Tester::~Tester() {
 }
 
 void Tester::StartTest() {
+	MVCTPInit();
+
 	string serv_addr = ConfigInfo::GetInstance()->GetValue("Monitor_Server");
 	string port = ConfigInfo::GetInstance()->GetValue("Monitor_Server_Port");
 
@@ -137,7 +139,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 
 	// Data transfer statistics
 	struct ReceiveBufferStats stats = ptr_mvctp_receiver->GetReceiveBufferManager()->GetBufferStats();
-	sprintf(s, "Statistics:\n# Total Packets: %d\n# Retrans. Packets: %d\n # Dup. Retrans. Packets: %d",
+	sprintf(s, "Statistics:\n# Total Packets: %d\n# Retrans. Packets: %d\n# Dup. Retrans. Packets: %d",
 			stats.num_received_packets, stats.num_retrans_packets, stats.num_dup_retrans_packets);
 	this->SendMessage(INFORMATIONAL, s);
 
