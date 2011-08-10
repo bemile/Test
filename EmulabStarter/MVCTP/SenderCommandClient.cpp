@@ -55,6 +55,21 @@ int SenderCommandClient::HandleCommand(char* command) {
 		ptr_sender->ResetBuffer();
 		SendMessage(COMMAND_RESPONSE, "Buffer has been reset.");
 	}
+	else if (parts.front().compare("CreateLogFile") == 0) {
+		if (parts.size() == 2) {
+			CreateNewLogFile(parts.back().c_str());
+		}
+	}
+	else if (parts.front().compare("SetLogSwitch") == 0) {
+		if (parts.size() == 2) {
+			if (parts.back().compare("On") == 0) {
+				is_log_enabled = true;
+			}
+			else if (parts.back().compare("Off") == 0) {
+				is_log_enabled = false;
+			}
+		}
+	}
 	else {
 		CommandExecClient::HandleCommand(command);
 		//ExecSysCommand(command);

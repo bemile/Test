@@ -10,6 +10,7 @@
 void MVCTPInit() {
 	CPU_MHZ = GetCPUMhz();
 	log_file = NULL;
+	is_log_enabled = false;
 }
 
 void SysError(string s) {
@@ -18,7 +19,7 @@ void SysError(string s) {
 }
 
 void Log(char* format, ...) {
-	if (!is_debug)
+	if (!is_log_enabled)
 		return;
 
 	if (log_file == NULL) {
@@ -30,6 +31,14 @@ void Log(char* format, ...) {
 	vfprintf (log_file, format, args);
 	//fflush(log_file);
 	va_end (args);
+}
+
+void CreateNewLogFile(const char* file_name) {
+	if (log_file != NULL) {
+		fclose(log_file);
+	}
+
+	log_file = fopen(file_name, "w");
 }
 
 

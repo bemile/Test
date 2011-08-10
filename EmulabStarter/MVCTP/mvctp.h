@@ -49,6 +49,7 @@ double GetCPUMhz();
 double GetCurrentTime();
 void SysError(string s);
 void Log(char* format, ...);
+void CreateNewLogFile(const char* file_name);
 
 // Linux network struct typedefs
 typedef struct sockaddr SA;
@@ -123,6 +124,8 @@ const int INIT_RTT	= 10;		// in milliseconds
 
 static double CPU_MHZ;
 static FILE*  log_file;
+static bool is_log_enabled;
 static struct CpuCycleCounter start_time_counter;
+
 
 #endif /* MVCTP_H_ */
