@@ -25,7 +25,6 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	sender_udp_addr.sin_port = htons(BUFFER_UDP_SEND_PORT);
 	sender_udp_addr.sin_family = AF_INET;
 	memcpy(&sender_udp_addr.sin_addr, &address, sizeof(address));
-	cout << "Sender address: " << inet_ntoa(address) << endl;
 
 	packet_loss_rate = 0;
 	srand(time(NULL));
@@ -192,8 +191,8 @@ void ReceiveBufferMgr::Run() {
 			sockaddr_in * ptr_sock = (sockaddr_in *)&sender_multicast_addr;
 			inet_ntop(AF_INET, (void*)&(ptr_sock->sin_addr), ip, 20);
 			ip[15] = 0;
-			cout << "Sender IP address: " << ip << endl;
-			cout << "Sender Port: " << ntohs(ptr_sock->sin_port) << endl;
+			//cout << "Sender IP address: " << ip << endl;
+			//cout << "Sender Port: " << ntohs(ptr_sock->sin_port) << endl;
 
 			last_recv_packet_id = header->packet_id - 1;
 			last_del_packet_id = header->packet_id - 1;

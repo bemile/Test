@@ -151,10 +151,12 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 		if (entry != NULL) {
 			udp_comm->SendTo((void *)entry->mvctp_header, entry->packet_len, 0,
 						(SA*)&sender_addr, sender_socklen);
-			//Log("One packet retransmitted. Packet ID: %d\n", packet_id);
+			Log("%.6f    One packet retransmitted. Packet ID: %d    Receiver: %s\n",
+					GetCurrentTime(), packet_id, inet_ntoa(sender_addr.sin_addr));
 		}
 		else {
-			//Log("Could not find packet for retransmission. Packet ID: %d\n", packet_id);
+			Log("%.6f    Could not find packet for retransmission. Packet ID: %d    Receiver: %s\n",
+					GetCurrentTime(), packet_id, inet_ntoa(sender_addr.sin_addr));
 		}
 	}
 	pthread_mutex_unlock(&buf_mutex);
