@@ -136,7 +136,7 @@ void SendBufferMgr::ReceiveNack() {
 		}
 
 		if (nack_msg->proto == MVCTP_PROTO_TYPE) {
-			Log("%.6f    One retransmission request received. Packet Number: %d    Receiver: %s",
+			Log("%.6f    One retransmission request received. Packet Number: %d    Receiver: %s\n",
 					GetCurrentTime(), nack_msg->num_missing_packets,  inet_ntoa(sender_addr.sin_addr));
 			Retransmit(nack_msg);
 		}
