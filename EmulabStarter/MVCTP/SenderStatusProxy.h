@@ -1,14 +1,14 @@
 /*
- * SenderCommandClient.h
+ * SenderStatusProxy.h
  *
  *  Created on: Jun 28, 2011
  *      Author: jie
  */
 
-#ifndef SENDERCOMMANDCLIENT_H_
-#define SENDERCOMMANDCLIENT_H_
+#ifndef SENDERSTATUSPROXY_H_
+#define SENDERSTATUSPROXY_H_
 
-#include "../CommUtil/CommandExecClient.h"
+#include "../CommUtil/StatusProxy.h"
 #include "MVCTPSender.h"
 #include <sys/time.h>
 
@@ -31,10 +31,9 @@ struct TransferMessage {
 };
 
 
-class SenderCommandClient : public CommandExecClient {
+class SenderStatusProxy : public StatusProxy {
 public:
-	SenderCommandClient(MVCTPSender* psender);
-	SenderCommandClient(int sock, MVCTPSender* psender);
+	SenderStatusProxy(string addr, int port, MVCTPSender* psender);
 
 protected:
 	virtual int HandleCommand(char* command);
@@ -48,4 +47,4 @@ private:
 };
 
 
-#endif /* SENDERCOMMANDCLIENT_H_ */
+#endif /* SENDERSTATUSPROXY_H_ */

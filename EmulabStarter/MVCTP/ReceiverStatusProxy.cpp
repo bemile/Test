@@ -1,23 +1,18 @@
 /*
- * ReceiverMonitor.cpp
+ * ReceiverStatusProxy.cpp
  *
  *  Created on: Jun 28, 2011
  *      Author: jie
  */
 
-#include "ReceiverCommandClient.h"
+#include "ReceiverStatusProxy.h"
 
-ReceiverCommandClient::ReceiverCommandClient(MVCTPReceiver* preceiver) {
+ReceiverStatusProxy::ReceiverStatusProxy(string addr, int port, MVCTPReceiver* preceiver)
+		: StatusProxy(addr, port) {
 	ptr_receiver = preceiver;
 }
 
-
-ReceiverCommandClient::ReceiverCommandClient(int sock, MVCTPReceiver* preceiver) {
-	sockfd = sock;
-	ptr_receiver = preceiver;
-}
-
-int ReceiverCommandClient::HandleCommand(char* command) {
+int ReceiverStatusProxy::HandleCommand(char* command) {
 	string s = command;
 	/*int length = s.length();
 	int index = s.find(' ');
@@ -75,8 +70,7 @@ int ReceiverCommandClient::HandleCommand(char* command) {
 			}
 		}
 	} else {
-		CommandExecClient::HandleCommand(command);
-		//ExecSysCommand(command);
+		StatusProxy::HandleCommand(command);
 	}
 
 	return 1;

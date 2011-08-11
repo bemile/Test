@@ -1,10 +1,10 @@
 CC=g++
 CFLAGS=-lpthread
 VPATH=starter:CommUtil:MVCTP
-OBJ=EmulabStarter.o ConfigInfo.o Logger.o mvctp.o Tester.o MVCTPComm.o \
+OBJ=EmulabStarter.o ConfigInfo.o mvctp.o Tester.o MVCTPComm.o \
 SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MVCTPSender.o MVCTPReceiver.o \
 MulticastComm.o RawSocketComm.o InetComm.o UdpComm.o NetInterfaceManager.o \
-ReceiverCommandClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o
+ReceiverStatusProxy.o SenderStatusProxy.o StatusProxy.o
 
 
 
@@ -13,15 +13,15 @@ all: emustarter
 emustarter: $(OBJ)
 	$(CC) -o $@ $(OBJ) $(CFLAGS)
 
-EmulabStarter.o: ConfigInfo.o Logger.o Tester.o
+EmulabStarter.o: ConfigInfo.o Tester.o
 
-ConfigInfo.o Logger.o: 
+ConfigInfo.o: 
 
-Tester.o: mvctp.o MulticastComm.o RawSocketComm.o InetComm.o MVCTPComm.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MVCTPSender.o MVCTPReceiver.o UdpComm.o ReceiverCommandClient.o SenderCommandClient.o StatusMonitor.o CommandExecClient.o StatusReportClient.o NetInterfaceManager.o
+Tester.o: mvctp.o MulticastComm.o RawSocketComm.o InetComm.o MVCTPComm.o SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MVCTPSender.o MVCTPReceiver.o UdpComm.o ReceiverStatusProxy.o SenderStatusProxy.o StatusProxy.o NetInterfaceManager.o
 
-SenderCommandClient.o : CommandExecClient.o MVCTPSender.o MVCTPComm.o
+SenderStatusProxy.o : StatusProxy.o MVCTPSender.o MVCTPComm.o
 
-ReceiverCommandClient.o : CommandExecClient.o MVCTPReceiver.o MVCTPComm.o
+ReceiverStatusProxy.o : StatusProxy.o MVCTPReceiver.o MVCTPComm.o
 
 MVCTPSender.o: mvctp.o MVCTPComm.o SendBufferMgr.o 
 
@@ -39,11 +39,10 @@ InetComm.o : mvctp.o
 
 UdpComm.o NetInterfaceManager.o: mvctp.o
 
-mvctp.o:
+mvctp.o :
 
-StatusMonitor.o: CommandExecClient.o StatusReportClient.o
+StatusProxy.o : CommUtil.h
 
-CommandExecClient.o StatusReportClient.o:
 
 
 # Clean Action

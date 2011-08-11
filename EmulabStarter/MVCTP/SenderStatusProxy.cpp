@@ -1,23 +1,18 @@
 /*
- * SenderCommandClient.cpp
+ * SenderStatusProxy.cpp
  *
  *  Created on: Jun 28, 2011
  *      Author: jie
  */
 
-#include "SenderCommandClient.h"
+#include "SenderStatusProxy.h"
 
-SenderCommandClient::SenderCommandClient(MVCTPSender* psender) {
+SenderStatusProxy::SenderStatusProxy(string addr, int port, MVCTPSender* psender)
+			: StatusProxy(addr, port) {
 	ptr_sender = psender;
 }
 
-
-SenderCommandClient::SenderCommandClient(int sock, MVCTPSender* psender) {
-	sockfd = sock;
-	ptr_sender = psender;
-}
-
-int SenderCommandClient::HandleCommand(char* command) {
+int SenderStatusProxy::HandleCommand(char* command) {
 	string s = command;
 	/*int length = s.length();
 	int index = s.find(' ');
@@ -71,8 +66,7 @@ int SenderCommandClient::HandleCommand(char* command) {
 		}
 	}
 	else {
-		CommandExecClient::HandleCommand(command);
-		//ExecSysCommand(command);
+		StatusProxy::HandleCommand(command);
 	}
 
 	return 1;
@@ -82,7 +76,7 @@ int SenderCommandClient::HandleCommand(char* command) {
 
 
 //
-int SenderCommandClient::HandleSendCommand(list<string>& slist) {
+int SenderStatusProxy::HandleSendCommand(list<string>& slist) {
 	bool memory_transfer = false;
 	bool file_transfer = false;
 	bool send_out_packets = true;
@@ -139,7 +133,7 @@ int SenderCommandClient::HandleSendCommand(list<string>& slist) {
 
 // Transfer memory-to-memory data to all receivers
 // size: the size of data to transfer (in megabytes)
-int SenderCommandClient::TransferMemoryData(int size) {
+int SenderStatusProxy::TransferMemoryData(int size) {
 	TransferMessage msg;
 	msg.msg_type = MEMORY_TRANSFER;
 	msg.data_len = size;
@@ -187,7 +181,7 @@ int SenderCommandClient::TransferMemoryData(int size) {
 }
 
 
-int SenderCommandClient::TransferString(string str, bool send_out_packets) {
+int SenderStatusProxy::TransferString(string str, bool send_out_packets) {
 	TransferMessage msg;
 	msg.msg_type = STRING_TRANSFER;
 	msg.data_len = str.length();
