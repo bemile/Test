@@ -60,6 +60,7 @@ int ReceiverStatusProxy::HandleCommand(char* command) {
 	else if (parts.front().compare("CreateLogFile") == 0) {
 		if (parts.size() == 2) {
 			CreateNewLogFile(parts.back().c_str());
+			SendMessage(COMMAND_RESPONSE, "New log file created.");
 		}
 	} else if (parts.front().compare("SetLogSwitch") == 0) {
 		if (parts.size() == 2) {
@@ -68,6 +69,7 @@ int ReceiverStatusProxy::HandleCommand(char* command) {
 			} else if (parts.back().compare("Off") == 0) {
 				is_log_enabled = false;
 			}
+			SendMessage(COMMAND_RESPONSE, "Log switch set.");
 		}
 	} else {
 		StatusProxy::HandleCommand(command);

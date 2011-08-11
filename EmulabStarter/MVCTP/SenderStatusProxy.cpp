@@ -176,6 +176,7 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 		}
 	}
 
+	ptr_sender->ResetBuffer();
 	SendMessage(COMMAND_RESPONSE, "Memory data transfer completed.");
 	return 1;
 }
