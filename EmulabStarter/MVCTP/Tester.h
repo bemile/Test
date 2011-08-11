@@ -11,9 +11,8 @@
 #include "mvctp.h"
 #include "MVCTPSender.h"
 #include "MVCTPReceiver.h"
-#include "SenderCommandClient.h"
-#include "ReceiverCommandClient.h"
-#include "../CommUtil/StatusMonitor.h"
+#include "SenderStatusProxy.h"
+#include "ReceiverStatusProxy.h"
 
 class Tester {
 public:
@@ -23,8 +22,8 @@ public:
 	void SendMessage(int level, string msg);
 
 private:
-	StatusMonitor* 	ptr_monitor;
-	MVCTPSender*	ptr_mvctp_sender;
+	StatusProxy* 	ptr_status_proxy;
+	MVCTPSender* 	ptr_mvctp_sender;
 	MVCTPReceiver* 	ptr_mvctp_receiver;
 
 	void HandleStringTransfer(TransferMessage& msg);

@@ -12,15 +12,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "../CommUtil/StatusMonitor.h"
+#include "../CommUtil/StatusProxy.h"
 #include "../MVCTP/ConfigInfo.h"
-#include "Logger.h"
 #include "../MVCTP/Tester.h"
 
 using namespace std;
 
 ConfigInfo* ptr_config_info;
-StatusMonitor* ptr_monitor;
+StatusProxy* ptr_monitor;
 
 void StartStatusMonitor();
 void Clean();
@@ -35,12 +34,6 @@ int main(int argc, char** argv) {
 	// Parse configuration file
 	ptr_config_info = ConfigInfo::GetInstance();
 	ptr_config_info->Parse(argv[1]);
-
-	// Start status monitor
-	//StartStatusMonitor();
-
-	// Configure logger
-	//Logger::AddRemoteClient(ptr_monitor->GetStatusReportClient());
 
 
 	Tester tester;
@@ -65,9 +58,9 @@ void StartStatusMonitor() {
 		string serv_addr = ptr_config_info->GetValue("Monitor Server");
 		string port = ptr_config_info->GetValue("Monitor Server Port");
 		if (serv_addr.length() > 0) {
-			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
+			ptr_monitor = new StatusProxy(serv_addr, atoi(port.c_str()));
 			ptr_monitor->ConnectServer();
-			ptr_monitor->StartClients();
+			ptr_monitor->StartService();
 		}
 	}
 }

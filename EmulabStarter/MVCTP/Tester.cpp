@@ -11,7 +11,7 @@ Tester::Tester() {
 }
 
 Tester::~Tester() {
-	delete ptr_monitor;
+	delete ptr_status_proxy;
 }
 
 void Tester::StartTest() {
@@ -28,12 +28,10 @@ void Tester::StartTest() {
 		ptr_mvctp_sender->JoinGroup(group_id, mvctp_port);
 		ptr_mvctp_sender->SetSendRate(50);
 
-		SenderCommandClient command_client(ptr_mvctp_sender);
 		if (serv_addr.length() > 0) {
-			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
-			ptr_monitor->SetCommandExecClient(&command_client);
-			ptr_monitor->ConnectServer();
-			ptr_monitor->StartClients();
+			ptr_status_proxy = new SenderStatusProxy(serv_addr, atoi(port.c_str()), ptr_mvctp_sender);
+			ptr_status_proxy->ConnectServer();
+			ptr_status_proxy->StartService();
 		}
 
 		this->SendMessage(INFORMATIONAL, "I'm the sender. Just joined the multicast group.");
@@ -51,12 +49,10 @@ void Tester::StartTest() {
 		ptr_mvctp_receiver = new MVCTPReceiver(recv_buf_size);
 		ptr_mvctp_receiver->JoinGroup(group_id, mvctp_port);
 
-		ReceiverCommandClient command_client(ptr_mvctp_receiver);
 		if (serv_addr.length() > 0) {
-			ptr_monitor = new StatusMonitor(serv_addr, atoi(port.c_str()));
-			ptr_monitor->SetCommandExecClient(&command_client);
-			ptr_monitor->ConnectServer();
-			ptr_monitor->StartClients();
+			ptr_status_proxy = new ReceiverStatusProxy(serv_addr, atoi(port.c_str()), ptr_mvctp_receiver);
+			ptr_status_proxy->ConnectServer();
+			ptr_status_proxy->StartService();
 		}
 
 		this->SendMessage(INFORMATIONAL, "I'm a receiver. Just joined the multicast group.");
@@ -178,7 +174,7 @@ void Tester::HandleFileTransfer(TransferMessage& msg, size_t buff_size) {
 
 
 void Tester::SendMessage(int level, string msg) {
-	ptr_monitor->GetStatusReportClient()->SendMessage(level, msg);
+	ptr_status_proxy->SendMessage(level, msg);
 }
 
 bool Tester::IsSender() {

@@ -25,7 +25,6 @@ int StatusReportClient::SendNodeName() {
 	uname(&host_name);
 	SendMessage(NODE_NAME, host_name.nodename);
 	return 1;
-
 }
 
 
