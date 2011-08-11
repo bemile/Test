@@ -31,7 +31,7 @@ int StatusProxy::ConnectServer() {
 	int res;
 	while ((res = connect(sockfd, (SA *) &servaddr, sizeof(servaddr))) < 0) {
 		cout << "connect() error" << endl;
-		sleep(30);
+		sleep(15);
 		//return -1;
 	}
 
@@ -141,6 +141,7 @@ void StatusProxy::ReconnectServer() {
 	close(sockfd);
 	is_connected = false;
 	ConnectServer();
+	SendNodeInfo();
 	SendMessage(INFORMATIONAL, "Socket error. Service reconnected.");
 }
 
