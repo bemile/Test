@@ -30,7 +30,8 @@ enum MsgType {
     WARNING = 4,
     COMMAND = 5,
     COMMAND_RESPONSE = 6,
-    EXP_RESULT_REPORT = 7
+    EXP_RESULT_REPORT = 7,
+    PARAM_SETTING = 8
 };
 
 

@@ -128,6 +128,7 @@ void StatusProxy::RunCommandExecThread() {
 
 		switch (msg_type) {
 		case COMMAND:
+		case PARAM_SETTING:
 			HandleCommand(buffer);
 			break;
 		default:
