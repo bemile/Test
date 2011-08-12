@@ -124,12 +124,12 @@ int SenderStatusProxy::HandleSendCommand(list<string>& slist) {
 	}
 
 	// Send result status back to the monitor
-	if (send_out_packets) {
-		SendMessage(COMMAND_RESPONSE, "Data sent.");
-	}
-	else {
-		SendMessage(COMMAND_RESPONSE, "Data recorded but not sent out (simulate packet loss).");
-	}
+//	if (send_out_packets) {
+//		SendMessage(COMMAND_RESPONSE, "Data sent.");
+//	}
+//	else {
+//		SendMessage(COMMAND_RESPONSE, "Data recorded but not sent out (simulate packet loss).");
+//	}
 
 	return 1;
 }
@@ -178,8 +178,6 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 			SendMessage(INFORMATIONAL, buf);
 		}
 	}
-
-	ptr_sender->ResetBuffer();
 	SendMessage(COMMAND_RESPONSE, "Memory data transfer completed.");
 	return 1;
 }
