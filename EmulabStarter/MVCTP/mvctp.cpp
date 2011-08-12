@@ -29,7 +29,7 @@ void Log(char* format, ...) {
 	va_list args;
 	va_start (args, format);
 	vfprintf (log_file, format, args);
-	//fflush(log_file);
+	fflush(log_file);
 	va_end (args);
 }
 
