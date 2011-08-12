@@ -19,8 +19,8 @@ void SysError(string s) {
 }
 
 void Log(char* format, ...) {
-	if (!is_log_enabled)
-		return;
+	//if (!is_log_enabled)
+	//	return;
 
 	if (log_file == NULL) {
 		log_file = fopen("mvctp_run.log", "w");
