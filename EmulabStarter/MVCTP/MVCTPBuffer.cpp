@@ -22,8 +22,10 @@ MVCTPBuffer::~MVCTPBuffer() {
 	Clear();
 
 	list<BufferEntry*>::iterator it;
-	for (it = free_packet_list.begin(); it != free_packet_list.end(); it++) {
+	while (!free_packet_list.empty()) {
+		it = free_packet_list.begin();
 		DestroyEntry(*it);
+		free_packet_list.pop_front();
 	}
 }
 
