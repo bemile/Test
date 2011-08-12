@@ -136,8 +136,8 @@ void SendBufferMgr::ReceiveNack() {
 		}
 
 		if (nack_msg->proto == MVCTP_PROTO_TYPE) {
-			//Log("%.6f    One retransmission request received. Packet Number: %d    Receiver: %s\n",
-			//		GetCurrentTime(), nack_msg->num_missing_packets,  inet_ntoa(sender_addr.sin_addr));
+			Log("%.6f    One retransmission request received. Packet Number: %d    Receiver: %s\n",
+					GetCurrentTime(), nack_msg->num_missing_packets,  inet_ntoa(sender_addr.sin_addr));
 			Retransmit(nack_msg);
 		}
 	}
@@ -152,12 +152,12 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 		if (entry != NULL) {
 			udp_comm->SendTo((void *)entry->mvctp_header, entry->packet_len, 0,
 						(SA*)&sender_addr, sender_socklen);
-			//Log("%.6f    One packet retransmitted. Packet ID: %d\n",
-			//		GetCurrentTime(), packet_id);
+			Log("%.6f    One packet retransmitted. Packet ID: %d\n",
+					GetCurrentTime(), packet_id);
 		}
 		else {
-			//Log("%.6f    Could not find packet for retransmission. Packet ID: %d\n",
-			//		GetCurrentTime(), packet_id);
+			Log("%.6f    Could not find packet for retransmission. Packet ID: %d\n",
+					GetCurrentTime(), packet_id);
 		}
 	}
 	pthread_mutex_unlock(&buf_mutex);
