@@ -60,11 +60,12 @@ int SenderStatusProxy::HandleCommand(char* command) {
 		if (parts.size() == 2) {
 			if (parts.back().compare("On") == 0) {
 				is_log_enabled = true;
+				SendMessage(COMMAND_RESPONSE, "Log switch set to ON.");
 			}
 			else if (parts.back().compare("Off") == 0) {
 				is_log_enabled = false;
+				SendMessage(COMMAND_RESPONSE, "Log switch set to OFF.");
 			}
-			SendMessage(COMMAND_RESPONSE, "Log switch set.");
 		}
 	}
 	else {
