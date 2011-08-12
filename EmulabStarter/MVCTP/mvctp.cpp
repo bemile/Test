@@ -6,41 +6,47 @@
  */
 #include "mvctp.h"
 
+double MVCTP::CPU_MHZ = 0;
+FILE*  MVCTP::log_file = NULL;
+bool MVCTP::is_log_enabled;
+struct CpuCycleCounter MVCTP::start_time_counter;
+
 // Must be called before starting MVCTP activities
 void MVCTPInit() {
-	CPU_MHZ = GetCPUMhz();
-	log_file = NULL;
-	is_log_enabled = false;
-}
-
-void SysError(string s) {
-	perror(s.c_str());
-	exit(-1);
+	MVCTP::CPU_MHZ = GetCPUMhz();
+	AccessCPUCounter(&MVCTP::start_time_counter.hi, &MVCTP::start_time_counter.lo);
+	MVCTP::log_file = NULL;
+	MVCTP::is_log_enabled = false;
 }
 
 void Log(char* format, ...) {
-	//if (!is_log_enabled)
-	//	return;
+	if (!MVCTP::is_log_enabled)
+		return;
 
-	if (log_file == NULL) {
-		log_file = fopen("mvctp_run.log", "w");
+	if (MVCTP::log_file == NULL) {
+		MVCTP::log_file = fopen("mvctp_run.log", "w");
 	}
 
 	va_list args;
 	va_start (args, format);
-	vfprintf (log_file, format, args);
+	vfprintf (MVCTP::log_file, format, args);
 	//fflush(log_file);
 	va_end (args);
 }
 
 void CreateNewLogFile(const char* file_name) {
-	if (log_file != NULL) {
-		fclose(log_file);
+	if (MVCTP::log_file != NULL) {
+		fclose(MVCTP::log_file);
 	}
 
-	log_file = fopen(file_name, "w");
+	MVCTP::log_file = fopen(file_name, "w");
 }
 
+
+void SysError(string s) {
+	perror(s.c_str());
+	exit(-1);
+}
 
 void AccessCPUCounter(unsigned *hi, unsigned *lo) {
 	asm("rdtsc; movl %%edx, %0; movl %%eax, %1"
@@ -74,16 +80,15 @@ double GetCPUMhz() {
 	AccessCPUCounter(&hi, &lo);
 	sleep(1);
 	rate = GetElapsedCycles(hi, lo) / 1 / 1000000;
-	AccessCPUCounter(&start_time_counter.hi, &start_time_counter.lo);
 	return rate;
 }
 
 double GetCurrentTime() {
-	return GetElapsedCycles(start_time_counter.hi, start_time_counter.lo) / 1000000.0 / CPU_MHZ;
+	return GetElapsedCycles(MVCTP::start_time_counter.hi, MVCTP::start_time_counter.lo) / 1000000.0 / MVCTP::CPU_MHZ;
 }
 
 double GetElapsedSeconds(CpuCycleCounter lastCount) {
-	return GetElapsedCycles(lastCount.hi, lastCount.lo) / 1000000.0 / CPU_MHZ;
+	return GetElapsedCycles(lastCount.hi, lastCount.lo) / 1000000.0 / MVCTP::CPU_MHZ;
 }
 
 

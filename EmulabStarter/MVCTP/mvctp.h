@@ -122,10 +122,13 @@ const int UDP_PACKET_LEN = ETH_DATA_LEN;
 
 const int INIT_RTT	= 20;		// in milliseconds
 
-static double CPU_MHZ;
-static FILE*  log_file;
-static bool is_log_enabled;
-static struct CpuCycleCounter start_time_counter;
 
+class MVCTP {
+public:
+	static double CPU_MHZ;
+	static FILE*  log_file;
+	static bool is_log_enabled;
+	static struct CpuCycleCounter start_time_counter;
+};
 
 #endif /* MVCTP_H_ */
