@@ -168,7 +168,7 @@ int StatusProxy::HandleCommand(char* command) {
 void StatusProxy::HandleRestartCommand() {
 	//TODO: Ugly way to close all opened file descriptors (sockets).
 	//How to fix it?
-	for (int i = 3; i < 10; i++) {
+	for (int i = 3; i < 1000; i++) {
 		close(i);
 	}
 
