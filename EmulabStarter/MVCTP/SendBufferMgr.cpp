@@ -102,7 +102,7 @@ void SendBufferMgr::MakeRoomForNewPacket(size_t room_size) {
 			break;
 
 		if ( (it = send_buf->Find(pid)) != NULL)
-			size += MVCTP_DATA_LEN; //it->data_len;
+			size += it->data_len;
 	}
 
 	send_buf->DeleteUntil(send_buf->GetMinPacketId(), pid);
