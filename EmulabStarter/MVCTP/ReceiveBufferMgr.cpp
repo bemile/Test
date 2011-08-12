@@ -292,7 +292,7 @@ void ReceiveBufferMgr::NackRun() {
 
 		pthread_mutex_lock(&nack_list_mutex);
 		for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
-			if ((cur_time - it->second.time_stamp) > (INIT_RTT * it->second.num_retries * CLOCKS_PER_SEC / 1000)
+			if ((cur_time - it->second.time_stamp) > (INIT_RTT * CLOCKS_PER_SEC / 1000)
 						&& it->second.num_retries < 50) {
 				msg.packet_ids[msg.num_missing_packets] = it->first;
 				msg.num_missing_packets++;
