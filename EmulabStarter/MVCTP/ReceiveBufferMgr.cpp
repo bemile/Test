@@ -27,7 +27,10 @@ ReceiveBufferMgr::ReceiveBufferMgr(int size, InetComm* mcomm) {
 	memcpy(&sender_udp_addr.sin_addr, &address, sizeof(address));
 
 	packet_loss_rate = 0;
-	srand(time(NULL));
+
+	CpuCycleCounter cc;
+	AccessCPUCounter(&cc.hi, &cc.lo);
+	srand(cc.lo);
 
 //	int index = 0;
 //	while( (address = (in_addr *)record->h_addr_list[index++]) != NULL) {
