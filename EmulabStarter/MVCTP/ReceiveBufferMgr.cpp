@@ -231,6 +231,9 @@ void ReceiveBufferMgr::Run() {
 			if (msg.num_missing_packets > 0) {
 				SendNackMsg(msg);
 			}
+
+			Log("%.6f    Retransmission requests sent for missing packet IDs. From: %d To: %d\n",
+						GetCurrentTime(), last_recv_packet_id + 1, header->packet_id - 1);
 			pthread_mutex_unlock(&nack_list_mutex);
 		}
 
