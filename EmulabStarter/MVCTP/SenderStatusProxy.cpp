@@ -137,6 +137,8 @@ int SenderStatusProxy::HandleSendCommand(list<string>& slist) {
 // Transfer memory-to-memory data to all receivers
 // size: the size of data to transfer (in megabytes)
 int SenderStatusProxy::TransferMemoryData(int size) {
+	ptr_sender->ResetBuffer();
+
 	TransferMessage msg;
 	msg.msg_type = MEMORY_TRANSFER;
 	msg.data_len = size;
