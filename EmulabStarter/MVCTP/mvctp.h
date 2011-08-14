@@ -120,7 +120,7 @@ const int UDP_MVCTP_HLEN = sizeof(MVCTP_HEADER);
 const int UDP_MVCTP_DATA_LEN = 1200 - sizeof(MVCTP_HEADER);
 const int UDP_PACKET_LEN = ETH_DATA_LEN;
 
-const int INIT_RTT	= 1000;		// in milliseconds
+const int INIT_RTT	= 20;		// in milliseconds
 
 
 class MVCTP {
