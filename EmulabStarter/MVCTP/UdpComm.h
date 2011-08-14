@@ -14,6 +14,8 @@ class UdpComm {
 public:
 	UdpComm(ushort port);
 	~UdpComm();
+
+	void SetSocketBufferSize(size_t size);
 	ssize_t SendTo(const void* buff, size_t len, int flags, SA* to_addr,  socklen_t to_len);
 	ssize_t RecvFrom(void* buff, size_t len, int flags, SA* from_addr, socklen_t* from_len);
 

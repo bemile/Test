@@ -13,6 +13,7 @@ SendBufferMgr::SendBufferMgr(int size, InetComm* mcomm) {
 	send_buf = new MVCTPBuffer(size);
 	comm = mcomm;
 	udp_comm = new UdpComm(BUFFER_UDP_SEND_PORT);
+	udp_comm->SetSocketBufferSize(8000000);
 
 	StartUdpThread();
 }

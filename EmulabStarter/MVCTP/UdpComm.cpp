@@ -28,6 +28,13 @@ UdpComm::~UdpComm() {
 }
 
 
+void UdpComm::SetSocketBufferSize(size_t size) {
+	if (setsockopt(sock_fd, SOL_SOCKET, SO_RCVBUFFORCE, &size, sizeof(size)) < 0) {
+		SysError("Cannot set receive buffer size for raw socket.");
+	}
+}
+
+
 ssize_t UdpComm::SendTo(const void* buff, size_t len, int flags, SA* to_addr,  socklen_t to_len) {
 	return sendto(sock_fd, buff, len, flags, to_addr, to_len);
 }
