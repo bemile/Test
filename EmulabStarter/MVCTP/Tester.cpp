@@ -139,6 +139,8 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 			stats.num_received_packets, stats.num_retrans_packets, stats.num_dup_retrans_packets);
 	this->SendMessage(INFORMATIONAL, s);
 
+	ptr_mvctp_receiver->ResetBuffer();
+
 	float retrans_rate = stats.num_retrans_packets * 1.0 / stats.num_received_packets;
 	float throughput = total_bytes * 8.0 / 1024.0 / 1024.0 / trans_time;
 	// Format:TransferBytes, Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
@@ -146,7 +148,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 					stats.num_retrans_packets, retrans_rate);
 	this->SendMessage(EXP_RESULT_REPORT, s);
 
-	ptr_mvctp_receiver->ResetBuffer();
+
 
 //	char file_name[30];
 //	string host_name = ExecSysCommand("hostname -f");
