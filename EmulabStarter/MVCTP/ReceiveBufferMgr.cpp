@@ -287,15 +287,22 @@ void* ReceiveBufferMgr::StartNackThread(void* ptr) {
 // Keep checking the missing list for retransmission request
 void ReceiveBufferMgr::NackRun() {
 	map<int32_t, NackMsgInfo>::iterator it;
+	clock_t max_rto = 160;
+
 	while (true) {
 		clock_t cur_time = clock();
 		NackMsg msg;
 		memset(&msg, 0, sizeof(msg));
 		msg.proto = MVCTP_PROTO_TYPE;
 
+
 		pthread_mutex_lock(&nack_list_mutex);
 		for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
-			if ((cur_time - it->second.time_stamp) > (it->second.num_retries * INIT_RTT * CLOCKS_PER_SEC / 1000)) {
+			clock_t rto = it->second.num_retries * INIT_RTT * CLOCKS_PER_SEC / 1000;
+			if (rto > max_rto)
+				rto = max_rto;
+
+			if ((cur_time - it->second.time_stamp) > rto) {
 				//		&& it->second.num_retries < 20) {
 				msg.packet_ids[msg.num_missing_packets] = it->first;
 				msg.num_missing_packets++;
