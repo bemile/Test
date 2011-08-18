@@ -287,7 +287,7 @@ void* ReceiveBufferMgr::StartNackThread(void* ptr) {
 // Keep checking the missing list for retransmission request
 void ReceiveBufferMgr::NackRun() {
 	map<int32_t, NackMsgInfo>::iterator it;
-	clock_t max_rto = 160;
+	clock_t max_rto = 200;
 
 	while (true) {
 		clock_t cur_time = clock();
