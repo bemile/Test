@@ -122,6 +122,7 @@ ssize_t RawSocketComm::SendPacket(PacketBuffer* buffer, int flags, void* dst_add
 	ethhdr* eth_header = (ethhdr*)buffer->eth_header;
 	memcpy(eth_header->h_source, mac_addr, ETH_ALEN);
 	memcpy(eth_header->h_dest, dst_addr, ETH_ALEN);
+	eth_header->h_proto = htons(MVCTP_PROTO_TYPE);
 
 	return SendFrame(buffer->eth_header, buffer->data_len + MVCTP_HLEN + ETH_HLEN);
 }
