@@ -60,7 +60,7 @@ void RawSocketComm::Bind(const SA* sa, int sa_len, u_char* mac_addr) {
 
 void RawSocketComm::SetSendRate(int num_mbps) {
 	send_rate_in_mbps = num_mbps;
-	unit_size_token = (size_t)(RATE_CHECK_PERIOD / 1000.0 * num_mbps * 1024 * 1024 / 8);	// change to number of bytes
+	unit_size_token = (size_t)(RATE_CHECK_PERIOD / 1000.0 * num_mbps * 1024 * 1024 / 8.0);	// change to number of bytes
 	current_size_token = unit_size_token;
 	AccessCPUCounter(&last_checked_counter.hi, &last_checked_counter.lo);
 	//gettimeofday(&last_check_time, NULL);
