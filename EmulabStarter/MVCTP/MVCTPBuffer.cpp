@@ -82,9 +82,15 @@ bool MVCTPBuffer::IsEmpty() {
 }
 
 
-int MVCTPBuffer::Insert(BufferEntry* entry) {
+bool MVCTPBuffer::Insert(BufferEntry* entry) {
 	if (entry == NULL)
 		return 0;
+
+	pair<map<int32_t, BufferEntry*>::iterator, bool > res =
+			buffer_pool.insert(pair<int32_t, BufferEntry*>(entry->packet_id, entry));
+
+	if (!res.second)
+		return false;
 
 	if (min_packet_id > entry->packet_id)
 			min_packet_id = entry->packet_id;
@@ -95,13 +101,16 @@ int MVCTPBuffer::Insert(BufferEntry* entry) {
 	current_buffer_size += entry->data_len;
 	num_entry++;
 
-	buffer_pool.insert(pair<int32_t, BufferEntry*>(entry->packet_id, entry));
-	return 1;
+	return true;
 }
 
 
 int MVCTPBuffer::Delete(BufferEntry* entry) {
 	if (entry == NULL)
+		return 0;
+
+	int res = buffer_pool.erase(entry->packet_id);
+	if (res == 0)
 		return 0;
 
 	current_buffer_size -= entry->data_len;
@@ -112,7 +121,6 @@ int MVCTPBuffer::Delete(BufferEntry* entry) {
 	else if (max_packet_id == entry->packet_id)
 		max_packet_id--;
 
-	buffer_pool.erase(entry->packet_id);
 	AddFreePacket(entry);
 	//DestroyEntry(entry);
 

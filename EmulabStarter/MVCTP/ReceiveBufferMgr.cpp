@@ -256,9 +256,8 @@ void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 	memcpy(entry->mvctp_header, buf, entry->packet_len);
 
 	if (entry->packet_len <= recv_buf->GetAvailableBufferSize()) {
-		//recv_buf->AddEntry(header, data);
-		recv_buf->Insert(entry);
-		buffer_stats.num_received_packets++;
+		if (recv_buf->Insert(entry))
+			buffer_stats.num_received_packets++;
 		//Log("One new packet received. Packet ID: %d\n", header->packet_id);
 	}
 	else {
@@ -374,12 +373,12 @@ void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 		entry->data_len = header->data_len;
 		memcpy(entry->mvctp_header, buf, entry->packet_len);
 
-		recv_buf->Insert(entry);
+		if (recv_buf->Insert(entry)) {
+			//last_recv_packet_id = header->packet_id;
+			buffer_stats.num_retrans_packets++;
+			buffer_stats.num_received_packets++;
+		}
 	pthread_mutex_unlock(&buf_mutex);
-
-	//last_recv_packet_id = header->packet_id;
-	buffer_stats.num_retrans_packets++;
-	buffer_stats.num_received_packets++;
 
 	Log("%.6f    Retransmitted packet added to the buffer. Packet ID: %d\n", GetCurrentTime(), header->packet_id);
 }

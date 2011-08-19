@@ -38,8 +38,8 @@ public:
 	int32_t GetMaxPacketId() {return max_packet_id;}
 
 	BufferEntry* 	Find(int32_t pid);
-	int 			PushBack(BufferEntry* entry);
-	int 			Insert(BufferEntry* entry);
+	//int 			PushBack(BufferEntry* entry);
+	bool 			Insert(BufferEntry* entry);
 	int 			Delete(BufferEntry*	entry);
 	int 			DeleteUntil(int32_t start_id, int32_t end_id);
 	bool 			IsEmpty();
