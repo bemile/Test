@@ -53,7 +53,7 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 //		header->data_len = len;
 //		memcpy(ptr_data + MVCTP_HLEN, pos, len);
 
-		BufferEntry* entry = send_buf->GetFreePacket(); //(BufferEntry*) malloc(sizeof(BufferEntry));
+		PacketBuffer* entry = send_buf->GetFreePacket(); //(BufferEntry*) malloc(sizeof(BufferEntry));
 		MVCTP_HEADER* header = (MVCTP_HEADER*) entry->mvctp_header;
 		header->proto = MVCTP_PROTO_TYPE;
 		header->packet_id = ++last_packet_id;
@@ -78,7 +78,7 @@ int SendBufferMgr::SendData(const char* data, size_t length, void* dst_addr, boo
 }
 
 
-void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out) {
+void SendBufferMgr::SendPacket(PacketBuffer* entry, void* dst_addr, bool send_out) {
 	size_t avail_buf_size = send_buf->GetAvailableBufferSize();
 	if (avail_buf_size < entry->packet_len) {
 		MakeRoomForNewPacket(entry->packet_len - avail_buf_size);
@@ -86,10 +86,12 @@ void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out
 
 	send_buf->Insert(entry);
 	if (send_out) {
-		if (comm->SendData(entry->mvctp_header, entry->packet_len, 0, dst_addr) < 0) {
+		if (comm->SendPacket(entry, 0, dst_addr) < 0) {
 			SysError("SendBufferMgr::SendPacket()::SendData() error");
 		}
-		//cout << "Successfully sent packet. Packet length: " << entry->data_len << endl;
+		//if (comm->SendData(entry->mvctp_header, entry->packet_len, 0, dst_addr) < 0) {
+		//	SysError("SendBufferMgr::SendPacket()::SendData() error");
+		//}
 	}
 }
 
@@ -97,7 +99,7 @@ void SendBufferMgr::SendPacket(BufferEntry* entry, void* dst_addr, bool send_out
 void SendBufferMgr::MakeRoomForNewPacket(size_t room_size) {
 	size_t size = 0;
 	int32_t pid;
-	BufferEntry* it;
+	PacketBuffer* it;
 	for (pid = send_buf->GetMinPacketId(); pid <= send_buf->GetMaxPacketId(); pid++) {
 		if (size > room_size)
 			break;
@@ -149,7 +151,7 @@ void SendBufferMgr::Retransmit(NackMsg* ptr_msg) {
 	pthread_mutex_lock(&buf_mutex);
 	for (int i = 0; i < ptr_msg->num_missing_packets; i++) {
 		int32_t packet_id = ptr_msg->packet_ids[i];
-		BufferEntry* entry = send_buf->Find(packet_id);
+		PacketBuffer* entry = send_buf->Find(packet_id);
 		if (entry != NULL) {
 			udp_comm->SendTo((void *)entry->mvctp_header, entry->packet_len, 0,
 						(SA*)&sender_addr, sender_socklen);

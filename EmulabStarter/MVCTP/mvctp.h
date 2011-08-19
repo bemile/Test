@@ -78,6 +78,18 @@ typedef struct MVCTPHeader {
 #endif
 */
 
+// buffer entry for a single packet
+typedef struct PacketBuffer {
+	int32_t 	packet_id;
+	size_t		packet_len;
+	size_t		data_len;
+	char*		eth_header;
+	char*		mvctp_header;
+	char*		data;
+	char* 		packet_buffer;
+} BUFFER_ENTRY, * PTR_BUFFER_ENTRY;
+
+
 const int MAX_NACK_IDS = 10;
 struct NackMsg {
 	int32_t 	proto;

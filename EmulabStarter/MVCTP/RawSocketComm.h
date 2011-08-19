@@ -33,6 +33,7 @@ public:
 
 	void SetBufferSize(size_t buf_size);
 	ssize_t SendData(const void* buff, size_t len, int flags, void* dst_addr);
+	ssize_t SendPacket(PacketBuffer* buffer, int flags, void* dst_addr);
 	ssize_t RecvData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len);
 
 	void Bind(const SA* sa, int sa_len, u_char* mac_addr);

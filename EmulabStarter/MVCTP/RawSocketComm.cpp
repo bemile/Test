@@ -117,6 +117,16 @@ int RawSocketComm::SendData(const void* buff, size_t len, int flags, void* dst_a
 }
 
 
+ssize_t RawSocketComm::SendPacket(PacketBuffer* buffer, int flags, void* dst_addr) {
+	memcpy(dest_address.sll_addr, dst_addr, ETH_ALEN);
+	ethhdr* eth_header = (ethhdr*)buffer->eth_header;
+	memcpy(eth_header->h_source, mac_addr, ETH_ALEN);
+	memcpy(eth_header->h_dest, dst_addr, ETH_ALEN);
+
+	return SendFrame(buffer->eth_header, buffer->data_len + MVCTP_HLEN + ETH_HLEN);
+}
+
+
 int RawSocketComm::SendFrame(void* buffer, size_t length) {
 	if (current_size_token < length) {
 		WaitForNewToken();

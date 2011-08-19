@@ -11,17 +11,6 @@
 #include "mvctp.h"
 #include <pthread.h>
 
-// buffer entry for a single packet
-typedef struct BufferEntry {
-	int32_t 	packet_id;
-	size_t		packet_len;
-	size_t		data_len;
-	char*		eth_header;
-	char*		mvctp_header;
-	char*		data;
-	char* 		packet_buffer;
-} BUFFER_ENTRY, * PTR_BUFFER_ENTRY;
-
 
 //	information for an MVCTP send/receive buffer
 class MVCTPBuffer {
@@ -37,16 +26,16 @@ public:
 	int32_t	GetMinPacketId() {return min_packet_id;}
 	int32_t GetMaxPacketId() {return max_packet_id;}
 
-	BufferEntry* 	Find(int32_t pid);
+	PacketBuffer* 	Find(int32_t pid);
 	//int 			PushBack(BufferEntry* entry);
-	bool 			Insert(BufferEntry* entry);
-	int 			Delete(BufferEntry*	entry);
+	bool 			Insert(PacketBuffer* entry);
+	int 			Delete(PacketBuffer*	entry);
 	int 			DeleteUntil(int32_t start_id, int32_t end_id);
 	bool 			IsEmpty();
-	int 			ShrinkEntry(BufferEntry* entry, size_t new_size);
+	int 			ShrinkEntry(PacketBuffer* entry, size_t new_size);
 	void			Clear();
 
-	BufferEntry* 				GetFreePacket();
+	PacketBuffer* 				GetFreePacket();
 
 protected:
 	int 		num_entry;				// number of packet entries in the buffer
@@ -55,12 +44,12 @@ protected:
 	int32_t		min_packet_id;
 	int32_t		max_packet_id;
 
-	map<int32_t, BufferEntry*> 	buffer_pool;
-	list<BufferEntry*> 			free_packet_list;
+	map<int32_t, PacketBuffer*> 	buffer_pool;
+	list<PacketBuffer*> 			free_packet_list;
 	void 						AllocateFreePackets();
-	void						AddFreePacket(BufferEntry* entry);
+	void						AddFreePacket(PacketBuffer* entry);
 
-	void DestroyEntry(BufferEntry* entry);
+	void DestroyEntry(PacketBuffer* entry);
 };
 
 

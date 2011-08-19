@@ -109,6 +109,11 @@ ssize_t MulticastComm::SendData(const void* buff, size_t len, int flags, void* d
 	return sendto(sock_fd, buff, len, flags, &this->dst_addr, sizeof(sockaddr_in));
 }
 
+ssize_t MulticastComm::SendPacket(PacketBuffer* buffer, int flags, void* dst_addr) {
+	return sendto(sock_fd, buffer->mvctp_header, buffer->data_len + MVCTP_HLEN,
+					flags, &this->dst_addr, sizeof(sockaddr_in));
+}
+
 
 ssize_t MulticastComm::RecvData(void* buff, size_t len, int flags, SA* from, socklen_t* from_len) {
 	return recvfrom(sock_fd, buff, len, flags, from, from_len);

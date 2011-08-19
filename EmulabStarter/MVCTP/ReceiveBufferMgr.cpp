@@ -106,7 +106,7 @@ size_t ReceiveBufferMgr::GetData(void* buff, size_t len) {
 	size_t bytes_copied = 0;
 	size_t bytes_remained = len;
 	int32_t next_pid = last_del_packet_id  + 1;
-	BufferEntry * tmp = NULL;
+	PacketBuffer * tmp = NULL;
 	int sleep_turns = 0;
 	while (true) {
 		pthread_mutex_lock(&buf_mutex);
@@ -249,7 +249,7 @@ void ReceiveBufferMgr::Run() {
 
 void ReceiveBufferMgr::AddNewEntry(MVCTP_HEADER* header, void* buf) {
 	pthread_mutex_lock(&buf_mutex);
-	BufferEntry* entry = recv_buf->GetFreePacket();
+	PacketBuffer* entry = recv_buf->GetFreePacket();
 	entry->packet_id = header->packet_id;
 	entry->packet_len = MVCTP_HLEN + header->data_len;
 	entry->data_len = header->data_len;
@@ -367,7 +367,7 @@ void ReceiveBufferMgr::UdpReceive() {
 
 void ReceiveBufferMgr::AddRetransmittedEntry(MVCTP_HEADER* header, void* buf) {
 	pthread_mutex_lock(&buf_mutex);
-		BufferEntry* entry = recv_buf->GetFreePacket();
+		PacketBuffer* entry = recv_buf->GetFreePacket();
 		entry->packet_id = header->packet_id;
 		entry->packet_len = MVCTP_HLEN + header->data_len;
 		entry->data_len = header->data_len;
