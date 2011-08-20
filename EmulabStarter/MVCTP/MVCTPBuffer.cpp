@@ -40,8 +40,8 @@ size_t 	MVCTPBuffer::GetAvailableBufferSize() {
 
 void MVCTPBuffer::AllocateFreePackets() {
 	int numPackets = max_buffer_size / MVCTP_ETH_FRAME_LEN;
-	if (numPackets > 5000) {
-		numPackets = 5000;
+	if (numPackets > 15000) {
+		numPackets = 15000;
 	}
 
 	char* ptr = (char*)malloc(numPackets * MVCTP_ETH_FRAME_LEN);
