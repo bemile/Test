@@ -137,6 +137,9 @@ int SenderStatusProxy::HandleSendCommand(list<string>& slist) {
 // Transfer memory-to-memory data to all receivers
 // size: the size of data to transfer (in megabytes)
 int SenderStatusProxy::TransferMemoryData(int size) {
+	// Clear the send buffer
+	ptr_sender->ResetBuffer();
+
 	TransferMessage msg;
 	msg.msg_type = MEMORY_TRANSFER;
 	msg.data_len = size;
@@ -145,14 +148,12 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 	//char buffer[MVCTP_DATA_LEN];
 	//memset(buffer, 1, MVCTP_DATA_LEN);
 
-	// Clear the send buffer
-	ptr_sender->ResetBuffer();
 	// Initialize the memory buffer
 	uint num_ints = size / sizeof(uint);
 	uint* mem_store = (uint*)malloc(size);
-	for (uint i = 0; i < num_ints; i++) {
-		mem_store[i] = i;
-	}
+//	for (uint i = 0; i < num_ints; i++) {
+//		mem_store[i] = i;
+//	}
 
 	char* buffer = (char*)mem_store;
 	timeval last_time, cur_time;
