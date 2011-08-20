@@ -144,7 +144,7 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 	uint num_ints = size / sizeof(uint);
 	uint* mem_store = (uint*)malloc(size);
 	for (uint i = 0; i < num_ints; i++) {
-		mem_store[i] = i;
+		mem_store[i] = 1;
 	}
 
 	TransferMessage msg;
