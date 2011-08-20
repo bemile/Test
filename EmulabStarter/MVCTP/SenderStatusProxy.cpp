@@ -140,17 +140,18 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 	// Clear the send buffer
 	ptr_sender->ResetBuffer();
 
-	// Initialize the memory buffer
-	uint* mem_store = (uint*)malloc(size);
-	uint num_ints = size / sizeof(uint);
-	for (uint i = 0; i < num_ints; i++) {
-		mem_store[i] = i;
-	}
-
 	TransferMessage msg;
 	msg.msg_type = MEMORY_TRANSFER;
 	msg.data_len = size;
 	ptr_sender->RawSend((char*)&msg, sizeof(msg), true);
+
+	// Initialize the memory buffer
+	uint* mem_store = (uint*)malloc(size);
+//	uint num_ints = size / sizeof(uint);
+//	for (uint i = 0; i < num_ints; i++) {
+//		mem_store[i] = i;
+//	}
+
 
 	//char buffer[MVCTP_DATA_LEN];
 	//memset(buffer, 1, MVCTP_DATA_LEN);
