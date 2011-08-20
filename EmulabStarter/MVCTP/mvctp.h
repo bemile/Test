@@ -23,6 +23,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
 #include <ctime>
 #include <iostream>
 #include <cstdio>

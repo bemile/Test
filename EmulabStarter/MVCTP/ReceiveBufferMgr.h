@@ -59,12 +59,20 @@ private:
 	void Run();
 	void AddNewEntry(MVCTP_HEADER* header, void* buf);
 	void AddRetransmittedEntry(MVCTP_HEADER* header, void* buf);
+
+
+	timer_t timer_id;
+	struct sigevent signal_event;
+	struct sigaction signal_action;
+	struct itimerspec timer_specs;
 	static void* StartNackThread(void* ptr);
 	void NackRun();
 	void StartNackRetransTimer();
 	static void RetransmitNackHandler(int cause, siginfo_t *how_come, void *ucontext);
 	void DoRetransmitNacks();
 	void DeleteNackFromList(int32_t packet_id);
+
+
 	static void* StartUdpReceiveThread(void* ptr);
 	void UdpReceive();
 };

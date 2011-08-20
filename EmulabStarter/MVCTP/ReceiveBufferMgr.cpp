@@ -329,21 +329,38 @@ void ReceiveBufferMgr::NackRun() {
 
 void ReceiveBufferMgr::StartNackRetransTimer() {
 	/* Install our SIGPROF signal handler */
-	struct sigaction sa;
-	sa.sa_sigaction = ReceiveBufferMgr::RetransmitNackHandler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_SIGINFO; /* we want a siginfo_t */
-	if (sigaction(SIGPROF, &sa, 0)) {
+	signal_action.sa_sigaction = ReceiveBufferMgr::RetransmitNackHandler;
+	sigemptyset(&signal_action.sa_mask);
+	signal_action.sa_flags = SA_SIGINFO; /* we want a siginfo_t */
+	if (sigaction(SIGPROF, &signal_action, 0)) {
 		SysError("ReceiveBufferMgr::StartNackRetransTimer()::sigaction()");
 	}
 
+	// Define sigEvent
+	// This information will be forwarded to the signal-handler function
+	memset(&signal_event, 0, sizeof(signal_event));
+	// With the SIGEV_SIGNAL flag we say that there is sigev_value
+	signal_event.sigev_notify = SIGEV_SIGNAL;
+	// Now it's possible to give a pointer to the object
+	signal_event.sigev_value.sival_ptr = (void*) this;
+	// Declare this signal as Alarm Signal
+	signal_event.sigev_signo = SIGALRM;
+
+	// Install the Timer
+	if (timer_create(CLOCK_REALTIME, &signal_event, &timer_id) != 0) {
+		SysError("ReceiveBufferMgr::StartNackRetransTimer()::timer_create()");
+	}
+
 	/* Request SIGPROF */
-	struct itimerval itimer;
-	itimer.it_interval.tv_sec = 0;
-	itimer.it_interval.tv_usec = 10 * 1000;
-	itimer.it_value.tv_sec = 0;
-	itimer.it_value.tv_usec = 10 * 1000;
-	setitimer(ITIMER_PROF, &itimer, NULL);
+	timer_specs.it_interval.tv_sec = 0;
+	timer_specs.it_interval.tv_nsec = 10 * 1000 * 1000;
+	timer_specs.it_value.tv_sec = 0;
+	timer_specs.it_value.tv_nsec = 10 * 1000 * 1000;
+	//setitimer(SIGALRM, &timer_specs, NULL);
+
+	if (timer_settime(timer_id, 0, &timer_specs, NULL) == -1) {
+		SysError("Could not start timer:");
+	}
 }
 
 void ReceiveBufferMgr::RetransmitNackHandler(int cause, siginfo_t *si, void *ucontext) {

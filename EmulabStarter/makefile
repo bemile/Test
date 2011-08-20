@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-lpthread
+CFLAGS=-lpthread -lrt
 VPATH=starter:CommUtil:MVCTP
 OBJ=EmulabStarter.o ConfigInfo.o mvctp.o Tester.o MVCTPComm.o \
 SendBufferMgr.o ReceiveBufferMgr.o MVCTPBuffer.o MVCTPSender.o MVCTPReceiver.o \
