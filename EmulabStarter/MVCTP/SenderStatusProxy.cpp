@@ -141,10 +141,10 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 	ptr_sender->ResetBuffer();
 
 	// Initialize the memory buffer
-	uint num_ints = size / sizeof(uint);
 	uint* mem_store = (uint*)malloc(size);
+	uint num_ints = size / sizeof(uint);
 	for (uint i = 0; i < num_ints; i++) {
-		mem_store[i] = 1;
+		mem_store[i] = i;
 	}
 
 	TransferMessage msg;
