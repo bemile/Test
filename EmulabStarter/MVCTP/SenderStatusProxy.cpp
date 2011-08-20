@@ -147,10 +147,10 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 
 	// Initialize the memory buffer
 	uint* mem_store = (uint*)malloc(size);
-	uint num_ints = size / sizeof(uint);
-	for (uint i = 0; i < num_ints; i++) {
-		mem_store[i] = i;
-	}
+//	uint num_ints = size / sizeof(uint);
+//	for (uint i = 0; i < num_ints; i++) {
+//		mem_store[i] = i;
+//	}
 
 
 	//char buffer[MVCTP_DATA_LEN];
