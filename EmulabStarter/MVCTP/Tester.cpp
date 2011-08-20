@@ -139,9 +139,9 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 //	}
 //	this->SendMessage(INFORMATIONAL, "Memory data test passed!");
 
+	gettimeofday(&end_time, NULL);
 	free(mem_store);
 
-	gettimeofday(&end_time, NULL);
 	float trans_time = end_time.tv_sec - start_time.tv_sec +
 			(end_time.tv_usec - start_time.tv_usec) / 1000000.0 + 0.001;
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
