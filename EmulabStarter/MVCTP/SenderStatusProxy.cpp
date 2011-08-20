@@ -137,18 +137,25 @@ int SenderStatusProxy::HandleSendCommand(list<string>& slist) {
 // Transfer memory-to-memory data to all receivers
 // size: the size of data to transfer (in megabytes)
 int SenderStatusProxy::TransferMemoryData(int size) {
-	ptr_sender->ResetBuffer();
-
 	TransferMessage msg;
 	msg.msg_type = MEMORY_TRANSFER;
 	msg.data_len = size;
 	ptr_sender->RawSend((char*)&msg, sizeof(msg), true);
 
-	char buffer[MVCTP_DATA_LEN];
-	memset(buffer, 1, MVCTP_DATA_LEN);
+	//char buffer[MVCTP_DATA_LEN];
+	//memset(buffer, 1, MVCTP_DATA_LEN);
 
+	// Clear the send buffer
+	ptr_sender->ResetBuffer();
+	// Initialize the memory buffer
+	uint num_ints = size / sizeof(uint);
+	uint* mem_store = (uint*)malloc(size);
+	for (uint i = 0; i < num_ints; i++) {
+		mem_store[i] = i;
+	}
+
+	char* buffer = (char*)mem_store;
 	timeval last_time, cur_time;
-	long size_count = 0;
 	float time_diff;
 	gettimeofday(&last_time, NULL);
 
@@ -157,15 +164,16 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 		period = 1;
 
 	int send_count = 0;
-	int remained_size = size;
+	uint remained_size = size;
+	uint sent_size = 0;
 	while (remained_size > 0) {
 		int packet_size = remained_size > MVCTP_ETH_FRAME_LEN ? MVCTP_ETH_FRAME_LEN
 				: remained_size;
-		ptr_sender->RawSend(buffer, packet_size - MVCTP_HLEN - ETH_HLEN, true);
+		ptr_sender->RawSend(buffer + size - remained_size, packet_size - MVCTP_HLEN - ETH_HLEN, true);
 		remained_size -= packet_size;
 
 		// periodically calculate transfer speed
-		size_count += packet_size; //(packet_size + MVCTP_HLEN + ETH_HLEN);
+		sent_size += packet_size; //(packet_size + MVCTP_HLEN + ETH_HLEN);
 		send_count++;
 		if (send_count % period == 0) {
 			gettimeofday(&cur_time, NULL);
@@ -173,13 +181,15 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 					+ (cur_time.tv_usec - last_time.tv_usec) / 1000000.0 + 0.001;
 
 			last_time = cur_time;
-			float rate = size_count / time_diff / 1024.0 / 1024.0 * 8;
-			size_count = 0;
+			float rate = sent_size / time_diff / 1024.0 / 1024.0 * 8;
+			sent_size = 0;
 			char buf[100];
 			sprintf(buf, "Data sending rate: %3.2f Mbps", rate);
 			SendMessage(INFORMATIONAL, buf);
 		}
 	}
+
+	free(mem_store);
 	SendMessage(COMMAND_RESPONSE, "Memory data transfer completed.");
 	return 1;
 }

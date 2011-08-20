@@ -103,6 +103,8 @@ void Tester::HandleStringTransfer(TransferMessage& msg) {
 
 
 void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
+	char* mem_store = (char*)malloc(msg.data_len);
+
 	char buff[buff_size];
 	sockaddr_in from;
 	socklen_t socklen = sizeof(from);
@@ -117,7 +119,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	size_t total_bytes = 0;
 	while (remained_size > 0) {
 		int recv_size = remained_size > buff_size ? buff_size : remained_size;
-		if ((bytes = ptr_mvctp_receiver->RawReceive(buff, recv_size, 0,
+		if ((bytes = ptr_mvctp_receiver->RawReceive(/*buff*/mem_store + msg.data_len - remained_size, recv_size, 0,
 				(SA *) &from, &socklen)) < 0) {
 			SysError("Tester::HandleMemoryTransfer::RawReceive() error");
 		}
@@ -126,10 +128,21 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 		remained_size -= actual_size; //bytes;
 		total_bytes += actual_size;
 	}
+
+	uint num_ints = msg.data_len / sizeof(uint);
+	uint* ptr = (uint*)mem_store;
+	for (uint i = 0; i < num_ints; i++) {
+		if (ptr[i] != i) {
+			this->SendMessage(INFORMATIONAL, "Invalide data detected!");
+			break;
+		}
+	}
+
+	this->SendMessage(INFORMATIONAL, "Memory data test passed!");
+
 	gettimeofday(&end_time, NULL);
 	float trans_time = end_time.tv_sec - start_time.tv_sec +
 			(end_time.tv_usec - start_time.tv_usec) / 1000000.0 + 0.001;
-
 	sprintf(s, "Memory transfer finished. Total transfer time: %.2f", trans_time);
 	this->SendMessage(INFORMATIONAL, s);
 
