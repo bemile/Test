@@ -332,7 +332,7 @@ void ReceiveBufferMgr::StartNackRetransTimer() {
 	signal_action.sa_sigaction = ReceiveBufferMgr::RetransmitNackHandler;
 	sigemptyset(&signal_action.sa_mask);
 	signal_action.sa_flags = SA_SIGINFO; /* we want a siginfo_t */
-	if (sigaction(SIGPROF, &signal_action, 0)) {
+	if (sigaction(SIGALRM, &signal_action, 0)) {
 		SysError("ReceiveBufferMgr::StartNackRetransTimer()::sigaction()");
 	}
 
