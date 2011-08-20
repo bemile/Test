@@ -369,7 +369,6 @@ void ReceiveBufferMgr::RetransmitNackHandler(int cause, siginfo_t *si, void *uco
 }
 
 void ReceiveBufferMgr::DoRetransmitNacks() {
-	cout << "DoRetransmitNacks() called." << endl;
 	map<int32_t, NackMsgInfo>::iterator it;
 	clock_t max_rto = 400;
 	clock_t cur_time = clock();
