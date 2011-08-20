@@ -61,6 +61,9 @@ private:
 	void AddRetransmittedEntry(MVCTP_HEADER* header, void* buf);
 	static void* StartNackThread(void* ptr);
 	void NackRun();
+	void StartNackRetransTimer();
+	static void RetransmitNackHandler(int cause, siginfo_t *how_come, void *ucontext);
+	void DoRetransmitNacks();
 	void DeleteNackFromList(int32_t packet_id);
 	static void* StartUdpReceiveThread(void* ptr);
 	void UdpReceive();

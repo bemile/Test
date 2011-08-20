@@ -22,6 +22,7 @@
 #include <net/if.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <signal.h>
 #include <ctime>
 #include <iostream>
 #include <cstdio>

@@ -157,13 +157,13 @@ void ReceiveBufferMgr::StartReceiveThread() {
 		SysError("ReceiveBufferMgr:: pthread_create() error");
 	}
 
-	if ( (res= pthread_create(&nack_thread, NULL, &ReceiveBufferMgr::StartNackThread, this)) != 0) {
-		SysError("ReceiveBufferMgr:: pthread_create() error");
-	}
-
 	if ( (res= pthread_create(&udp_thread, NULL, &ReceiveBufferMgr::StartUdpReceiveThread, this)) != 0) {
 		SysError("ReceiveBufferMgr:: pthread_create() error");
 	}
+
+	//if ( (res= pthread_create(&nack_thread, NULL, &ReceiveBufferMgr::StartNackThread, this)) != 0) {
+	//		SysError("ReceiveBufferMgr:: pthread_create() error");
+	//}
 }
 
 // Helper function to start the multicast data receiving thread
@@ -327,6 +327,66 @@ void ReceiveBufferMgr::NackRun() {
 }
 
 
+void ReceiveBufferMgr::StartNackRetransTimer() {
+	/* Install our SIGPROF signal handler */
+	struct sigaction sa;
+	sa.sa_sigaction = ReceiveBufferMgr::RetransmitNackHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_SIGINFO; /* we want a siginfo_t */
+	if (sigaction(SIGPROF, &sa, 0)) {
+		SysError("ReceiveBufferMgr::StartNackRetransTimer()::sigaction()");
+	}
+
+	/* Request SIGPROF */
+	struct itimerval itimer;
+	itimer.it_interval.tv_sec = 0;
+	itimer.it_interval.tv_usec = 10 * 1000;
+	itimer.it_value.tv_sec = 0;
+	itimer.it_value.tv_usec = 10 * 1000;
+	setitimer(ITIMER_PROF, &itimer, NULL);
+}
+
+void ReceiveBufferMgr::RetransmitNackHandler(int cause, siginfo_t *si, void *ucontext) {
+	ReceiveBufferMgr* ptr = (ReceiveBufferMgr*)si->si_value.sival_ptr;
+	ptr->DoRetransmitNacks();
+}
+
+void ReceiveBufferMgr::DoRetransmitNacks() {
+	map<int32_t, NackMsgInfo>::iterator it;
+	clock_t max_rto = 400;
+	clock_t cur_time = clock();
+
+	NackMsg msg;
+	memset(&msg, 0, sizeof(msg));
+	msg.proto = MVCTP_PROTO_TYPE;
+
+	pthread_mutex_lock(&nack_list_mutex);
+	for (it = missing_packets.begin(); it != missing_packets.end(); it++) {
+		clock_t rto = it->second.num_retries * INIT_RTT * CLOCKS_PER_SEC / 1000;
+		if (rto > max_rto)
+			rto = max_rto;
+
+		if ((cur_time - it->second.time_stamp) > rto) {
+			//		&& it->second.num_retries < 20) {
+			msg.packet_ids[msg.num_missing_packets] = it->first;
+			msg.num_missing_packets++;
+			if (msg.num_missing_packets == MAX_NACK_IDS) {
+				SendNackMsg(msg);
+				msg.num_missing_packets = 0;
+			}
+
+			it->second.num_retries++;
+			it->second.time_stamp = cur_time;
+			//cout << "One NACK message sent." << endl;
+		}
+	}
+	pthread_mutex_unlock(&nack_list_mutex);
+
+	if (msg.num_missing_packets > 0) {
+		SendNackMsg(msg);
+	}
+}
+
 // Send a retransmission request to the sender
 int ReceiveBufferMgr::SendNackMsg(NackMsg& msg) {
 	return udp_comm->SendTo((void *)&msg, sizeof(msg), 0,
@@ -346,6 +406,8 @@ void ReceiveBufferMgr::UdpReceive() {
 	char buf[UDP_PACKET_LEN];
 	MVCTP_HEADER* header = (MVCTP_HEADER*) buf;
 	int bytes;
+
+	StartNackRetransTimer();
 
 	while (true) {
 		if ( (bytes = udp_comm->RecvFrom(buf, UDP_PACKET_LEN, 0, NULL, NULL)) <= 0) {
