@@ -116,20 +116,20 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	gettimeofday(&start_time, NULL);
 	int bytes = 0;
 	size_t remained_size = msg.data_len;
-	size_t total_bytes = 0;
+	size_t data_bytes = 0;
 	while (remained_size > 0) {
 		int recv_size = remained_size > buff_size ? buff_size : remained_size;
-		if ((bytes = ptr_mvctp_receiver->RawReceive(/*buff*/mem_store + msg.data_len - remained_size, recv_size, 0,
+		if ((bytes = ptr_mvctp_receiver->RawReceive(/*buff*/mem_store + data_bytes, recv_size, 0,
 				(SA *) &from, &socklen)) < 0) {
 			SysError("Tester::HandleMemoryTransfer::RawReceive() error");
 		}
 
 		int actual_size = bytes + MVCTP_HLEN + ETH_HLEN;
 		remained_size -= actual_size; //bytes;
-		total_bytes += actual_size;
+		data_bytes += bytes;
 	}
 
-	uint num_ints = msg.data_len / sizeof(uint);
+	uint num_ints = data_bytes / sizeof(uint);
 	uint* ptr = (uint*)mem_store;
 	for (uint i = 0; i < num_ints; i++) {
 		if (ptr[i] != i) {
@@ -138,6 +138,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 		}
 	}
 
+	free(mem_store);
 	this->SendMessage(INFORMATIONAL, "Memory data test passed!");
 
 	gettimeofday(&end_time, NULL);
@@ -155,7 +156,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	ptr_mvctp_receiver->ResetBuffer();
 
 	float retrans_rate = stats.num_retrans_packets * 1.0 / stats.num_received_packets;
-	float throughput = total_bytes * 8.0 / 1024.0 / 1024.0 / trans_time;
+	float throughput = msg.data_len * 8.0 / 1024.0 / 1024.0 / trans_time;
 	// Format:TransferBytes, Transfer Time (Sec), Throughput (Mbps), #Packets, #Retransmitted Packets, #Retransmission Rate
 	sprintf(s, "%d,%.2f,%.2f,%d,%d,%.4f\n", msg.data_len, trans_time, throughput, stats.num_received_packets,
 					stats.num_retrans_packets, retrans_rate);

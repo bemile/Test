@@ -165,15 +165,17 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 
 	int send_count = 0;
 	uint remained_size = size;
-	uint sent_size = 0;
+	uint period_sent_size = 0;
+	uint total_sent_data = 0;
 	while (remained_size > 0) {
 		int packet_size = remained_size > MVCTP_ETH_FRAME_LEN ? MVCTP_ETH_FRAME_LEN
 				: remained_size;
-		ptr_sender->RawSend(buffer + size - remained_size, packet_size - MVCTP_HLEN - ETH_HLEN, true);
+		ptr_sender->RawSend(buffer + total_sent_data, packet_size - MVCTP_HLEN - ETH_HLEN, true);
 		remained_size -= packet_size;
+		total_sent_data += packet_size - MVCTP_HLEN - ETH_HLEN;
 
 		// periodically calculate transfer speed
-		sent_size += packet_size; //(packet_size + MVCTP_HLEN + ETH_HLEN);
+		period_sent_size += packet_size; //(packet_size + MVCTP_HLEN + ETH_HLEN);
 		send_count++;
 		if (send_count % period == 0) {
 			gettimeofday(&cur_time, NULL);
@@ -181,8 +183,8 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 					+ (cur_time.tv_usec - last_time.tv_usec) / 1000000.0 + 0.001;
 
 			last_time = cur_time;
-			float rate = sent_size / time_diff / 1024.0 / 1024.0 * 8;
-			sent_size = 0;
+			float rate = period_sent_size / time_diff / 1024.0 / 1024.0 * 8;
+			period_sent_size = 0;
 			char buf[100];
 			sprintf(buf, "Data sending rate: %3.2f Mbps", rate);
 			SendMessage(INFORMATIONAL, buf);
