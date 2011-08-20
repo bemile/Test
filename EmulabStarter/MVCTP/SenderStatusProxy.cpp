@@ -146,17 +146,17 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 	ptr_sender->RawSend((char*)&msg, sizeof(msg), true);
 
 	// Initialize the memory buffer
-	uint* mem_store = (uint*)malloc(size);
+//	uint* mem_store = (uint*)malloc(size);
+//  char* buffer = (char*)mem_store;
 //	uint num_ints = size / sizeof(uint);
 //	for (uint i = 0; i < num_ints; i++) {
 //		mem_store[i] = i;
 //	}
 
 
-	//char buffer[MVCTP_DATA_LEN];
-	//memset(buffer, 1, MVCTP_DATA_LEN);
+	char buffer[MVCTP_DATA_LEN];
+	memset(buffer, 1, MVCTP_DATA_LEN);
 
-	char* buffer = (char*)mem_store;
 	timeval last_time, cur_time;
 	float time_diff;
 	gettimeofday(&last_time, NULL);
@@ -172,7 +172,7 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 	while (remained_size > 0) {
 		int packet_size = remained_size > MVCTP_ETH_FRAME_LEN ? MVCTP_ETH_FRAME_LEN
 				: remained_size;
-		ptr_sender->RawSend(buffer + total_sent_data, packet_size - MVCTP_HLEN - ETH_HLEN, true);
+		ptr_sender->RawSend(buffer /*+ total_sent_data*/, packet_size - MVCTP_HLEN - ETH_HLEN, true);
 		remained_size -= packet_size;
 		total_sent_data += packet_size - MVCTP_HLEN - ETH_HLEN;
 
@@ -193,7 +193,7 @@ int SenderStatusProxy::TransferMemoryData(int size) {
 		}
 	}
 
-	free(mem_store);
+	//free(mem_store);
 	SendMessage(COMMAND_RESPONSE, "Memory data transfer completed.");
 	return 1;
 }

@@ -103,7 +103,7 @@ void Tester::HandleStringTransfer(TransferMessage& msg) {
 
 
 void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
-	char* mem_store = (char*)malloc(msg.data_len);
+	//char* mem_store = (char*)malloc(msg.data_len);
 
 	char buff[buff_size];
 	sockaddr_in from;
@@ -119,7 +119,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 	size_t data_bytes = 0;
 	while (remained_size > 0) {
 		int recv_size = remained_size > buff_size ? buff_size : remained_size;
-		if ((bytes = ptr_mvctp_receiver->RawReceive(/*buff*/mem_store + data_bytes, recv_size, 0,
+		if ((bytes = ptr_mvctp_receiver->RawReceive(buff/*mem_store + data_bytes*/, recv_size, 0,
 				(SA *) &from, &socklen)) < 0) {
 			SysError("Tester::HandleMemoryTransfer::RawReceive() error");
 		}
@@ -140,7 +140,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 //	this->SendMessage(INFORMATIONAL, "Memory data test passed!");
 
 	gettimeofday(&end_time, NULL);
-	free(mem_store);
+	//free(mem_store);
 
 	float trans_time = end_time.tv_sec - start_time.tv_sec +
 			(end_time.tv_usec - start_time.tv_usec) / 1000000.0 + 0.001;
