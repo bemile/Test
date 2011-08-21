@@ -139,6 +139,9 @@ void StatusProxy::RunCommandExecThread() {
 
 
 void StatusProxy::ReconnectServer() {
+	if (errno == EINTR)
+		return;
+
 	close(sockfd);
 	is_connected = false;
 	ConnectServer();

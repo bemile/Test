@@ -153,7 +153,7 @@ int RawSocketComm::RecvData(void* buff, size_t len, int flags, SA* from, socklen
 	int bytes;
 	while (remained_len > 0) {
 		if ( (bytes = ReceiveFrame(recv_frame.frame_buffer)) < 0) {
-			return -1;
+			return bytes;
 		}
 
 		if (IsMyPacket()) {
