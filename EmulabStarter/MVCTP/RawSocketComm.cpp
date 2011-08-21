@@ -153,7 +153,7 @@ int RawSocketComm::RecvData(void* buff, size_t len, int flags, SA* from, socklen
 	int bytes;
 	while (remained_len > 0) {
 		if ( (bytes = ReceiveFrame(recv_frame.frame_buffer)) < 0) {
-			return received_bytes;
+			return -1;
 		}
 
 		if (IsMyPacket()) {
@@ -178,12 +178,7 @@ int RawSocketComm::RecvData(void* buff, size_t len, int flags, SA* from, socklen
 
 
 int RawSocketComm::ReceiveFrame(void* buffer) {
-	int bytes;
-	if ( (bytes = recvfrom(sock_fd, buffer, ETH_FRAME_LEN, 0, NULL, NULL)) < 0) {
-		SysError("RawSocketComm::recvfrom() error.");
-	}
-
-	return bytes;
+	return recvfrom(sock_fd, buffer, ETH_FRAME_LEN, 0, NULL, NULL);
 }
 
 

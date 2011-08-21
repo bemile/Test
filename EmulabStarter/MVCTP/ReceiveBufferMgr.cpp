@@ -184,7 +184,10 @@ void ReceiveBufferMgr::Run() {
 
 	while (true) {
 		if ( (bytes = comm->RecvData(buf, ETH_DATA_LEN, 0, (SA*)&sender_multicast_addr, &sender_socklen)) <= 0) {
-			SysError("MVCTPBuffer error on receiving data");
+			if (errno == EINTR)
+				continue;
+			else
+				SysError("MVCTPBuffer error on receiving data");
 		}
 		//cout << "I received one packet. Packet length: " << bytes << endl;
 
@@ -428,7 +431,10 @@ void ReceiveBufferMgr::UdpReceive() {
 
 	while (true) {
 		if ( (bytes = udp_comm->RecvFrom(buf, UDP_PACKET_LEN, 0, NULL, NULL)) <= 0) {
-			SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
+			if (errno == EINTR)
+				continue;
+			else
+				SysError("ReceiveBufferMgr::UdpReceive()::RecvData() error");
 		}
 
 		Log("%.6f    One retransmission packet received. Packet ID: %d\n", GetCurrentTime(), header->packet_id);
