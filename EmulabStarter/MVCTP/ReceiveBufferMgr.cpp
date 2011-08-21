@@ -353,9 +353,9 @@ void ReceiveBufferMgr::StartNackRetransTimer() {
 
 	/* Request SIGPROF */
 	timer_specs.it_interval.tv_sec = 0;
-	timer_specs.it_interval.tv_nsec = 10 * 1000 * 1000;
+	timer_specs.it_interval.tv_nsec = 5 * 1000 * 1000;
 	timer_specs.it_value.tv_sec = 0;
-	timer_specs.it_value.tv_nsec = 10 * 1000 * 1000;
+	timer_specs.it_value.tv_nsec = 5 * 1000 * 1000;
 	//setitimer(SIGALRM, &timer_specs, NULL);
 
 	if (timer_settime(timer_id, 0, &timer_specs, NULL) == -1) {

@@ -124,7 +124,7 @@ void Tester::HandleMemoryTransfer(TransferMessage& msg, size_t buff_size) {
 			SysError("Tester::HandleMemoryTransfer::RawReceive() error");
 		}
 
-		int actual_size = bytes + MVCTP_HLEN + ETH_HLEN;
+		int actual_size = bytes > 0 ? bytes + MVCTP_HLEN + ETH_HLEN : 0;
 		remained_size -= actual_size; //bytes;
 		data_bytes += bytes;
 	}
